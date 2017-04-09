@@ -1,0 +1,6 @@
+*.iml
+.idea
+target
+src/main/resources/tuples/*
+src/main/resources/fawiki_extracted.txt
+src/main/resources/fawiki_temp.txt
