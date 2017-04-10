@@ -14,6 +14,7 @@ public class SharedResources {
     public static final Path tuplesPath = ConfigReader.INSTANCE.getPath("tuples.folder", "~/.pkg/data/tuples");
     public static final Path rawTextPath = ConfigReader.INSTANCE.getPath("raw.text.file", "~/.pkg/data/raw.txt");
     public static final Path corpusPath = ConfigReader.INSTANCE.getPath("corpus.file", "~/.pkg/data/corpus.txt");
+    public static final Path bagOfWordsModelPath = ConfigReader.INSTANCE.getPath("bagOfWords.model", "~/.pkg/data/bagOfWords");
 
     public static String rawText = "";
     public static List<String> rawTextLines = new ArrayList<String>();

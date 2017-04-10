@@ -29,10 +29,10 @@ public class Test {
         //RawTextHandler.loadRawText();
         //RawTextHandler.buildCorpus();
         //RawTextHandler.saveCorpus();
-        /*RawTextHandler.loadCorpus();
+        //RawTextHandler.loadCorpus();
 
 
-        final Path directory = ConfigReader.INSTANCE.getPath("tuples.folder", "~/.pkg/data/tuples");
+        /*final Path directory = ConfigReader.INSTANCE.getPath("tuples.folder", "~/.pkg/data/tuples");
 
         LanguageChecker.INSTANCE.isEnglish("Test");
         final List<Path> files = PathWalker.INSTANCE.getPath(directory, new Regex("\\d-infoboxes.json"));
@@ -52,8 +52,11 @@ public class Test {
         dbHandler.addToPatternTable(pattern);*/
 
         CorpusDbHandler corpusDbHandler  = new CorpusDbHandler();
+        //corpusDbHandler.createCorpusTable();
         corpusDbHandler.loadCorpusTable();
         BagOfWordsModel bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false);
+
+
         int tempp = 0;
     }
 }

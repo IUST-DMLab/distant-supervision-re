@@ -17,4 +17,11 @@ public class Constants {
         public static final String OBJECT_ENTITY_TYPE = "object_entity_type";
         public static final String SUBJECT_ENTITY_TYPE = "subject_entity_type";
     }
+
+    public static class BAGOFWORDS_ATTRIBS{
+        public static final String TF = "tf";
+        public static final String IDF = "idf";
+        public static final String TF_IDF = "tf_idf";
+        public static final String TOKEN = "token";
+    }
 }

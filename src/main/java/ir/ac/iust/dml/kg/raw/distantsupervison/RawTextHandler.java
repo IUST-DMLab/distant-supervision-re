@@ -24,11 +24,14 @@ public class RawTextHandler {
     public static void loadRawText(){
         Scanner reader;
         try {
-            reader = new Scanner(new FileInputStream(rawTextPath));
+            int numberOfLines = 0;
+            reader = new Scanner(new FileInputStream(rawTextPath.toString()));
             while (reader.hasNextLine()){
                 String line = reader.nextLine();
                 rawText += line;
                 rawTextLines.add(line);
+                numberOfLines++;
+                System.out.println(numberOfLines);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -52,7 +55,8 @@ public class RawTextHandler {
     public static void saveCorpus(){
         JsonWriter writer;
         try {
-            writer = new JsonWriter(new FileWriter(corpusPath));
+            System.out.print(corpusPath.toString());
+            writer = new JsonWriter(new FileWriter(corpusPath.toString()));
             List<Sentence> sentenceList = corpus.getSentences();
             writer.beginArray();
             for (Sentence sentence:
@@ -79,7 +83,7 @@ public class RawTextHandler {
 
     public static void loadCorpus() {
         try {
-            JsonReader reader = new JsonReader(new FileReader(corpusPath));
+            JsonReader reader = new JsonReader(new FileReader(corpusPath.toString()));
             reader.beginArray();
             corpus = new Corpus();
             while(reader.hasNext()) {
