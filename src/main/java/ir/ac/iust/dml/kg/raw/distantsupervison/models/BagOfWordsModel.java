@@ -28,9 +28,10 @@ public class BagOfWordsModel {
     private List<String> sortedByTf = new ArrayList<>();
 
 
-    public BagOfWordsModel(List<Sentence> corpusOfBOW, Boolean doLemmatize){
+    public BagOfWordsModel(List<Sentence> corpusOfBOW, Boolean doLemmatize, int maximumNoOfVocabulary){
         this.doLemmatize = doLemmatize;
         this.numberOfSentences = corpusOfBOW.size();
+        this.maximumNoOfVocabulary = maximumNoOfVocabulary;
         if (!doLemmatize){
             extractVocabulary(corpusOfBOW);
         }

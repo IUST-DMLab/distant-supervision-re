@@ -1,15 +1,21 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import de.bwaldvogel.liblinear.*;
+import ir.ac.iust.dml.kg.raw.distantsupervison.Corpus;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Sentence;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.CorpusDbHandler;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
+import static ir.ac.iust.dml.kg.raw.distantsupervison.RawTextHandler.stringToList;
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
+import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpusPath;
 
 /**
  * Created by hemmatan on 4/10/2017.
@@ -17,11 +23,68 @@ import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
 public class Classifier {
 
     @Test
+    public void test2(){
+        CorpusDbHandler corpusDbHandler  = new CorpusDbHandler();
+        corpusDbHandler.createCorpusTable();
+        //corpusDbHandler.loadCorpusTable();
+        //BagOfWordsModel bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false);
+    }
+
+
+    @Test
+    public void test3(){
+        CorpusDbHandler corpusDbHandler  = new CorpusDbHandler();
+        //corpusDbHandler.createCorpusTable();
+        corpusDbHandler.loadCorpusTable();
+        BagOfWordsModel bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false, 5000);
+
+    }
+
+    @Test
+    public void loadCorpusJason(){
+        String tempCorpusJasonPath = "Corpus.json";
+        try {
+            JsonReader reader = new JsonReader(new FileReader(tempCorpusJasonPath));
+            reader.beginArray();
+            int cnt = 0;
+            JsonToken nextToken = reader.peek();
+            while(reader.hasNext() && cnt<=3) {
+                if (JsonToken.BEGIN_OBJECT.equals(nextToken)){
+                    reader.beginObject();
+                    String name = reader.nextName();
+                    String subject = reader.nextString();
+                    name = reader.nextName();
+                    String object = reader.nextString();
+                    name = reader.nextName();
+                    String predicate = reader.nextString();
+                    name = reader.nextName();
+                    reader.beginObject();
+                    JsonToken nextToken2 = reader.peek();
+                    while (!JsonToken.END_OBJECT.equals(nextToken2)){
+                        String n = reader.nextName();
+                        String occur = reader.nextString();
+                        nextToken2 = reader.peek();
+                    }
+                    reader.endObject();
+                    reader.endObject();
+                    nextToken = reader.peek();
+                    cnt++;
+                }
+            }
+            //reader.endArray();
+            reader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
     public void test(){
         CorpusDbHandler corpusDbHandler  = new CorpusDbHandler();
         //corpusDbHandler.createCorpusTable();
         corpusDbHandler.loadCorpusTable();
-        BagOfWordsModel bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false);
+        BagOfWordsModel bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false, 10000);
 
         Sentence tavallod1 = new Sentence("قلی در ایران چشم به جهان گشود.");
         Sentence tavallod2 = new Sentence("گلی در سمنان چشم به جهان باز کرد.");

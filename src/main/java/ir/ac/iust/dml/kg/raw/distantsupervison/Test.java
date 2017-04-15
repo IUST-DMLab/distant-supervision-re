@@ -54,7 +54,7 @@ public class Test {
         CorpusDbHandler corpusDbHandler  = new CorpusDbHandler();
         //corpusDbHandler.createCorpusTable();
         corpusDbHandler.loadCorpusTable();
-        BagOfWordsModel bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false);
+        BagOfWordsModel bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false, 10000);
 
 
         int tempp = 0;

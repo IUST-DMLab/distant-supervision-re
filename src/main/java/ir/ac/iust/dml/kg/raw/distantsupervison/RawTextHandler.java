@@ -26,7 +26,7 @@ public class RawTextHandler {
         try {
             int numberOfLines = 0;
             reader = new Scanner(new FileInputStream(rawTextPath.toString()));
-            while (reader.hasNextLine()){
+            while (reader.hasNextLine() && numberOfLines<=50000){
                 String line = reader.nextLine();
                 rawText += line;
                 rawTextLines.add(line);

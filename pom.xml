@@ -80,5 +80,6 @@
             <artifactId>liblinear</artifactId>
             <version>1.95</version>
         </dependency>
+        <!--dl4j-->
     </dependencies>
 </project>
