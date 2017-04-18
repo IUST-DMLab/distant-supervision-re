@@ -1,25 +1,9 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
-import com.google.gson.internal.bind.JsonTreeReader;
-import ir.ac.iust.dml.kg.raw.distantsupervison.database.CorpusDbHandler;
-import ir.ac.iust.dml.kg.raw.distantsupervison.database.PatternsDbHandler;
+import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.BagOfWordsModel;
-import ir.ac.iust.dml.kg.raw.utils.ConfigReader;
-import ir.ac.iust.dml.kg.raw.utils.LanguageChecker;
-import ir.ac.iust.dml.kg.raw.utils.PathWalker;
-import ir.ac.iust.dml.kg.raw.utils.dump.triple.TripleData;
-import ir.ac.iust.dml.kg.raw.utils.dump.triple.TripleJsonFileReader;
-import kotlin.text.Regex;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
-import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.tripleDataList;
 
 /**
  * Created by hemmatan on 4/4/2017.
@@ -51,9 +35,9 @@ public class Test {
         PatternsDbHandler dbHandler = new PatternsDbHandler();
         dbHandler.addToPatternTable(pattern);*/
 
-        CorpusDbHandler corpusDbHandler  = new CorpusDbHandler();
-        //corpusDbHandler.createCorpusTable();
-        corpusDbHandler.loadCorpusTable();
+        SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
+        //sentenceDbHandler.createCorpusTableFromWikiDump();
+        sentenceDbHandler.loadCorpusTable();
         BagOfWordsModel bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false, 10000);
 
 

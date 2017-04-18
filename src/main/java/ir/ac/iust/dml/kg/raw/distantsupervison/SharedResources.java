@@ -19,6 +19,7 @@ public class SharedResources {
     public static String rawText = "";
     public static List<String> rawTextLines = new ArrayList<String>();
     public static Corpus corpus = new Corpus();
+    public static CorpusDB corpusDB = new CorpusDB();
     public static List<TripleData> tripleDataList = new ArrayList<TripleData>();
 
 }

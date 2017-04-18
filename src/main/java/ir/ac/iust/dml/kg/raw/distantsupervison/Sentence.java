@@ -1,6 +1,7 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import edu.stanford.nlp.ling.TaggedWord;
+import ir.ac.iust.dml.kg.raw.Normalizer;
 import ir.ac.iust.dml.kg.raw.POSTagger;
 import ir.ac.iust.dml.kg.raw.WordTokenizer;
 
@@ -12,10 +13,11 @@ import java.util.List;
  */
 public class Sentence {
     private String raw;
+    private String normalized;
     private List<String> words;
     private List<String> posTagged;
 
-    public Sentence(){
+    public Sentence() {
         raw = "";
         words = new ArrayList<String>();
         posTagged = new ArrayList<String>();
@@ -24,22 +26,37 @@ public class Sentence {
 
     public Sentence(String raw) {
         this.raw = raw;
+        this.normalized = Normalizer.normalize(raw);
         this.words = WordTokenizer.tokenizeRaw(raw).get(0);
         this.posTagged = new ArrayList<String>();
         List<TaggedWord> taggedWords = POSTagger.tag(this.words);
         System.out.print(taggedWords.toString());
-        for (TaggedWord taggedWord:
-             taggedWords) {
+        for (TaggedWord taggedWord :
+                taggedWords) {
             this.posTagged.add(taggedWord.tag());
         }
     }
 
-    public Sentence(String raw, List<String> words, List<String> posTagged){
+    public Sentence(String raw, List<String> words, List<String> posTagged) {
         this.raw = raw;
         this.words = words;
         this.posTagged = posTagged;
     }
 
+    public Sentence(String raw, List<String> words, List<String> posTagged, String normalized) {
+        this.raw = raw;
+        this.words = words;
+        this.posTagged = posTagged;
+        this.normalized = normalized;
+    }
+
+    public String getNormalized() {
+        return normalized;
+    }
+
+    public void setNormalized(String normalized) {
+        this.normalized = normalized;
+    }
 
     public String getRaw() {
         return raw;

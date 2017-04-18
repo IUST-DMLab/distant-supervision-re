@@ -27,6 +27,8 @@ public class BagOfWordsModel {
     private HashMap<String, Integer> indices = new HashMap<>();
     private List<String> sortedByTf = new ArrayList<>();
 
+    public BagOfWordsModel() {
+    }
 
     public BagOfWordsModel(List<Sentence> corpusOfBOW, Boolean doLemmatize, int maximumNoOfVocabulary){
         this.doLemmatize = doLemmatize;
@@ -59,7 +61,7 @@ public class BagOfWordsModel {
             for (String word:
                     uniqueWords) {
                 if (!df.containsKey(word))
-                    df.put(word, 1.0);
+                    df.put(word, 2.0);
                 else
                     df.put(word, df.get(word)+1);
             }
@@ -105,7 +107,9 @@ public class BagOfWordsModel {
         }
         for (String queryWord:
              queryWords) {
-            tf_idf.put(queryWord, tf.get(queryWord)*idf.get(queryWord));
+            if (idf.containsKey(queryWord))
+                tf_idf.put(queryWord, tf.get(queryWord)*idf.get(queryWord));
+            else tf_idf.put(queryWord,log10(this.numberOfSentences));
         }
         return tf_idf;
     }

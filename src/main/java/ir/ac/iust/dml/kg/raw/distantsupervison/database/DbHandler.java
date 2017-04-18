@@ -22,7 +22,9 @@ public class DbHandler {
     protected static final int port = 27017;
     protected static final String distantSupervisionDBName = "DistantSupervision";
     protected static final String patternsTableName = "patterns";
-    protected static final String corpusTableName = "sentences";
+    protected static final String sentencesTableName = "sentences";
+    protected static final String corpusTableName = "corpus";
+
 
 
     public List<String> convertBasicDBListToJavaListOfStrings(BasicDBList basicDBList){

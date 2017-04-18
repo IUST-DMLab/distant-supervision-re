@@ -4,8 +4,10 @@ package ir.ac.iust.dml.kg.raw.distantsupervison;
  * Created by hemmatan on 4/5/2017.
  */
 public class Constants {
+
     public static class SENTENCE_ATTRIBS{
         public static final String RAW = "raw";
+        public static final String NORMALIZED = "normalized";
         public static final String WORDS = "words";
         public static final String POSTAG = "postag";
     }
@@ -23,5 +25,13 @@ public class Constants {
         public static final String IDF = "idf";
         public static final String TF_IDF = "tf_idf";
         public static final String TOKEN = "token";
+    }
+
+    public static class CORPUS_DB_ENTRY_ATTRIBS{
+        public static final String GENERALIZED_SENTENCE = "generalized_sentence";
+        public static final String OCCURRENCE = "occurrence";
+        public static final String SUBJECT = "subject";
+        public static final String OBJECT = "object";
+        public static final String PREDICATE = "predicate";
     }
 }
