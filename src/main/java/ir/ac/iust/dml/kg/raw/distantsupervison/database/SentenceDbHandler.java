@@ -17,7 +17,7 @@ public class SentenceDbHandler extends DbHandler {
 
     public void createCorpusTableFromWikiDump() {
         MongoClient mongo = null;
-        try {
+
             mongo = new MongoClient(host, port);
             DB distantSupervisionDB = mongo.getDB(distantSupervisionDBName);
 
@@ -38,14 +38,12 @@ public class SentenceDbHandler extends DbHandler {
                 corpusTable.insert(dbSentence);
             }
 
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+
     }
 
     public void loadCorpusTable(){
         MongoClient mongo = null;
-        try {
+
             mongo = new MongoClient(host, port);
             DB distantSupervisionDB = mongo.getDB(distantSupervisionDBName);
 
@@ -66,8 +64,6 @@ public class SentenceDbHandler extends DbHandler {
                 corpus.addSentence(currentSentence);
             }
 
-        } catch (UnknownHostException e){
-            e.printStackTrace();
-        }
+
     }
 }

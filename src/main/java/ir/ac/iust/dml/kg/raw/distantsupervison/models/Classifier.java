@@ -34,6 +34,14 @@ public class Classifier {
 
 
     @Test
+    public void dbTest(){
+        CorpusDbHandler corpusDbHandler = new CorpusDbHandler();
+        corpusDbHandler.load(1000);
+        corpusDB.shuffle();
+        corpusDbHandler.test();
+    }
+
+    @Test
     public void test3(){
         SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
         //sentenceDbHandler.createCorpusTableFromWikiDump();
@@ -44,7 +52,7 @@ public class Classifier {
         corpusDbHandler.load(10000);
         corpusDB.shuffle();
 
-        Problem problem = new Problem();
+       /* Problem problem = new Problem();
         problem.l =  10000; // number of training examples
         problem.n =  bagOfWordsModel.getMaximumNoOfVocabulary();// number of features
 
@@ -62,20 +70,26 @@ public class Classifier {
 
         SolverType solver = SolverType.L2R_LR; // -s 0
         double C = 1.0;    // cost of constraints violation
-        double eps = 0.01; // stopping criteria
+        double eps = 1; // stopping criteria
 
-        Parameter parameter = new Parameter(solver, C, eps);
-        Model model = Linear.train(problem, parameter);
+        Parameter parameter = new Parameter(solver, C, eps);*/
         File modelFile = new File("temptestmodel");
+        Model model = null;//Linear.train(problem, parameter);
         try {
+            model = Linear.loadModel(modelFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /*try {
             model.save(modelFile);
             // load model or use it directly
             model = Model.load(modelFile);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
-        Sentence test = new Sentence("او در تهران چشم از جهان فرو بست.");
+        Sentence test = new Sentence("بویینگ نوعی هواپیما است");
 
         Feature[] instance = bagOfWordsModel.createBowLibLinearFeatureNodeForQuery(test.getWords());
         double prediction = Linear.predict(model, instance);

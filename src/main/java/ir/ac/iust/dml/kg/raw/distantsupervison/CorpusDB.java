@@ -11,9 +11,9 @@ import java.util.List;
 public class CorpusDB {
     private List<CorpusEntryObject> entries;
     private List<CorpusEntryObject> shuffledEntries;
-    private HashMap<String, Integer> indices = new HashMap<>();
-    private HashMap<Integer, String> invertedIndices = new HashMap<>();
-    private int numberOfClasses = 0;
+    private HashMap<String, Double> indices = new HashMap<>();
+    private HashMap<Double, String> invertedIndices = new HashMap<>();
+    private Double numberOfClasses = 0.0;
 
     public CorpusDB() {
         this.entries = new ArrayList<>();
@@ -25,27 +25,27 @@ public class CorpusDB {
         index();
     }
 
-    public HashMap<String, Integer> getIndices() {
+    public HashMap<String, Double> getIndices() {
         return indices;
     }
 
-    public void setIndices(HashMap<String, Integer> indices) {
+    public void setIndices(HashMap<String, Double> indices) {
         this.indices = indices;
     }
 
-    public HashMap<Integer, String> getInvertedIndices() {
+    public HashMap<Double, String> getInvertedIndices() {
         return invertedIndices;
     }
 
-    public void setInvertedIndices(HashMap<Integer, String> invertedIndices) {
+    public void setInvertedIndices(HashMap<Double, String> invertedIndices) {
         this.invertedIndices = invertedIndices;
     }
 
-    public int getNumberOfClasses() {
+    public Double getNumberOfClasses() {
         return numberOfClasses;
     }
 
-    public void setNumberOfClasses(int numberOfClasses) {
+    public void setNumberOfClasses(Double numberOfClasses) {
         this.numberOfClasses = numberOfClasses;
     }
 

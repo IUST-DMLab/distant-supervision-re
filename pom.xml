@@ -68,12 +68,7 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
         </dependency>
-        <!--mongojavadriver-->
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>2.10.1</version>
-        </dependency>
+
         <!--liblinear-->
         <dependency>
             <groupId>de.bwaldvogel</groupId>
@@ -81,5 +76,19 @@
             <version>1.95</version>
         </dependency>
         <!--dl4j-->
+        <!--bson-->
+        <!-- https://mvnrepository.com/artifact/org.mongodb/bson -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>bson</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.4.1</version>
+        </dependency>
+
+
     </dependencies>
 </project>

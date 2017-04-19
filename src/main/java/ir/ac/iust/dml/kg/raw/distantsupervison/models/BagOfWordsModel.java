@@ -16,6 +16,7 @@ public class BagOfWordsModel {
 
     private List<Sentence> corpusOfBOW = new ArrayList<>();
     private Set<String> vocabularySet = new HashSet<>();
+    private List<Set<String >> sentencesUniqueWords = new ArrayList<>();
     private int vocabularySize;
     private int maximumNoOfVocabulary = 1000;
     private double numberOfSentences;
@@ -45,12 +46,12 @@ public class BagOfWordsModel {
         for (Sentence sentence:
              corpusOfBOW) {
             List<String> words = sentence.getWords();
-            Set<String> uniqueWords = new HashSet<>();
+            Set<String> currentSentenceUniqueWords = new HashSet<>();
 
             for (String queryWord:
                  words) {
                 vocabularySet.add(queryWord);
-                uniqueWords.add(queryWord);
+                currentSentenceUniqueWords.add(queryWord);
                 if (!tfInCorpus.containsKey(queryWord)) {
                     tfInCorpus.put(queryWord, 1.0);
                 }
@@ -59,7 +60,7 @@ public class BagOfWordsModel {
             }
 
             for (String word:
-                    uniqueWords) {
+                    currentSentenceUniqueWords) {
                 if (!df.containsKey(word))
                     df.put(word, 2.0);
                 else
@@ -138,7 +139,7 @@ public class BagOfWordsModel {
     }
 
     public void saveModel(){
-        try (Writer fileWriter = new FileWriter("C:\\Users\\hemmatan\\Desktop\\KG\\distant-supervision-re\\src\\main\\java\\ir\\ac\\iust\\dml\\kg\\raw\\distantsupervison\\models\\bagOfWords")) {
+        try (Writer fileWriter = new FileWriter("bagOfWords.model")) {
             for (String token:
                     this.sortedByTf) {
                 fileWriter.write(token+"\t");
@@ -154,7 +155,7 @@ public class BagOfWordsModel {
 
     public void loadModel(){
         int currentIndex = 0;
-        try (Scanner scanner = new Scanner(new FileInputStream(bagOfWordsModelPath.toString()))) {
+        try (Scanner scanner = new Scanner(new FileInputStream("bagOfWords.model"))) {
             while (scanner.hasNextLine()){
                 String line = scanner.nextLine();
                 String[] tokens = line.split("\t");

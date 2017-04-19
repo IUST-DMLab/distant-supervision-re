@@ -16,7 +16,6 @@ public class PatternsDbHandler extends DbHandler {
 
     public void addToPatternTable(Pattern pattern) {
         MongoClient mongo = null;
-        try {
             mongo = new MongoClient(host, port);
             DB distantSupervisionDB = mongo.getDB(distantSupervisionDBName);
 
@@ -32,9 +31,7 @@ public class PatternsDbHandler extends DbHandler {
 
             patternTable.insert(dbPattern);
 
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+
     }
 
 
