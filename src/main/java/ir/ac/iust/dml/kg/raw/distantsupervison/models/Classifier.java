@@ -1,18 +1,15 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
 import de.bwaldvogel.liblinear.*;
-import ir.ac.iust.dml.kg.raw.Normalizer;
 import ir.ac.iust.dml.kg.raw.WordTokenizer;
 import ir.ac.iust.dml.kg.raw.distantsupervison.CorpusEntryObject;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Sentence;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.CorpusDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
+import org.apache.commons.lang.ObjectUtils;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
@@ -36,24 +33,24 @@ public class Classifier {
     @Test
     public void dbTest(){
         CorpusDbHandler corpusDbHandler = new CorpusDbHandler();
-        corpusDbHandler.load(1000);
+        corpusDbHandler.loadByMostFrequentPredicates(corpusDB, 1000);
         corpusDB.shuffle();
-        corpusDbHandler.test();
+        //corpusDbHandler.test();
     }
 
     @Test
-    public void test3(){
+    public void train(){
         SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
         //sentenceDbHandler.createCorpusTableFromWikiDump();
         sentenceDbHandler.loadCorpusTable();
         BagOfWordsModel bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false, 5000);
 
         CorpusDbHandler corpusDbHandler = new CorpusDbHandler();
-        corpusDbHandler.load(10000);
+        corpusDbHandler.loadByMostFrequentPredicates(corpusDB, 1000);
         corpusDB.shuffle();
 
-       /* Problem problem = new Problem();
-        problem.l =  10000; // number of training examples
+       Problem problem = new Problem();
+        problem.l =  1000; // number of training examples
         problem.n =  bagOfWordsModel.getMaximumNoOfVocabulary();// number of features
 
         FeatureNode[][] featureNodes = new FeatureNode[problem.l][];
@@ -72,10 +69,11 @@ public class Classifier {
         double C = 1.0;    // cost of constraints violation
         double eps = 1; // stopping criteria
 
-        Parameter parameter = new Parameter(solver, C, eps);*/
-        File modelFile = new File("temptestmodel");
+        Parameter parameter = new Parameter(solver, C, eps);
+
+        File modelFile = new File("temptestmodel2");
         Model model = null;//Linear.train(problem, parameter);
-        try {
+       try {
             model = Linear.loadModel(modelFile);
         } catch (IOException e) {
             e.printStackTrace();
@@ -89,12 +87,12 @@ public class Classifier {
             e.printStackTrace();
         }*/
 
-        Sentence test = new Sentence("بویینگ نوعی هواپیما است");
+        Sentence test = new Sentence("$SUBJ، به آلمانی $OBJ");
 
         Feature[] instance = bagOfWordsModel.createBowLibLinearFeatureNodeForQuery(test.getWords());
         double prediction = Linear.predict(model, instance);
 
-        System.out.println("\n"+corpusDB.getInvertedIndices().get(prediction));
+        System.out.println("\n"+ corpusDB.getInvertedIndices().get(prediction));
     }
 
 
