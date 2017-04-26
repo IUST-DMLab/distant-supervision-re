@@ -11,6 +11,7 @@ import java.util.List;
 public class CorpusDB {
     private List<CorpusEntryObject> entries;
     private List<CorpusEntryObject> shuffledEntries;
+    private HashMap<String, Double> predicateCounts = new HashMap<>();
     private HashMap<String, Double> indices = new HashMap<>();
     private HashMap<Double, String> invertedIndices = new HashMap<>();
     private Double numberOfClasses = 0.0;
@@ -57,12 +58,20 @@ public class CorpusDB {
         this.shuffledEntries = shuffledEntries;
     }
 
+    public HashMap<String, Double> getPredicateCounts() { return predicateCounts; }
+
+    public void setPredicateCounts(HashMap<String, Double> predicateCounts) { this.predicateCounts = predicateCounts; }
+
     public void addEntry(CorpusEntryObject corpusEntryObject) {
         this.entries.add(corpusEntryObject);
         if (!indices.containsKey(corpusEntryObject.getPredicate())) {
             indices.put(corpusEntryObject.getPredicate(), ++numberOfClasses);
             invertedIndices.put(numberOfClasses, corpusEntryObject.getPredicate());
+            predicateCounts.put(corpusEntryObject.getPredicate(), 1.0);
         }
+        else
+            predicateCounts.put(corpusEntryObject.getPredicate(),
+                    predicateCounts.get(corpusEntryObject.getPredicate())+1);
     }
 
     public List<CorpusEntryObject> getEntries() {

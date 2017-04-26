@@ -1,6 +1,7 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
 import de.bwaldvogel.liblinear.FeatureNode;
+import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Sentence;
 
 import java.io.*;
@@ -18,7 +19,7 @@ public class BagOfWordsModel {
     private Set<String> vocabularySet = new HashSet<>();
     private List<Set<String >> sentencesUniqueWords = new ArrayList<>();
     private int vocabularySize;
-    private int maximumNoOfVocabulary = 1000;
+    private int maximumNoOfVocabulary = Configuration.maximumNoOfVocabularyForBagOfWords;
     private double numberOfSentences;
     private HashMap<String, Double> idf = new HashMap<>();
     private HashMap<String, Double> tfInCorpus = new HashMap<>();

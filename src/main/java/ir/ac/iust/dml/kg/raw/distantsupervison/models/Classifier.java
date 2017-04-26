@@ -1,17 +1,17 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
 import de.bwaldvogel.liblinear.*;
-import ir.ac.iust.dml.kg.raw.WordTokenizer;
+import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
 import ir.ac.iust.dml.kg.raw.distantsupervison.CorpusEntryObject;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Sentence;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.CorpusDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
-import org.apache.commons.lang.ObjectUtils;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpusDB;
@@ -21,47 +21,76 @@ import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpusDB;
  */
 public class Classifier {
 
-    @Test
-    public void test2(){
-        SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
-        sentenceDbHandler.createCorpusTableFromWikiDump();
-        //sentenceDbHandler.loadCorpusTable();
-        //BagOfWordsModel bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false);
+    private String modelFilePath = "tempTestModel";
+    private String testDataFile = "testData.txt";
+    private BagOfWordsModel bagOfWordsModel;
+    private List<CorpusEntryObject> trainData = new ArrayList<>();
+    private List<CorpusEntryObject> testData = new ArrayList<>();
+
+    public Classifier(){
+        int defaultMaximumNoOfVocabularyForBOW = Configuration.maximumNoOfVocabularyForBagOfWords;
+        bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false, defaultMaximumNoOfVocabularyForBOW);
     }
 
-
-    @Test
-    public void dbTest(){
-        CorpusDbHandler corpusDbHandler = new CorpusDbHandler();
-        corpusDbHandler.loadByMostFrequentPredicates(corpusDB, 1000);
-        corpusDB.shuffle();
-        //corpusDbHandler.test();
+    public Classifier(int maximumNoOfVocabularyForBOW){
+        bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false, maximumNoOfVocabularyForBOW);
     }
 
-    @Test
-    public void train(){
+    public Classifier(String modelFilePath, BagOfWordsModel bagOfWordsModel) {
+        this.modelFilePath = modelFilePath;
+        this.bagOfWordsModel = bagOfWordsModel;
+    }
+
+    public Classifier(boolean createBagOfWordsModel, int maximumNoOfVocabularyForBOW) {
+        if (createBagOfWordsModel)
+            bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false, maximumNoOfVocabularyForBOW);
+        else{
+            bagOfWordsModel = new BagOfWordsModel();
+            bagOfWordsModel.loadModel();
+        }
+    }
+
+    public String getModelFilePath() {
+        return modelFilePath;
+    }
+
+    public void setModelFilePath(String modelFilePath) {
+        this.modelFilePath = modelFilePath;
+    }
+
+    public BagOfWordsModel getBagOfWordsModel() {
+        return bagOfWordsModel;
+    }
+
+    public void setBagOfWordsModel(BagOfWordsModel bagOfWordsModel) {
+        this.bagOfWordsModel = bagOfWordsModel;
+    }
+
+    public void train(int numberOfTrainingExamples, int numberOfTestExamples){
+        int totalNoOfData = numberOfTestExamples + numberOfTrainingExamples;
         SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
-        //sentenceDbHandler.createCorpusTableFromWikiDump();
         sentenceDbHandler.loadCorpusTable();
-        BagOfWordsModel bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false, 5000);
 
         CorpusDbHandler corpusDbHandler = new CorpusDbHandler();
-        corpusDbHandler.loadByMostFrequentPredicates(corpusDB, 1000);
+        corpusDbHandler.loadByMostFrequentPredicates(corpusDB, totalNoOfData);
         corpusDB.shuffle();
 
-       Problem problem = new Problem();
-        problem.l =  1000; // number of training examples
-        problem.n =  bagOfWordsModel.getMaximumNoOfVocabulary();// number of features
+        Problem problem = new Problem();
+        problem.l =  numberOfTrainingExamples; // number of training examples
+        problem.n =  this.bagOfWordsModel.getMaximumNoOfVocabulary();// number of features
 
         FeatureNode[][] featureNodes = new FeatureNode[problem.l][];
         problem.y = new double[problem.l];// target values
         for (int i = 0 ; i<problem.l; i++){
-            CorpusEntryObject temp = corpusDB.getShuffledEntries().get(i);
-            String jomle = temp.getGeneralizedSentence();
-            List<String> tokenized = WordTokenizer.tokenize(jomle);
-            featureNodes[i] = bagOfWordsModel.createBowLibLinearFeatureNodeForQuery(tokenized);
-            problem.y[i] = corpusDB.getIndices().get(temp.getPredicate());
+            trainData.add(corpusDB.getShuffledEntries().get(i));
+            CorpusEntryObject corpusEntryObject = corpusDB.getShuffledEntries().get(i);
+            featureNodes[i] = FeatureExtractor.createFeatureNode(bagOfWordsModel, corpusEntryObject);
+            problem.y[i] = corpusDB.getIndices().get(corpusEntryObject.getPredicate());
         }
+
+        createAndSaveTestData(problem, numberOfTestExamples);
+
+        //System.out.println(corpusDB.getIndices().keySet());
 
         problem.x =  featureNodes;// feature nodes
 
@@ -71,33 +100,91 @@ public class Classifier {
 
         Parameter parameter = new Parameter(solver, C, eps);
 
-        File modelFile = new File("temptestmodel2");
-        Model model = null;//Linear.train(problem, parameter);
-       try {
+        File modelFile = new File(this.modelFilePath);
+        Model model = Linear.train(problem, parameter);
+
+        try {
+            model.save(modelFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createAndSaveTestData(Problem problem, int numberOfTestExamples) {
+        try (Writer fileWriter = new FileWriter(this.testDataFile)) {
+            CorpusEntryObject currentTestData;
+            for (int i = problem.l; i<problem.l+numberOfTestExamples; i++){
+                currentTestData = corpusDB.getShuffledEntries().get(i);
+                testData.add(currentTestData);
+                fileWriter.write(currentTestData.getOriginalSentence().getRaw()+"\t");
+                fileWriter.write(currentTestData.getGeneralizedSentence()+"\t");
+                fileWriter.write(currentTestData.getSubject()+"\t");
+                fileWriter.write(currentTestData.getObject()+"\t");
+                fileWriter.write(currentTestData.getPredicate()+"\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void loadTestData(){
+        this.testData.clear();
+        try (Scanner scanner = new Scanner(new FileInputStream(this.testDataFile))) {
+            String[] lineTokens;
+            CorpusEntryObject currentTestData;
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                lineTokens = line.split("\t");
+                Sentence originalSentence = new Sentence(lineTokens[0]);
+                String generalizedSentence = lineTokens[1];
+                String subject = lineTokens[2];
+                String object = lineTokens[3];
+                String predicate =  lineTokens[4];
+                Integer occurrence =  Integer.valueOf(lineTokens[5]);
+                CorpusEntryObject corpusEntryObject = new CorpusEntryObject(originalSentence, generalizedSentence, object, subject, predicate, occurrence);
+                this.testData.add(corpusEntryObject);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void testForTestData(){
+        Model model = null;
+        File modelFile = new File(this.modelFilePath);
+        try {
             model = Linear.loadModel(modelFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        for (CorpusEntryObject instanceEntryObject:
+             this.testData) {
+            Sentence test = new Sentence(instanceEntryObject.getGeneralizedSentence());
+            Feature[] instance = bagOfWordsModel.createBowLibLinearFeatureNodeForQuery(test.getWords());
+            double prediction = Linear.predict(model, instance);
+            System.out.println("\n"+ corpusDB.getInvertedIndices().get(prediction)+"\t"+instanceEntryObject.getPredicate());
+        }
 
-        /*try {
-            model.save(modelFile);
-            // load model or use it directly
-            model = Model.load(modelFile);
+    }
+
+    public void testForSingleSentenceString(String sentenceString){
+        Sentence test = new Sentence(sentenceString);
+        Feature[] instance = bagOfWordsModel.createBowLibLinearFeatureNodeForQuery(test.getWords());
+        Model model = null;
+        File modelFile = new File(this.modelFilePath);
+        try {
+            model = Linear.loadModel(modelFile);
+            double prediction = Linear.predict(model, instance);
+            System.out.println("\n"+ corpusDB.getInvertedIndices().get(prediction));
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
-
-        Sentence test = new Sentence("$SUBJ، به آلمانی $OBJ");
-
-        Feature[] instance = bagOfWordsModel.createBowLibLinearFeatureNodeForQuery(test.getWords());
-        double prediction = Linear.predict(model, instance);
-
-        System.out.println("\n"+ corpusDB.getInvertedIndices().get(prediction));
+        }
     }
 
 
     @Test
-    public void test(){
+    public void temp(){
         SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
         //sentenceDbHandler.createCorpusTableFromWikiDump();
         sentenceDbHandler.loadCorpusTable();
@@ -156,4 +243,24 @@ public class Classifier {
 
         System.out.println("\n"+prediction);
     }
+
+
+
+    @Test
+    public void test2(){
+        SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
+        sentenceDbHandler.createCorpusTableFromWikiDump();
+        //sentenceDbHandler.loadCorpusTable();
+        //BagOfWordsModel bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false);
+    }
+
+
+    @Test
+    public void dbTest(){
+        CorpusDbHandler corpusDbHandler = new CorpusDbHandler();
+        corpusDbHandler.loadByMostFrequentPredicates(corpusDB, 1000);
+        corpusDB.shuffle();
+        //corpusDbHandler.test();
+    }
+
 }

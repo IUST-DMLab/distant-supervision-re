@@ -1,14 +1,11 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
-import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import ir.ac.iust.dml.kg.raw.SentenceTokenizer;
-import jdk.nashorn.internal.ir.debug.JSONWriter;
 import com.google.gson.stream.JsonWriter;
 
 
-import javax.xml.ws.Response;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,9 +59,9 @@ public class RawTextHandler {
             for (Sentence sentence:
                  sentenceList) {
                 writer.beginObject();
-                writer.name(Constants.SENTENCE_ATTRIBS.RAW).value(sentence.getRaw());
-                writer.name(Constants.SENTENCE_ATTRIBS.WORDS).value(sentence.getWords().toString());
-                writer.name(Constants.SENTENCE_ATTRIBS.POSTAG).value(sentence.getPosTagged().toString());
+                writer.name(Constants.sentenceAttribs.RAW).value(sentence.getRaw());
+                writer.name(Constants.sentenceAttribs.WORDS).value(sentence.getWords().toString());
+                writer.name(Constants.sentenceAttribs.POSTAG).value(sentence.getPosTagged().toString());
                 writer.endObject();
             }
             writer.endArray();

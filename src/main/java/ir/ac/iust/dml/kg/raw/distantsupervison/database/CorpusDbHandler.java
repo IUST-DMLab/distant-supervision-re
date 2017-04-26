@@ -4,7 +4,6 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.mongodb.*;
 import com.mongodb.client.*;
-import com.mongodb.client.model.Projections;
 import ir.ac.iust.dml.kg.raw.Normalizer;
 
 import ir.ac.iust.dml.kg.raw.distantsupervison.*;
@@ -23,7 +22,6 @@ public class CorpusDbHandler extends DbHandler {
     private MongoCollection<Document> corpusTable;
 
     public CorpusDbHandler() {
-
         mongo = new MongoClient(host, port);
         distantSupervisionDB = mongo.getDatabase(distantSupervisionDBName);
         corpusTable = distantSupervisionDB.getCollection(corpusTableName);
@@ -31,18 +29,18 @@ public class CorpusDbHandler extends DbHandler {
 
     public void insert(CorpusEntryObject corpusEntryObject) {
 
-            Document document = new Document();
-            document.put(Constants.SENTENCE_ATTRIBS.RAW, corpusEntryObject.getOriginalSentence().getRaw());
-            document.put(Constants.SENTENCE_ATTRIBS.NORMALIZED, corpusEntryObject.getOriginalSentence().getNormalized());
-            document.put(Constants.SENTENCE_ATTRIBS.WORDS, corpusEntryObject.getOriginalSentence().getWords());
-            document.put(Constants.SENTENCE_ATTRIBS.POSTAG, corpusEntryObject.getOriginalSentence().getPosTagged());
-            document.put(Constants.CORPUS_DB_ENTRY_ATTRIBS.GENERALIZED_SENTENCE, corpusEntryObject.getGeneralizedSentence());
-            document.put(Constants.CORPUS_DB_ENTRY_ATTRIBS.SUBJECT, corpusEntryObject.getSubject());
-            document.put(Constants.CORPUS_DB_ENTRY_ATTRIBS.OBJECT, corpusEntryObject.getObject());
-        document.put(Constants.CORPUS_DB_ENTRY_ATTRIBS.PREDICATE, corpusEntryObject.getPredicate());
-        document.put(Constants.CORPUS_DB_ENTRY_ATTRIBS.OCCURRENCE, corpusEntryObject.getOccurrence());
+        Document document = new Document();
+        document.put(Constants.sentenceAttribs.RAW, corpusEntryObject.getOriginalSentence().getRaw());
+        document.put(Constants.sentenceAttribs.NORMALIZED, corpusEntryObject.getOriginalSentence().getNormalized());
+        document.put(Constants.sentenceAttribs.WORDS, corpusEntryObject.getOriginalSentence().getWords());
+        document.put(Constants.sentenceAttribs.POSTAG, corpusEntryObject.getOriginalSentence().getPosTagged());
+        document.put(Constants.corpusDbEntryAttribs.GENERALIZED_SENTENCE, corpusEntryObject.getGeneralizedSentence());
+        document.put(Constants.corpusDbEntryAttribs.SUBJECT, corpusEntryObject.getSubject());
+        document.put(Constants.corpusDbEntryAttribs.OBJECT, corpusEntryObject.getObject());
+        document.put(Constants.corpusDbEntryAttribs.PREDICATE, corpusEntryObject.getPredicate());
+        document.put(Constants.corpusDbEntryAttribs.OCCURRENCE, corpusEntryObject.getOccurrence());
 
-            corpusTable.insertOne(document);
+        corpusTable.insertOne(document);
     }
 
     public void insertAll(List<CorpusEntryObject> corpusEntryObjects){
@@ -54,8 +52,8 @@ public class CorpusDbHandler extends DbHandler {
 
     public void loadByMostFrequentPredicates(CorpusDB destinationCorpusDB,
                                              int numberOfEntriesToLoad){
-        List<String> predicates = getMostFrequentPredicates(numberOfEntriesToLoad);
-
+        int numberOfPredicatesToLoad = (Integer) numberOfEntriesToLoad/Configuration.maximumNoOfInstancesForEachPredicate +1;
+        List<String> predicates = getMostFrequentPredicates(numberOfPredicatesToLoad);
         MongoCursor cursor = corpusTable.find().iterator();
         Document document;
         String rawString;
@@ -73,15 +71,18 @@ public class CorpusDbHandler extends DbHandler {
         CorpusEntryObject corpusEntryObject;
         while (cursor.hasNext() && destinationCorpusDB.getEntries().size()<=numberOfEntriesToLoad){
             document = (Document) cursor.next();
-            rawString = (String) document.get(Constants.SENTENCE_ATTRIBS.RAW);
-            normalized = (String) document.get(Constants.SENTENCE_ATTRIBS.NORMALIZED);
-            words = (List<String>) document.get(Constants.SENTENCE_ATTRIBS.WORDS);
-            posTags = (List<String>) document.get(Constants.SENTENCE_ATTRIBS.POSTAG);
-            generalizedSentence = (String) document.get(Constants.CORPUS_DB_ENTRY_ATTRIBS.GENERALIZED_SENTENCE);
-            object = (String) document.get(Constants.CORPUS_DB_ENTRY_ATTRIBS.OBJECT);
-            subject = (String) document.get(Constants.CORPUS_DB_ENTRY_ATTRIBS.SUBJECT);
-            predicate = (String) document.get(Constants.CORPUS_DB_ENTRY_ATTRIBS.PREDICATE);
-            occurrence = (int) document.get(Constants.CORPUS_DB_ENTRY_ATTRIBS.OCCURRENCE);
+            rawString = (String) document.get(Constants.sentenceAttribs.RAW);
+            normalized = (String) document.get(Constants.sentenceAttribs.NORMALIZED);
+            words = (List<String>) document.get(Constants.sentenceAttribs.WORDS);
+            posTags = (List<String>) document.get(Constants.sentenceAttribs.POSTAG);
+            generalizedSentence = (String) document.get(Constants.corpusDbEntryAttribs.GENERALIZED_SENTENCE);
+            object = (String) document.get(Constants.corpusDbEntryAttribs.OBJECT);
+            subject = (String) document.get(Constants.corpusDbEntryAttribs.SUBJECT);
+            predicate = (String) document.get(Constants.corpusDbEntryAttribs.PREDICATE);
+            occurrence = (int) document.get(Constants.corpusDbEntryAttribs.OCCURRENCE);
+            if (destinationCorpusDB.getPredicateCounts().containsKey(predicate) &&
+                destinationCorpusDB.getPredicateCounts().get(predicate)>=Configuration.maximumNoOfInstancesForEachPredicate)
+                    continue;
             //words = convertBasicDBListToJavaListOfStrings(wordsObject);
             //posTags = convertBasicDBListToJavaListOfStrings(postagObject);
             currentSentence = new Sentence(rawString,words,posTags,normalized);
@@ -89,12 +90,10 @@ public class CorpusDbHandler extends DbHandler {
             if (predicates.contains(corpusEntryObject.getPredicate()))
                 destinationCorpusDB.addEntry(corpusEntryObject);
         }
-
     }
 
     public void load(CorpusDB destinationCorpusDB){
         load(destinationCorpusDB, Integer.MAX_VALUE);
-
     }
 
     public void load(CorpusDB destinationCorpusDB, int numberOfEntriesToLoad){
@@ -118,25 +117,21 @@ public class CorpusDbHandler extends DbHandler {
             while (cursor.hasNext() && cnt<numberOfEntriesToLoad){
                 cnt+=1;
                 document = (Document) cursor.next();
-                rawString = (String) document.get(Constants.SENTENCE_ATTRIBS.RAW);
-                normalized = (String) document.get(Constants.SENTENCE_ATTRIBS.NORMALIZED);
-                words = (List<String>) document.get(Constants.SENTENCE_ATTRIBS.WORDS);
-                posTags = (List<String>) document.get(Constants.SENTENCE_ATTRIBS.POSTAG);
-                generalizedSentence = (String) document.get(Constants.CORPUS_DB_ENTRY_ATTRIBS.GENERALIZED_SENTENCE);
-                object = (String) document.get(Constants.CORPUS_DB_ENTRY_ATTRIBS.OBJECT);
-                subject = (String) document.get(Constants.CORPUS_DB_ENTRY_ATTRIBS.SUBJECT);
-                predicate = (String) document.get(Constants.CORPUS_DB_ENTRY_ATTRIBS.PREDICATE);
-                occurrence = (int) document.get(Constants.CORPUS_DB_ENTRY_ATTRIBS.OCCURRENCE);
+                rawString = (String) document.get(Constants.sentenceAttribs.RAW);
+                normalized = (String) document.get(Constants.sentenceAttribs.NORMALIZED);
+                words = (List<String>) document.get(Constants.sentenceAttribs.WORDS);
+                posTags = (List<String>) document.get(Constants.sentenceAttribs.POSTAG);
+                generalizedSentence = (String) document.get(Constants.corpusDbEntryAttribs.GENERALIZED_SENTENCE);
+                object = (String) document.get(Constants.corpusDbEntryAttribs.OBJECT);
+                subject = (String) document.get(Constants.corpusDbEntryAttribs.SUBJECT);
+                predicate = (String) document.get(Constants.corpusDbEntryAttribs.PREDICATE);
+                occurrence = (int) document.get(Constants.corpusDbEntryAttribs.OCCURRENCE);
                 //words = convertBasicDBListToJavaListOfStrings(wordsObject);
                 //posTags = convertBasicDBListToJavaListOfStrings(postagObject);
                 currentSentence = new Sentence(rawString,words,posTags,normalized);
                 corpusEntryObject = new CorpusEntryObject(currentSentence, generalizedSentence, object, subject, predicate, occurrence);
                 destinationCorpusDB.addEntry(corpusEntryObject);
             }
-    }
-
-    public void close(){
-        mongo.close();
     }
 
     public void saveCorpusJasonToDB(){
@@ -218,5 +213,10 @@ public class CorpusDbHandler extends DbHandler {
 
         return result;
     }
+
+    public void close(){
+        mongo.close();
+    }
+
 
 }

@@ -75,8 +75,6 @@
             <artifactId>liblinear</artifactId>
             <version>1.95</version>
         </dependency>
-        <!--dl4j-->
-        <!--bson-->
         <!-- https://mvnrepository.com/artifact/org.mongodb/bson -->
         <dependency>
             <groupId>org.mongodb</groupId>
@@ -88,6 +86,7 @@
             <artifactId>mongo-java-driver</artifactId>
             <version>3.4.1</version>
         </dependency>
+
 
 
     </dependencies>

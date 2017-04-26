@@ -5,7 +5,6 @@ import ir.ac.iust.dml.kg.raw.distantsupervison.Constants;
 import ir.ac.iust.dml.kg.raw.distantsupervison.RawTextHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Sentence;
 
-import java.net.UnknownHostException;
 import java.util.List;
 
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
@@ -31,9 +30,9 @@ public class SentenceDbHandler extends DbHandler {
             for (Sentence sentence:
                     sentenceList) {
                 BasicDBObject dbSentence = new BasicDBObject();
-                dbSentence.put(Constants.SENTENCE_ATTRIBS.RAW, sentence.getRaw());
-                dbSentence.put(Constants.SENTENCE_ATTRIBS.WORDS, sentence.getWords());
-                dbSentence.put(Constants.SENTENCE_ATTRIBS.POSTAG, sentence.getPosTagged());
+                dbSentence.put(Constants.sentenceAttribs.RAW, sentence.getRaw());
+                dbSentence.put(Constants.sentenceAttribs.WORDS, sentence.getWords());
+                dbSentence.put(Constants.sentenceAttribs.POSTAG, sentence.getPosTagged());
 
                 corpusTable.insert(dbSentence);
             }
@@ -55,9 +54,9 @@ public class SentenceDbHandler extends DbHandler {
             while (cursor.hasNext()){
                 cnt+=1;
                 DBObject dbSentence = cursor.next();
-                String rawString = (String) dbSentence.get(Constants.SENTENCE_ATTRIBS.RAW);
-                BasicDBList wordsObject = (BasicDBList) dbSentence.get(Constants.SENTENCE_ATTRIBS.WORDS);
-                BasicDBList postagObject = (BasicDBList) dbSentence.get(Constants.SENTENCE_ATTRIBS.POSTAG);
+                String rawString = (String) dbSentence.get(Constants.sentenceAttribs.RAW);
+                BasicDBList wordsObject = (BasicDBList) dbSentence.get(Constants.sentenceAttribs.WORDS);
+                BasicDBList postagObject = (BasicDBList) dbSentence.get(Constants.sentenceAttribs.POSTAG);
                 List<String> words = convertBasicDBListToJavaListOfStrings(wordsObject);
                 List<String> posTags = convertBasicDBListToJavaListOfStrings(postagObject);
                 Sentence currentSentence = new Sentence(rawString,words,posTags);
