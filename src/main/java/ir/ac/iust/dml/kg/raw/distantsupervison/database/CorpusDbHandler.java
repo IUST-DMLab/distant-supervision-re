@@ -7,7 +7,11 @@ import com.mongodb.client.*;
 import ir.ac.iust.dml.kg.raw.Normalizer;
 
 import ir.ac.iust.dml.kg.raw.distantsupervison.*;
+import ir.ac.iust.dml.kg.resource.extractor.client.ExtractorClient;
+import ir.ac.iust.dml.kg.resource.extractor.client.MatchedResource;
 import org.bson.Document;
+import org.junit.*;
+import org.junit.Test;
 
 import java.io.FileReader;
 import java.util.*;
@@ -37,6 +41,8 @@ public class CorpusDbHandler extends DbHandler {
         document.put(Constants.corpusDbEntryAttribs.GENERALIZED_SENTENCE, corpusEntryObject.getGeneralizedSentence());
         document.put(Constants.corpusDbEntryAttribs.SUBJECT, corpusEntryObject.getSubject());
         document.put(Constants.corpusDbEntryAttribs.OBJECT, corpusEntryObject.getObject());
+        document.put(Constants.corpusDbEntryAttribs.SUBJECT_TYPE, corpusEntryObject.getSubjectType());
+        document.put(Constants.corpusDbEntryAttribs.OBJECT_TYPE, corpusEntryObject.getObjectType());
         document.put(Constants.corpusDbEntryAttribs.PREDICATE, corpusEntryObject.getPredicate());
         document.put(Constants.corpusDbEntryAttribs.OCCURRENCE, corpusEntryObject.getOccurrence());
 
@@ -52,8 +58,7 @@ public class CorpusDbHandler extends DbHandler {
 
     public void loadByMostFrequentPredicates(CorpusDB destinationCorpusDB,
                                              int numberOfEntriesToLoad){
-        int numberOfPredicatesToLoad = (Integer) numberOfEntriesToLoad/Configuration.maximumNoOfInstancesForEachPredicate +1;
-        List<String> predicates = getMostFrequentPredicates(numberOfPredicatesToLoad);
+        List<String> predicates = getMostFrequentPredicates(Configuration.numberOfPredicatesToLoad);
         MongoCursor cursor = corpusTable.find().iterator();
         Document document;
         String rawString;
@@ -63,6 +68,8 @@ public class CorpusDbHandler extends DbHandler {
         String generalizedSentence;
         String object;
         String subject;
+        List<String> objectType;
+        List<String> subjectType;
         String predicate;
         int occurrence;
         List<String> words;
@@ -78,6 +85,8 @@ public class CorpusDbHandler extends DbHandler {
             generalizedSentence = (String) document.get(Constants.corpusDbEntryAttribs.GENERALIZED_SENTENCE);
             object = (String) document.get(Constants.corpusDbEntryAttribs.OBJECT);
             subject = (String) document.get(Constants.corpusDbEntryAttribs.SUBJECT);
+            objectType = (List<String>) document.get(Constants.corpusDbEntryAttribs.OBJECT_TYPE);
+            subjectType = (List<String>) document.get(Constants.corpusDbEntryAttribs.SUBJECT_TYPE);
             predicate = (String) document.get(Constants.corpusDbEntryAttribs.PREDICATE);
             occurrence = (int) document.get(Constants.corpusDbEntryAttribs.OCCURRENCE);
             if (destinationCorpusDB.getPredicateCounts().containsKey(predicate) &&
@@ -86,7 +95,7 @@ public class CorpusDbHandler extends DbHandler {
             //words = convertBasicDBListToJavaListOfStrings(wordsObject);
             //posTags = convertBasicDBListToJavaListOfStrings(postagObject);
             currentSentence = new Sentence(rawString,words,posTags,normalized);
-            corpusEntryObject = new CorpusEntryObject(currentSentence, generalizedSentence, object, subject, predicate, occurrence);
+            corpusEntryObject = new CorpusEntryObject(currentSentence, generalizedSentence, object, subject, objectType, subjectType, predicate, occurrence);
             if (predicates.contains(corpusEntryObject.getPredicate()))
                 destinationCorpusDB.addEntry(corpusEntryObject);
         }
@@ -108,6 +117,8 @@ public class CorpusDbHandler extends DbHandler {
         String generalizedSentence;
         String object;
         String subject;
+        List<String> objectType;
+        List<String> subjectType;
         String predicate;
         int occurrence;
         List<String> words;
@@ -124,16 +135,19 @@ public class CorpusDbHandler extends DbHandler {
                 generalizedSentence = (String) document.get(Constants.corpusDbEntryAttribs.GENERALIZED_SENTENCE);
                 object = (String) document.get(Constants.corpusDbEntryAttribs.OBJECT);
                 subject = (String) document.get(Constants.corpusDbEntryAttribs.SUBJECT);
+                objectType = (List<String>) document.get(Constants.corpusDbEntryAttribs.OBJECT_TYPE);
+                subjectType = (List<String>) document.get(Constants.corpusDbEntryAttribs.SUBJECT_TYPE);
                 predicate = (String) document.get(Constants.corpusDbEntryAttribs.PREDICATE);
                 occurrence = (int) document.get(Constants.corpusDbEntryAttribs.OCCURRENCE);
                 //words = convertBasicDBListToJavaListOfStrings(wordsObject);
                 //posTags = convertBasicDBListToJavaListOfStrings(postagObject);
                 currentSentence = new Sentence(rawString,words,posTags,normalized);
-                corpusEntryObject = new CorpusEntryObject(currentSentence, generalizedSentence, object, subject, predicate, occurrence);
+                corpusEntryObject = new CorpusEntryObject(currentSentence, generalizedSentence, object, subject,  objectType, subjectType, predicate, occurrence);
                 destinationCorpusDB.addEntry(corpusEntryObject);
             }
     }
 
+    @Test
     public void saveCorpusJasonToDB(){
         String tempCorpusJasonPath = "Corpus.json";
         try (JsonReader reader = new JsonReader(new FileReader(tempCorpusJasonPath));
@@ -143,6 +157,8 @@ public class CorpusDbHandler extends DbHandler {
             JsonToken nextToken = reader.peek();
 
             CorpusDbHandler corpusDbHandler = new CorpusDbHandler();
+            ExtractorClient client = new ExtractorClient(Configuration.extractorClient);
+
             while(reader.hasNext()) {
                 if (JsonToken.BEGIN_OBJECT.equals(nextToken)){
                     reader.beginObject();
@@ -161,10 +177,31 @@ public class CorpusDbHandler extends DbHandler {
 
                         String originalSentence = newSentence.replace("$SUBJ",subject);
                         originalSentence = originalSentence.replace("$OBJ", object);
+
+
+                        List<String> objectType = new ArrayList<>();
+                        List<String> subjectType = new ArrayList<>();
+
+                        final List<MatchedResource> result_object = client.match(object);
+                        final List<MatchedResource> result_subject = client.match(subject);
+
+                        if (result_object == null || result_object.size()==0 || result_object.get(0).getResource()==null)
+                            objectType.add("null");
+                        else if (result_object.get(0).getResource().getClassTree() == null || result_object.get(0).getResource().getClassTree().size()==0)
+                            objectType.add(result_object.get(0).getResource().getIri());
+                        else objectType.addAll(result_object.get(0).getResource().getClassTree());
+
+                        if (result_subject == null || result_subject.size()==0 || result_subject.get(0).getResource()==null)
+                            subjectType.add("null");
+                        else if (result_subject.get(0).getResource().getClassTree() == null || result_subject.get(0).getResource().getClassTree().size()==0)
+                            subjectType.add(result_subject.get(0).getResource().getIri());
+                        else subjectType.addAll(result_subject.get(0).getResource().getClassTree());
+
+
                         Sentence sentence = new Sentence(originalSentence);
                         String generalizedNormalizedSentence = sentence.getNormalized().replace(subject, "$SUBJ");
                         generalizedNormalizedSentence = generalizedNormalizedSentence.replace(object, "$OBJ");
-                        CorpusEntryObject corpusEntryObject = new CorpusEntryObject(sentence,generalizedNormalizedSentence,object,subject,predicate,occur);
+                        CorpusEntryObject corpusEntryObject = new CorpusEntryObject(sentence,generalizedNormalizedSentence,object,subject,objectType,subjectType,predicate,occur);
                         corpusDbHandler.insert(corpusEntryObject);
                         nextToken2 = reader.peek();
                     }

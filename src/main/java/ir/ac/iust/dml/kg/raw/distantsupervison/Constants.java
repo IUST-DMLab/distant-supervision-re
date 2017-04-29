@@ -32,6 +32,8 @@ public class Constants {
         public static final String OCCURRENCE = "occurrence";
         public static final String SUBJECT = "subject";
         public static final String OBJECT = "object";
+        public static final String SUBJECT_TYPE = "subject_type";
+        public static final String OBJECT_TYPE = "object_type";
         public static final String PREDICATE = "predicate";
     }
 }

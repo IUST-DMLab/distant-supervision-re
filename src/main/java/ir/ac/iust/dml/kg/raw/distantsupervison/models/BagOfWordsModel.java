@@ -15,6 +15,7 @@ import static java.lang.Math.log10;
  */
 public class BagOfWordsModel {
 
+    private String BowFile = "bagOfWords.model";
     private List<Sentence> corpusOfBOW = new ArrayList<>();
     private Set<String> vocabularySet = new HashSet<>();
     private List<Set<String >> sentencesUniqueWords = new ArrayList<>();
@@ -140,7 +141,13 @@ public class BagOfWordsModel {
     }
 
     public void saveModel(){
-        try (Writer fileWriter = new FileWriter("bagOfWords.model")) {
+        HashMap<String, Integer> temp = new HashMap<>();
+        temp.put("tfInCorpus", 0);
+        temp.put("df", 1);
+        temp.put("idf", 2);
+        String[] parameters = {"tfInCorpus", "df", "idf"};
+        try (Writer fileWriter = new FileWriter(this.BowFile)) {
+            fileWriter.write("maximumNoOfVocabulary" + "\t" + this.maximumNoOfVocabulary +"\n");
             for (String token:
                     this.sortedByTf) {
                 fileWriter.write(token+"\t");
@@ -156,7 +163,7 @@ public class BagOfWordsModel {
 
     public void loadModel(){
         int currentIndex = 0;
-        try (Scanner scanner = new Scanner(new FileInputStream("bagOfWords.model"))) {
+        try (Scanner scanner = new Scanner(new FileInputStream(this.BowFile))) {
             while (scanner.hasNextLine()){
                 String line = scanner.nextLine();
                 String[] tokens = line.split("\t");

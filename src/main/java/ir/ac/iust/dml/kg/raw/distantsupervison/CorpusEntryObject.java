@@ -1,5 +1,7 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
+import java.util.List;
+
 /**
  * Created by hemmatan on 4/18/2017.
  */
@@ -8,17 +10,20 @@ public class CorpusEntryObject {
     private Sentence originalSentence;
     private String generalizedSentence;
     private String object, subject;
+    private List<String> objectType, subjectType;
     private String predicate;
     private int occurrence;
 
     public CorpusEntryObject() {
     }
 
-    public CorpusEntryObject(Sentence originalSentence, String generalizedSentence, String object, String subject, String predicate, int occurrence) {
+    public CorpusEntryObject(Sentence originalSentence, String generalizedSentence, String object, String subject, List<String> objectType, List<String> subjectType, String predicate, int occurrence) {
         this.originalSentence = originalSentence;
         this.generalizedSentence = generalizedSentence;
         this.object = object;
         this.subject = subject;
+        this.objectType = objectType;
+        this.subjectType = subjectType;
         this.predicate = predicate;
         this.occurrence = occurrence;
     }
@@ -70,5 +75,21 @@ public class CorpusEntryObject {
 
     public void setOccurrence(int occurrence) {
         this.occurrence = occurrence;
+    }
+
+    public List<String> getObjectType() {
+        return objectType;
+    }
+
+    public void setObjectType(List<String> objectType) {
+        this.objectType = objectType;
+    }
+
+    public List<String> getSubjectType() {
+        return subjectType;
+    }
+
+    public void setSubjectType(List<String> subjectType) {
+        this.subjectType = subjectType;
     }
 }

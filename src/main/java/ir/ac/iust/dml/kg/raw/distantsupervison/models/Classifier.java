@@ -24,21 +24,25 @@ public class Classifier {
     private String modelFilePath = "tempTestModel";
     private String testDataFile = "testData.txt";
     private BagOfWordsModel bagOfWordsModel;
+    private EntityTypeModel entityTypeModel;
     private List<CorpusEntryObject> trainData = new ArrayList<>();
     private List<CorpusEntryObject> testData = new ArrayList<>();
 
     public Classifier(){
         int defaultMaximumNoOfVocabularyForBOW = Configuration.maximumNoOfVocabularyForBagOfWords;
+        entityTypeModel = new EntityTypeModel();
         bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false, defaultMaximumNoOfVocabularyForBOW);
     }
 
     public Classifier(int maximumNoOfVocabularyForBOW){
+        entityTypeModel = new EntityTypeModel();
         bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false, maximumNoOfVocabularyForBOW);
     }
 
     public Classifier(String modelFilePath, BagOfWordsModel bagOfWordsModel) {
         this.modelFilePath = modelFilePath;
         this.bagOfWordsModel = bagOfWordsModel;
+        entityTypeModel = new EntityTypeModel();
     }
 
     public Classifier(boolean createBagOfWordsModel, int maximumNoOfVocabularyForBOW) {
@@ -48,6 +52,7 @@ public class Classifier {
             bagOfWordsModel = new BagOfWordsModel();
             bagOfWordsModel.loadModel();
         }
+        entityTypeModel = new EntityTypeModel();
     }
 
     public String getModelFilePath() {
@@ -66,6 +71,10 @@ public class Classifier {
         this.bagOfWordsModel = bagOfWordsModel;
     }
 
+    public EntityTypeModel getEntityTypeModel() {
+        return entityTypeModel;
+    }
+
     public void train(int numberOfTrainingExamples, int numberOfTestExamples){
         int totalNoOfData = numberOfTestExamples + numberOfTrainingExamples;
         SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
@@ -77,14 +86,15 @@ public class Classifier {
 
         Problem problem = new Problem();
         problem.l =  numberOfTrainingExamples; // number of training examples
-        problem.n =  this.bagOfWordsModel.getMaximumNoOfVocabulary();// number of features
+        problem.n =  this.bagOfWordsModel.getMaximumNoOfVocabulary()
+                + 2*this.entityTypeModel.getNoOfEntityTypes();// number of features
 
         FeatureNode[][] featureNodes = new FeatureNode[problem.l][];
         problem.y = new double[problem.l];// target values
         for (int i = 0 ; i<problem.l; i++){
             trainData.add(corpusDB.getShuffledEntries().get(i));
             CorpusEntryObject corpusEntryObject = corpusDB.getShuffledEntries().get(i);
-            featureNodes[i] = FeatureExtractor.createFeatureNode(bagOfWordsModel, corpusEntryObject);
+            featureNodes[i] = FeatureExtractor.createFeatureNode(bagOfWordsModel, entityTypeModel, corpusEntryObject);
             problem.y[i] = corpusDB.getIndices().get(corpusEntryObject.getPredicate());
         }
 
@@ -128,7 +138,7 @@ public class Classifier {
     }
 
 
-    private void loadTestData(){
+    /*private void loadTestData(){
         this.testData.clear();
         try (Scanner scanner = new Scanner(new FileInputStream(this.testDataFile))) {
             String[] lineTokens;
@@ -148,9 +158,9 @@ public class Classifier {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
-    public void testForTestData(){
+    public void testForWholeTestData(){
         Model model = null;
         File modelFile = new File(this.modelFilePath);
         try {

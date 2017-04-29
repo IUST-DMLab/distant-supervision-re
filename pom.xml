@@ -86,7 +86,21 @@
             <artifactId>mongo-java-driver</artifactId>
             <version>3.4.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>ir.ac.iust.dml.kg.services</groupId>
+            <artifactId>ontology-tree-client</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>ir.ac.iust.dml.kg.services</groupId>
+            <artifactId>ontology-tree-client</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>ir.ac.iust.dml.kg.services</groupId>
+            <artifactId>resource-extractor-client</artifactId>
+            <version>0.1.0</version>
+        </dependency>
 
 
     </dependencies>
