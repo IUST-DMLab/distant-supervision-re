@@ -76,7 +76,7 @@ public class CorpusDbHandler extends DbHandler {
         List<String> posTags;
         Sentence currentSentence;
         CorpusEntryObject corpusEntryObject;
-        while (cursor.hasNext() && destinationCorpusDB.getEntries().size()<=numberOfEntriesToLoad){
+        while (cursor.hasNext() && destinationCorpusDB.getEntries().size()<numberOfEntriesToLoad){
             document = (Document) cursor.next();
             rawString = (String) document.get(Constants.sentenceAttribs.RAW);
             normalized = (String) document.get(Constants.sentenceAttribs.NORMALIZED);

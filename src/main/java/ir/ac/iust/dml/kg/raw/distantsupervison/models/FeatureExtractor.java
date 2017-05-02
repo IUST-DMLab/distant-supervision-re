@@ -22,17 +22,27 @@ public class FeatureExtractor {
         String jomle = corpusEntryObject.getGeneralizedSentence();
         List<String> tokenized = WordTokenizer.tokenize(jomle);
         FeatureNode[] bagOfWordsFeatureNodes = bagOfWordsModel.createBowLibLinearFeatureNodeForQuery(tokenized);
-        FeatureNode[] entityTypesFeatureNodes = createNamedEntityFeature(entityTypeModel, corpusEntryObject);
+        FeatureNode[] entityTypesFeatureNodes = createNamedEntityFeature(bagOfWordsModel, entityTypeModel, corpusEntryObject);
         FeatureNode[] featureNodes = ArrayUtils.addAll(bagOfWordsFeatureNodes, entityTypesFeatureNodes);
         return featureNodes;
     }
 
-    public static FeatureNode[] createNamedEntityFeature(EntityTypeModel entityTypeModel, CorpusEntryObject corpusEntryObject){
-        FeatureNode[] featureNodes = new FeatureNode[entityTypeModel.getNoOfEntityTypes()];
+    public static FeatureNode[] createNamedEntityFeature(BagOfWordsModel bagOfWordsModel, EntityTypeModel entityTypeModel, CorpusEntryObject corpusEntryObject){
+        FeatureNode[] featureNodes = new FeatureNode[2*entityTypeModel.getNoOfEntityTypes()];
+        List<String> subjectType = corpusEntryObject.getSubjectType();
+        List<String> objectType = corpusEntryObject.getObjectType();
         for (int i = 0; i<entityTypeModel.getNoOfEntityTypes(); i++){
-            String subject = corpusEntryObject.getSubject();
-            //if ()
-            //featureNodes[i] = new FeatureNode(i+1, featureVector.get(i));
+            if (subjectType.contains(entityTypeModel.getEntityInvertedIndex().get(i)))
+                featureNodes[i] = new FeatureNode(bagOfWordsModel.getMaximumNoOfVocabulary()+1+i, 1);
+            else
+                featureNodes[i] = new FeatureNode(bagOfWordsModel.getMaximumNoOfVocabulary()+1+i, 0);
+        }
+
+        for (int i = entityTypeModel.getNoOfEntityTypes(); i<2*entityTypeModel.getNoOfEntityTypes(); i++){
+            if (objectType.contains(entityTypeModel.getEntityInvertedIndex().get(i)))
+                featureNodes[i] = new FeatureNode(bagOfWordsModel.getMaximumNoOfVocabulary()+1+i, 1);
+            else
+                featureNodes[i] = new FeatureNode(bagOfWordsModel.getMaximumNoOfVocabulary()+1+i, 0);
         }
         return featureNodes;
     }

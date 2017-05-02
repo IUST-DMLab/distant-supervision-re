@@ -1,11 +1,14 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
 import de.bwaldvogel.liblinear.*;
+import ir.ac.iust.dml.kg.raw.WordTokenizer;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
 import ir.ac.iust.dml.kg.raw.distantsupervison.CorpusEntryObject;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Sentence;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.CorpusDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
+import ir.ac.iust.dml.kg.resource.extractor.client.ExtractorClient;
+import ir.ac.iust.dml.kg.resource.extractor.client.MatchedResource;
 import org.junit.Test;
 
 import java.io.*;
@@ -93,6 +96,7 @@ public class Classifier {
         problem.y = new double[problem.l];// target values
         for (int i = 0 ; i<problem.l; i++){
             trainData.add(corpusDB.getShuffledEntries().get(i));
+            System.out.println(i);
             CorpusEntryObject corpusEntryObject = corpusDB.getShuffledEntries().get(i);
             featureNodes[i] = FeatureExtractor.createFeatureNode(bagOfWordsModel, entityTypeModel, corpusEntryObject);
             problem.y[i] = corpusDB.getIndices().get(corpusEntryObject.getPredicate());
@@ -180,16 +184,73 @@ public class Classifier {
 
     public void testForSingleSentenceString(String sentenceString){
         Sentence test = new Sentence(sentenceString);
-        Feature[] instance = bagOfWordsModel.createBowLibLinearFeatureNodeForQuery(test.getWords());
+        ExtractorClient client = new ExtractorClient(Configuration.extractorClient);
+        List<MatchedResource> results = client.match(sentenceString);
+
+
+        //Feature[] instance = bagOfWordsModel.createBowLibLinearFeatureNodeForQuery(test.getWords());
         Model model = null;
         File modelFile = new File(this.modelFilePath);
         try {
             model = Linear.loadModel(modelFile);
-            double prediction = Linear.predict(model, instance);
-            System.out.println("\n"+ corpusDB.getInvertedIndices().get(prediction));
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        for (int i = 0; i<results.size(); i++) {
+
+            if (results.get(i).getResource().getClassTree() == null ||
+                    results.get(i).getResource().getClassTree().size() == 0)
+                continue;
+
+            for (int j = i+1; j<results.size(); j++){
+
+                if (results.get(j).getResource().getClassTree() == null ||
+                        results.get(j).getResource().getClassTree().size() == 0)
+                    continue;
+
+                CorpusEntryObject corpusEntryObject = new CorpusEntryObject();
+                corpusEntryObject.setOriginalSentence(test);
+
+
+                int objectStart = results.get(i).getStart();
+                int objectEnd = results.get(i).getEnd();
+
+                int subjectStart = results.get(j).getStart();
+                int subjectEnd = results.get(j).getEnd();
+
+                String jomle = new Sentence(sentenceString).getNormalized();
+                jomle = jomle.replace(test.getWords().get(objectStart), "$Obj");
+                jomle = jomle.replace(test.getWords().get(subjectStart), "$Subj");
+                List<String> words = WordTokenizer.tokenize(jomle);
+                for (int o = objectStart+1; o<=objectEnd; o++){
+                    jomle.replace(test.getWords().get(o), "");
+                    words.remove(o);
+                }
+                for (int s = subjectStart+1; s<=subjectEnd; s++){
+                    jomle.replace(test.getWords().get(s), "");
+                    words.remove(s);
+                }
+
+                corpusEntryObject.setGeneralizedSentence(jomle);
+
+                List<String> objectType = new ArrayList<>();
+                objectType.addAll(results.get(i).getResource().getClassTree());
+                List<String> subjectType = new ArrayList<>();
+                subjectType.addAll(results.get(j).getResource().getClassTree());
+
+                corpusEntryObject.setObjectType(objectType);
+                corpusEntryObject.setSubjectType(subjectType);
+
+                Feature[] instance = FeatureExtractor.createFeatureNode(bagOfWordsModel, entityTypeModel, corpusEntryObject);
+
+                double prediction = Linear.predict(model, instance);
+                System.out.println("\n"+ results.get(i).getResource().getLabel() +"\t" +results.get(j).getResource().getLabel() +"\t" + corpusDB.getInvertedIndices().get(prediction));
+            }
+        }
+
+
     }
 
 

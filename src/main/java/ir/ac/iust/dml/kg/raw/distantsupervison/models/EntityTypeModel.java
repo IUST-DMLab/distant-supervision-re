@@ -24,9 +24,11 @@ public class EntityTypeModel {
         int lastIdx = 0;
         for (OntologyClass ontologyClass:
              this.entities) {
-            entityIndex.put(ontologyClass.getOntologyClass(), lastIdx);
-            entityInvertedIndex.put(lastIdx, ontologyClass.getOntologyClass());
-            lastIdx++;
+            if(!entityIndex.containsKey((ontologyClass.getOntologyClass()))) {
+                entityIndex.put(ontologyClass.getOntologyClass(), lastIdx);
+                entityInvertedIndex.put(lastIdx, ontologyClass.getOntologyClass());
+                lastIdx++;
+            }
         }
     }
 
