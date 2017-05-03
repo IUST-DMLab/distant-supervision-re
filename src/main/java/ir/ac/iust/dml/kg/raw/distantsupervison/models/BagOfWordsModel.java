@@ -3,11 +3,11 @@ package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 import de.bwaldvogel.liblinear.FeatureNode;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Sentence;
+import ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources;
 
 import java.io.*;
 import java.util.*;
 
-import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.bagOfWordsModelPath;
 import static java.lang.Math.log10;
 
 /**
@@ -15,7 +15,7 @@ import static java.lang.Math.log10;
  */
 public class BagOfWordsModel {
 
-    private String BowFile = "bagOfWords.model";
+    private String bowFile = SharedResources.bagOfWordsModelPath.toString();
     private List<Sentence> corpusOfBOW = new ArrayList<>();
     private Set<String> vocabularySet = new HashSet<>();
     private List<Set<String >> sentencesUniqueWords = new ArrayList<>();
@@ -146,7 +146,7 @@ public class BagOfWordsModel {
         temp.put("df", 1);
         temp.put("idf", 2);
         String[] parameters = {"tfInCorpus", "df", "idf"};
-        try (Writer fileWriter = new FileWriter(this.BowFile)) {
+        try (Writer fileWriter = new FileWriter(this.bowFile)) {
             fileWriter.write("maximumNoOfVocabulary" + "\t" + this.maximumNoOfVocabulary +"\n");
             for (String token:
                     this.sortedByTf) {
@@ -163,7 +163,7 @@ public class BagOfWordsModel {
 
     public void loadModel(){
         int currentIndex = 0;
-        try (Scanner scanner = new Scanner(new FileInputStream(this.BowFile))) {
+        try (Scanner scanner = new Scanner(new FileInputStream(this.bowFile))) {
             while (scanner.hasNextLine()){
                 String line = scanner.nextLine();
                 String[] tokens = line.split("\t");
