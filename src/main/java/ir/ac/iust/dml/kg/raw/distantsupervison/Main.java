@@ -16,7 +16,7 @@ public class Main {
 
     private static void process(boolean train) {
         SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
-        //sentenceDbHandler.createCorpusTableFromWikiDump();
+        sentenceDbHandler.createCorpusTableFromWikiDump();
         sentenceDbHandler.loadCorpusTable();
 
         Classifier classifier = new Classifier();
