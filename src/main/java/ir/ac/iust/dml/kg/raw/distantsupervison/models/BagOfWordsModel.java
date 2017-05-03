@@ -6,6 +6,8 @@ import ir.ac.iust.dml.kg.raw.distantsupervison.Sentence;
 import ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static java.lang.Math.log10;
@@ -163,6 +165,8 @@ public class BagOfWordsModel {
 
     public void loadModel(){
         int currentIndex = 0;
+        System.out.println(this.bowFile);
+        System.out.println(Files.exists(Paths.get(this.bowFile)));
         try (Scanner scanner = new Scanner(new FileInputStream(this.bowFile))) {
             while (scanner.hasNextLine()){
                 String line = scanner.nextLine();
