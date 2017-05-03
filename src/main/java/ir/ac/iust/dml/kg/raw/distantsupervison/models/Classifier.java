@@ -3,6 +3,7 @@ package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 import de.bwaldvogel.liblinear.*;
 import ir.ac.iust.dml.kg.raw.WordTokenizer;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
+import ir.ac.iust.dml.kg.raw.distantsupervison.Constants;
 import ir.ac.iust.dml.kg.raw.distantsupervison.CorpusEntryObject;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Sentence;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.CorpusDbHandler;
@@ -11,10 +12,12 @@ import ir.ac.iust.dml.kg.resource.extractor.client.ExtractorClient;
 import ir.ac.iust.dml.kg.resource.extractor.client.MatchedResource;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpusDB;
@@ -32,6 +35,15 @@ public class Classifier {
     private List<CorpusEntryObject> testData = new ArrayList<>();
 
     public Classifier(){
+        SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
+        sentenceDbHandler.loadCorpusTable();
+
+        int totalNoOfData = Configuration.noOfTotalExamples;
+
+        CorpusDbHandler corpusDbHandler = new CorpusDbHandler();
+        corpusDbHandler.loadByMostFrequentPredicates(corpusDB, totalNoOfData);
+        corpusDB.shuffle();
+
         int defaultMaximumNoOfVocabularyForBOW = Configuration.maximumNoOfVocabularyForBagOfWords;
         entityTypeModel = new EntityTypeModel();
         bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false, defaultMaximumNoOfVocabularyForBOW);
@@ -80,12 +92,6 @@ public class Classifier {
 
     public void train(int numberOfTrainingExamples, int numberOfTestExamples){
         int totalNoOfData = numberOfTestExamples + numberOfTrainingExamples;
-        SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
-        sentenceDbHandler.loadCorpusTable();
-
-        CorpusDbHandler corpusDbHandler = new CorpusDbHandler();
-        corpusDbHandler.loadByMostFrequentPredicates(corpusDB, totalNoOfData);
-        corpusDB.shuffle();
 
         Problem problem = new Problem();
         problem.l =  numberOfTrainingExamples; // number of training examples
@@ -96,7 +102,10 @@ public class Classifier {
         problem.y = new double[problem.l];// target values
         for (int i = 0 ; i<problem.l; i++){
             trainData.add(corpusDB.getShuffledEntries().get(i));
-            System.out.println(i);
+            System.out.println(i + "\t" + corpusDB.getShuffledEntries().get(i).getOriginalSentence().getNormalized()
+                    + "\t" + corpusDB.getShuffledEntries().get(i).getSubject()
+                    + "\t" + corpusDB.getShuffledEntries().get(i).getObject()
+                    + "\t" + corpusDB.getShuffledEntries().get(i).getPredicate() + "\n");
             CorpusEntryObject corpusEntryObject = corpusDB.getShuffledEntries().get(i);
             featureNodes[i] = FeatureExtractor.createFeatureNode(bagOfWordsModel, entityTypeModel, corpusEntryObject);
             problem.y[i] = corpusDB.getIndices().get(corpusEntryObject.getPredicate());
@@ -110,7 +119,7 @@ public class Classifier {
 
         SolverType solver = SolverType.L2R_LR; // -s 0
         double C = 1.0;    // cost of constraints violation
-        double eps = 1; // stopping criteria
+        double eps = 0.1; // stopping criteria
 
         Parameter parameter = new Parameter(solver, C, eps);
 
@@ -200,13 +209,16 @@ public class Classifier {
 
         for (int i = 0; i<results.size(); i++) {
 
-            if (results.get(i).getResource().getClassTree() == null ||
+            if (results.get(i).getResource() == null ||
+                    results.get(i).getResource().getClassTree() == null ||
                     results.get(i).getResource().getClassTree().size() == 0)
                 continue;
 
             for (int j = i+1; j<results.size(); j++){
 
-                if (results.get(j).getResource().getClassTree() == null ||
+                if (results.get(j) == null ||
+                        results.get(j).getResource() == null ||
+                        results.get(j).getResource().getClassTree() == null ||
                         results.get(j).getResource().getClassTree().size() == 0)
                     continue;
 
@@ -214,39 +226,41 @@ public class Classifier {
                 corpusEntryObject.setOriginalSentence(test);
 
 
-                int objectStart = results.get(i).getStart();
-                int objectEnd = results.get(i).getEnd();
+                int subjectStart = results.get(i).getStart();
+                int subjectEnd = results.get(i).getEnd();
 
-                int subjectStart = results.get(j).getStart();
-                int subjectEnd = results.get(j).getEnd();
+                int objectStart = results.get(j).getStart();
+                int objectEnd = results.get(j).getEnd();
 
                 String jomle = new Sentence(sentenceString).getNormalized();
-                jomle = jomle.replace(test.getWords().get(objectStart), "$Obj");
-                jomle = jomle.replace(test.getWords().get(subjectStart), "$Subj");
+                jomle = jomle.replace(test.getWords().get(objectStart), Constants.sentenceAttribs.OBJECT_ABV);
+                jomle = jomle.replace(test.getWords().get(subjectStart), Constants.sentenceAttribs.SUBJECT_ABV);
                 List<String> words = WordTokenizer.tokenize(jomle);
                 for (int o = objectStart+1; o<=objectEnd; o++){
-                    jomle.replace(test.getWords().get(o), "");
+                    jomle = jomle.replace(test.getWords().get(o), "");
                     words.remove(o);
                 }
                 for (int s = subjectStart+1; s<=subjectEnd; s++){
-                    jomle.replace(test.getWords().get(s), "");
+                    jomle = jomle.replace(test.getWords().get(s), "");
                     words.remove(s);
                 }
 
                 corpusEntryObject.setGeneralizedSentence(jomle);
 
-                List<String> objectType = new ArrayList<>();
-                objectType.addAll(results.get(i).getResource().getClassTree());
                 List<String> subjectType = new ArrayList<>();
-                subjectType.addAll(results.get(j).getResource().getClassTree());
+                subjectType.addAll(results.get(i).getResource().getClassTree());
+                List<String> objectType = new ArrayList<>();
+                objectType.addAll(results.get(j).getResource().getClassTree());
 
-                corpusEntryObject.setObjectType(objectType);
                 corpusEntryObject.setSubjectType(subjectType);
+                corpusEntryObject.setObjectType(objectType);
 
                 Feature[] instance = FeatureExtractor.createFeatureNode(bagOfWordsModel, entityTypeModel, corpusEntryObject);
 
                 double prediction = Linear.predict(model, instance);
-                System.out.println("\n"+ results.get(i).getResource().getLabel() +"\t" +results.get(j).getResource().getLabel() +"\t" + corpusDB.getInvertedIndices().get(prediction));
+                System.out.println(subjectType);
+                System.out.println(objectType);
+                System.out.println("\n" + "Subject: " + results.get(i).getResource().getLabel() + "\n" + "Object: " + results.get(j).getResource().getLabel() + "\n" + "Predicate: " + corpusDB.getInvertedIndices().get(prediction));
             }
         }
 

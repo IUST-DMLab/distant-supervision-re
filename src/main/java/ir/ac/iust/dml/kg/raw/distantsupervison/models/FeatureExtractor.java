@@ -1,13 +1,9 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
 import de.bwaldvogel.liblinear.FeatureNode;
-import ir.ac.iust.dml.kg.ontology.tree.client.OntologyClass;
-import ir.ac.iust.dml.kg.ontology.tree.client.OntologyClient;
-import ir.ac.iust.dml.kg.ontology.tree.client.PagedData;
 import ir.ac.iust.dml.kg.raw.WordTokenizer;
 import ir.ac.iust.dml.kg.raw.distantsupervison.CorpusEntryObject;
 import org.apache.commons.lang3.ArrayUtils;
-import org.junit.Test;
 
 import java.util.List;
 
@@ -27,10 +23,11 @@ public class FeatureExtractor {
         return featureNodes;
     }
 
+
     public static FeatureNode[] createNamedEntityFeature(BagOfWordsModel bagOfWordsModel, EntityTypeModel entityTypeModel, CorpusEntryObject corpusEntryObject){
         FeatureNode[] featureNodes = new FeatureNode[2*entityTypeModel.getNoOfEntityTypes()];
-        List<String> subjectType = corpusEntryObject.getSubjectType();
-        List<String> objectType = corpusEntryObject.getObjectType();
+        List<String> subjectType = corpusEntryObject.getSubjectType().subList(0, Math.min(2, corpusEntryObject.getSubjectType().size()));
+        List<String> objectType = corpusEntryObject.getObjectType().subList(0, Math.min(2, corpusEntryObject.getObjectType().size()));
         for (int i = 0; i<entityTypeModel.getNoOfEntityTypes(); i++){
             if (subjectType.contains(entityTypeModel.getEntityInvertedIndex().get(i)))
                 featureNodes[i] = new FeatureNode(bagOfWordsModel.getMaximumNoOfVocabulary()+1+i, 1);
