@@ -41,6 +41,11 @@ public class SentenceDbHandler extends DbHandler {
     }
 
     public void loadCorpusTable(){
+        //if (corpus.getSentences().isEmpty())
+        //  createCorpusTableFromWikiDump();
+
+        corpus.clear();
+
         MongoClient mongo = null;
 
             mongo = new MongoClient(host, port);

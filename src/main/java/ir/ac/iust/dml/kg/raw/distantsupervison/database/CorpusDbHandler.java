@@ -2,19 +2,23 @@ package ir.ac.iust.dml.kg.raw.distantsupervison.database;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-import com.mongodb.*;
-import com.mongodb.client.*;
+import com.mongodb.BasicDBList;
+import com.mongodb.MongoClient;
+import com.mongodb.client.AggregateIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 import ir.ac.iust.dml.kg.raw.Normalizer;
-
 import ir.ac.iust.dml.kg.raw.distantsupervison.*;
 import ir.ac.iust.dml.kg.resource.extractor.client.ExtractorClient;
 import ir.ac.iust.dml.kg.resource.extractor.client.MatchedResource;
 import org.bson.Document;
-import org.junit.*;
 import org.junit.Test;
 
 import java.io.FileReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by hemmatan on 4/18/2017.
@@ -147,6 +151,8 @@ public class CorpusDbHandler extends DbHandler {
             }
     }
 
+
+    //TODO: :)
     @Test
     public void saveCorpusJasonToDB(){
         String tempCorpusJasonPath = "Corpus.json";
@@ -175,8 +181,8 @@ public class CorpusDbHandler extends DbHandler {
                         String newSentence = reader.nextName();
                         int occur = Integer.valueOf(reader.nextString());
 
-                        String originalSentence = newSentence.replace("$SUBJ",subject);
-                        originalSentence = originalSentence.replace("$OBJ", object);
+                        String originalSentence = newSentence.replace(Constants.sentenceAttribs.SUBJECT_ABV, subject);
+                        originalSentence = originalSentence.replace(Constants.sentenceAttribs.OBJECT_ABV, object);
 
 
                         List<String> objectType = new ArrayList<>();

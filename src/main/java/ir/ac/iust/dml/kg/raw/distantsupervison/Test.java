@@ -2,6 +2,7 @@ package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.BagOfWordsModel;
+import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
 
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
 
@@ -9,6 +10,28 @@ import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
  * Created by hemmatan on 4/4/2017.
  */
 public class Test {
+
+    @org.junit.Test
+    public void test() {
+        SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
+        sentenceDbHandler.loadCorpusTable();
+
+        Classifier classifier = new Classifier();
+
+        classifier.train(Configuration.noOfTrainExamples, Configuration.noOfTestExamples);
+
+        classifier.testForSingleSentenceString("پروین اعتصامی متولد قم است");
+        classifier.testForSingleSentenceString("مولوی متولد قم است");
+        classifier.testForSingleSentenceString("حافظ متولد قم است");
+        classifier.testForSingleSentenceString("حسن روحانی متولد قم است");
+        classifier.testForSingleSentenceString("محمد اصفهانی متولد قم است");
+        classifier.testForSingleSentenceString("علی لاریجانی متولد قم است");
+        classifier.testForSingleSentenceString("رفسنجانی متولد قم است");
+        classifier.testForSingleSentenceString("سعدی متولد قم است");
+
+    }
+
+
     public static void main(String[] args) {
         //RawTextHandler.loadRawText();
         //RawTextHandler.buildCorpus();

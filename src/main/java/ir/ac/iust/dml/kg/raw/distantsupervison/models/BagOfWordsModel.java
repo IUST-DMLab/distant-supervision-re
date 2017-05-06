@@ -148,6 +148,7 @@ public class BagOfWordsModel {
         temp.put("df", 1);
         temp.put("idf", 2);
         String[] parameters = {"tfInCorpus", "df", "idf"};
+        System.out.println(this.bowFile);
         try (Writer fileWriter = new FileWriter(this.bowFile)) {
             fileWriter.write("maximumNoOfVocabulary" + "\t" + this.maximumNoOfVocabulary +"\n");
             for (String token:

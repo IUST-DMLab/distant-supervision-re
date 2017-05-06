@@ -2,9 +2,8 @@ package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-import ir.ac.iust.dml.kg.raw.SentenceTokenizer;
 import com.google.gson.stream.JsonWriter;
-
+import ir.ac.iust.dml.kg.raw.SentenceTokenizer;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -23,6 +22,7 @@ public class RawTextHandler {
         try {
             int numberOfLines = 0;
             reader = new Scanner(new FileInputStream(rawTextPath.toString()));
+            //TODO: move numberOfLines to Configuartion
             while (reader.hasNextLine() && numberOfLines<=50000){
                 String line = reader.nextLine();
                 rawText += line;

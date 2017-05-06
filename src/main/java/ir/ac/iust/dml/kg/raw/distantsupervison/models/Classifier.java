@@ -10,6 +10,7 @@ import ir.ac.iust.dml.kg.raw.distantsupervison.database.CorpusDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
 import ir.ac.iust.dml.kg.resource.extractor.client.ExtractorClient;
 import ir.ac.iust.dml.kg.resource.extractor.client.MatchedResource;
+import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -17,6 +18,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
@@ -257,10 +260,16 @@ public class Classifier {
 
                 Feature[] instance = FeatureExtractor.createFeatureNode(bagOfWordsModel, entityTypeModel, corpusEntryObject);
 
-                double prediction = Linear.predict(model, instance);
-                System.out.println(subjectType);
-                System.out.println(objectType);
-                System.out.println("\n" + "Subject: " + results.get(i).getResource().getLabel() + "\n" + "Object: " + results.get(j).getResource().getLabel() + "\n" + "Predicate: " + corpusDB.getInvertedIndices().get(prediction));
+                double[] probs = new double[model.getNrClass()];
+                double prediction = Linear.predictProbability(model, instance, probs);
+                List a = Arrays.asList(ArrayUtils.toObject(probs));
+
+                if ((double) Collections.max(a) > Configuration.confidenceThreshold) {
+                    System.out.println(subjectType);
+                    System.out.println(objectType);
+                    System.out.println("\n" + "Subject: " + results.get(i).getResource().getLabel() + "\n" + "Object: " + results.get(j).getResource().getLabel() + "\n" + "Predicate: " + corpusDB.getInvertedIndices().get(prediction));
+                    System.out.println("Confidence: " + Collections.max(a));
+                }
             }
         }
 

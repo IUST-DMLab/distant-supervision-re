@@ -19,7 +19,7 @@ public class EntityTypeModel {
 
     public EntityTypeModel() {
         OntologyClient client = new OntologyClient(Configuration.ontologyClient);
-        final PagedData<OntologyClass> result = client.search(0, 1000, null, null, false);
+        final PagedData<OntologyClass> result = client.search(0, 1000, null, "Thing", false);
         this.noOfEntityTypes = result.getRowCount();
         this.entities = result.getData();
         int lastIdx = 0;

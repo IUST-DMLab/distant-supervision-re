@@ -26,8 +26,8 @@ public class FeatureExtractor {
 
     public static FeatureNode[] createNamedEntityFeature(BagOfWordsModel bagOfWordsModel, EntityTypeModel entityTypeModel, CorpusEntryObject corpusEntryObject){
         FeatureNode[] featureNodes = new FeatureNode[2*entityTypeModel.getNoOfEntityTypes()];
-        List<String> subjectType = corpusEntryObject.getSubjectType().subList(0, Math.min(2, corpusEntryObject.getSubjectType().size()));
-        List<String> objectType = corpusEntryObject.getObjectType().subList(0, Math.min(2, corpusEntryObject.getObjectType().size()));
+        List<String> subjectType = corpusEntryObject.getSubjectType();//.subList(0, Math.min(2, corpusEntryObject.getSubjectType().size()));
+        List<String> objectType = corpusEntryObject.getObjectType();//.subList(0, Math.min(2, corpusEntryObject.getObjectType().size()));
         for (int i = 0; i<entityTypeModel.getNoOfEntityTypes(); i++){
             if (subjectType.contains(entityTypeModel.getEntityInvertedIndex().get(i)))
                 featureNodes[i] = new FeatureNode(bagOfWordsModel.getMaximumNoOfVocabulary()+1+i, 1);
@@ -35,11 +35,11 @@ public class FeatureExtractor {
                 featureNodes[i] = new FeatureNode(bagOfWordsModel.getMaximumNoOfVocabulary()+1+i, 0);
         }
 
-        for (int i = entityTypeModel.getNoOfEntityTypes(); i<2*entityTypeModel.getNoOfEntityTypes(); i++){
+        for (int i = 0; i < entityTypeModel.getNoOfEntityTypes(); i++) {
             if (objectType.contains(entityTypeModel.getEntityInvertedIndex().get(i)))
-                featureNodes[i] = new FeatureNode(bagOfWordsModel.getMaximumNoOfVocabulary()+1+i, 1);
+                featureNodes[entityTypeModel.getNoOfEntityTypes() + i] = new FeatureNode(bagOfWordsModel.getMaximumNoOfVocabulary() + 1 + entityTypeModel.getNoOfEntityTypes() + i, 1);
             else
-                featureNodes[i] = new FeatureNode(bagOfWordsModel.getMaximumNoOfVocabulary()+1+i, 0);
+                featureNodes[entityTypeModel.getNoOfEntityTypes() + i] = new FeatureNode(bagOfWordsModel.getMaximumNoOfVocabulary() + 1 + entityTypeModel.getNoOfEntityTypes() + i, 0);
         }
         return featureNodes;
     }

@@ -25,4 +25,7 @@ public class Corpus {
         this.sentences = sentences;
     }
 
+    public void clear() {
+        this.sentences.clear();
+    }
 }
