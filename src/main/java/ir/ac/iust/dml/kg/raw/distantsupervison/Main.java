@@ -3,10 +3,6 @@ package ir.ac.iust.dml.kg.raw.distantsupervison;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 /**
  * Created by hemmatan on 4/26/2017.
  */
@@ -37,16 +33,6 @@ public class Main {
         classifier.testForSingleSentenceString("رفسنجانی متولد قم است");
         classifier.testForSingleSentenceString("سعدی متولد قم است");
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-
-        while (true) {
-            try {
-                String test = reader.readLine();
-                classifier.testForSingleSentenceString(test);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
 
 
         /*classifier.testForSingleSentenceString("پروین اعتصامی در آبادان چشم به جهان گشود");
