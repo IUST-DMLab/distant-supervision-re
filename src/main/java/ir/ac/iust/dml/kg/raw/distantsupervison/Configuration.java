@@ -14,9 +14,11 @@ public class Configuration {
     public static final int numberOfPredicatesToLoad =
             (Integer) noOfTotalExamples/maximumNoOfInstancesForEachPredicate +1;
 
-    public static final double confidenceThreshold = 0.1;
+    public static final double confidenceThreshold = 0.2;
 
     public static final String extractorClient = "http://194.225.227.161:8094";
     public static final String ontologyClient = "http://194.225.227.161:8090";
+
+    public static final int maxWindowSize = 5;
 
 }

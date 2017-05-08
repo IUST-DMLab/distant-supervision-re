@@ -4,6 +4,10 @@ import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.BagOfWordsModel;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
 
 /**
@@ -13,6 +17,15 @@ public class Test {
 
     @org.junit.Test
     public void test() {
+        PrintStream out = null;
+        try {
+            out = new PrintStream(new FileOutputStream("consoleOutput.txt"));
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        System.setOut(out);
+
         SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
         sentenceDbHandler.loadCorpusTable();
 

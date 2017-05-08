@@ -108,7 +108,7 @@ public class Classifier {
             System.out.println(i + "\t" + corpusDB.getShuffledEntries().get(i).getOriginalSentence().getNormalized()
                     + "\t" + corpusDB.getShuffledEntries().get(i).getSubject()
                     + "\t" + corpusDB.getShuffledEntries().get(i).getObject()
-                    + "\t" + corpusDB.getShuffledEntries().get(i).getPredicate() + "\n");
+                    + "\t" + "predicate: " + corpusDB.getShuffledEntries().get(i).getPredicate() + "\n");
             CorpusEntryObject corpusEntryObject = corpusDB.getShuffledEntries().get(i);
             featureNodes[i] = FeatureExtractor.createFeatureNode(bagOfWordsModel, entityTypeModel, corpusEntryObject);
             problem.y[i] = corpusDB.getIndices().get(corpusEntryObject.getPredicate());
@@ -187,7 +187,7 @@ public class Classifier {
         for (CorpusEntryObject instanceEntryObject:
              this.testData) {
             Sentence test = new Sentence(instanceEntryObject.getGeneralizedSentence());
-            Feature[] instance = bagOfWordsModel.createBowLibLinearFeatureNodeForQuery(test.getWords());
+            Feature[] instance = bagOfWordsModel.createBowLibLinearFeatureNodeForQuery(test.getWords());//TODO: with window
             double prediction = Linear.predict(model, instance);
             System.out.println("\n"+ corpusDB.getInvertedIndices().get(prediction)+"\t"+instanceEntryObject.getPredicate());
         }
@@ -200,7 +200,7 @@ public class Classifier {
         List<MatchedResource> results = client.match(sentenceString);
 
 
-        //Feature[] instance = bagOfWordsModel.createBowLibLinearFeatureNodeForQuery(test.getWords());
+        //Feature[] instance = bagOfWordsModel.createBowLibLinearFeatureNodeForQueryWithWindow(test.getWords());
         Model model = null;
         File modelFile = new File(this.modelFilePath);
         try {

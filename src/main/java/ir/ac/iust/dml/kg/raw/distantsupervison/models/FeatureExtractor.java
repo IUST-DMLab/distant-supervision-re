@@ -17,7 +17,7 @@ public class FeatureExtractor {
     public static FeatureNode[] createFeatureNode(BagOfWordsModel bagOfWordsModel, EntityTypeModel entityTypeModel, CorpusEntryObject corpusEntryObject) {
         String jomle = corpusEntryObject.getGeneralizedSentence();
         List<String> tokenized = WordTokenizer.tokenize(jomle);
-        FeatureNode[] bagOfWordsFeatureNodes = bagOfWordsModel.createBowLibLinearFeatureNodeForQuery(tokenized);
+        FeatureNode[] bagOfWordsFeatureNodes = bagOfWordsModel.createBowLibLinearFeatureNodeForQueryWithWindow(corpusEntryObject);
         FeatureNode[] entityTypesFeatureNodes = createNamedEntityFeature(bagOfWordsModel, entityTypeModel, corpusEntryObject);
         FeatureNode[] featureNodes = ArrayUtils.addAll(bagOfWordsFeatureNodes, entityTypesFeatureNodes);
         return featureNodes;

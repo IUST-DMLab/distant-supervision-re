@@ -34,13 +34,12 @@ public class Main {
         classifier.testForSingleSentenceString("سعدی متولد قم است");
 
 
-
-        /*classifier.testForSingleSentenceString("پروین اعتصامی در آبادان چشم به جهان گشود");
+        classifier.testForSingleSentenceString("پروین اعتصامی در آبادان چشم به جهان گشود");
         classifier.testForSingleSentenceString("محل تولد شاعر بزرگ، مولوی ساوه میباشد.");
         classifier.testForSingleSentenceString("حافظ در شیراز به دنیا آمد");
-        classifier.testForSingleSentenceString("حسن روحانی در خانواده ای تهیدست در  مشهد متولد گشت");
+        classifier.testForSingleSentenceString("حسن روحانی در خانواده تهیدست در  مشهد متولد گشت");
         classifier.testForSingleSentenceString("محمد اصفهانی در سال ۱۳۳۰ در تهران به دنیا آمد");
-        classifier.testForSingleSentenceString("علی لاریجانی در بهمن ۱۳۵۷ در  گرگان متولد شد");*/
+        classifier.testForSingleSentenceString("علی لاریجانی در بهمن ۱۳۵۷ در  گرگان متولد شد");
     }
 
 //    public void test() {

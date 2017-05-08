@@ -1,16 +1,15 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
 import de.bwaldvogel.liblinear.FeatureNode;
-import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
-import ir.ac.iust.dml.kg.raw.distantsupervison.Sentence;
-import ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources;
+import ir.ac.iust.dml.kg.raw.WordTokenizer;
+import ir.ac.iust.dml.kg.raw.distantsupervison.*;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static java.lang.Math.log10;
+import static java.lang.Math.*;
 
 /**
  * Created by hemmatan on 4/9/2017.
@@ -212,6 +211,40 @@ public class BagOfWordsModel {
 
     public int getMaximumNoOfVocabulary() {
         return maximumNoOfVocabulary;
+    }
+
+    public FeatureNode[] createBowLibLinearFeatureNodeForQueryWithWindow(CorpusEntryObject corpusEntryObject) {
+        FeatureNode[] featureNodes = new FeatureNode[this.maximumNoOfVocabulary];
+        List<Double> featureVector = this.createBowFeatureVectorForQueryWithWindow(corpusEntryObject);
+        for (int i = 0; i < featureVector.size(); i++) {
+            featureNodes[i] = new FeatureNode(i + 1, featureVector.get(i));
+        }
+        return featureNodes;
+    }
+
+    private List<Double> createBowFeatureVectorForQueryWithWindow(CorpusEntryObject corpusEntryObject) {
+        List<Double> featureVector = new ArrayList<>();
+        for (int i = 0; i < this.maximumNoOfVocabulary; i++)
+            featureVector.add(0.0);
+        List<String> allQueryWords = WordTokenizer.tokenize(corpusEntryObject.getGeneralizedSentence());
+        int subjIdx = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
+        int objIdx = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
+        int startIdx = min(subjIdx, objIdx);
+        int endIdx = max(subjIdx, objIdx);
+        startIdx = (startIdx - Configuration.maxWindowSize < 0) ? 0 : startIdx - Configuration.maxWindowSize;
+        endIdx = (endIdx + Configuration.maxWindowSize >= allQueryWords.size()) ? allQueryWords.size() - 1 : endIdx + Configuration.maxWindowSize;
+
+        List<String> queryWords = allQueryWords.subList(startIdx, endIdx);
+        System.out.println("queryWords: " + queryWords);
+
+        HashMap<String, Double> tf_idf = computeTfIdfForQuery(queryWords);
+        for (String queryWord :
+                queryWords) {
+            // TODO: this is temp! did not have time to add OOV
+            if (this.indices.containsKey(queryWord))
+                featureVector.set(this.indices.get(queryWord), tf_idf.get(queryWord));
+        }
+        return featureVector;
     }
 }
 

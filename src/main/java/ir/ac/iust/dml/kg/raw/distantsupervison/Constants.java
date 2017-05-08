@@ -10,8 +10,8 @@ public class Constants {
         public static final String NORMALIZED = "normalized";
         public static final String WORDS = "words";
         public static final String POSTAG = "postag";
-        public static final String OBJECT_ABV = "$Obj";
-        public static final String SUBJECT_ABV = "$Subj";
+        public static final String OBJECT_ABV = "$OBJ";
+        public static final String SUBJECT_ABV = "$SUBJ";
     }
 
     public static class patternAttribs {
