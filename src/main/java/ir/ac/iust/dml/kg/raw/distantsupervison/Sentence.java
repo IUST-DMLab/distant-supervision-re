@@ -27,13 +27,24 @@ public class Sentence {
     public Sentence(String raw) {
         this.raw = raw;
         this.normalized = Normalizer.normalize(raw);
-        this.words = WordTokenizer.tokenizeRaw(raw).get(0);
+        this.words = WordTokenizer.tokenize(normalized);
         this.posTagged = new ArrayList<String>();
         List<TaggedWord> taggedWords = POSTagger.tag(this.words);
-        System.out.print(taggedWords.toString());
+
         for (TaggedWord taggedWord :
                 taggedWords) {
             this.posTagged.add(taggedWord.tag());
+        }
+
+        if (this.words.size() != this.posTagged.size()) {
+            System.out.println("error in sentence ");
+            System.out.println(words);
+            System.out.println(posTagged);
+            try {
+                throw new Exception();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

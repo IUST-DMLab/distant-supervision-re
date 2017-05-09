@@ -30,10 +30,12 @@ import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpusDB;
  */
 public class Classifier {
 
+    private int numberOfFeatures;
     private String modelFilePath = "tempTestModel";
     private String testDataFile = "testData.txt";
     private BagOfWordsModel bagOfWordsModel;
     private EntityTypeModel entityTypeModel;
+    private PartOfSpeechModel partOfSpeechModel;
     private List<CorpusEntryObject> trainData = new ArrayList<>();
     private List<CorpusEntryObject> testData = new ArrayList<>();
 
@@ -49,7 +51,9 @@ public class Classifier {
 
         int defaultMaximumNoOfVocabularyForBOW = Configuration.maximumNoOfVocabularyForBagOfWords;
         entityTypeModel = new EntityTypeModel();
+        partOfSpeechModel = new PartOfSpeechModel();
         bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false, defaultMaximumNoOfVocabularyForBOW);
+
     }
 
     public Classifier(int maximumNoOfVocabularyForBOW){
@@ -98,27 +102,50 @@ public class Classifier {
 
         Problem problem = new Problem();
         problem.l =  numberOfTrainingExamples; // number of training examples
-        problem.n =  this.bagOfWordsModel.getMaximumNoOfVocabulary()
-                + 2*this.entityTypeModel.getNoOfEntityTypes();// number of features
 
         FeatureNode[][] featureNodes = new FeatureNode[problem.l][];
         problem.y = new double[problem.l];// target values
         for (int i = 0 ; i<problem.l; i++){
-            trainData.add(corpusDB.getShuffledEntries().get(i));
+            //trainData.add(corpusDB.getShuffledEntries().get(i));
             System.out.println(i + "\t" + corpusDB.getShuffledEntries().get(i).getOriginalSentence().getNormalized()
                     + "\t" + corpusDB.getShuffledEntries().get(i).getSubject()
                     + "\t" + corpusDB.getShuffledEntries().get(i).getObject()
                     + "\t" + "predicate: " + corpusDB.getShuffledEntries().get(i).getPredicate() + "\n");
             CorpusEntryObject corpusEntryObject = corpusDB.getShuffledEntries().get(i);
-            featureNodes[i] = FeatureExtractor.createFeatureNode(bagOfWordsModel, entityTypeModel, corpusEntryObject);
+            partOfSpeechModel.addToModel(corpusEntryObject.getOriginalSentence().getPosTagged());
+        }
+
+        numberOfFeatures = this.bagOfWordsModel.getMaximumNoOfVocabulary()
+                + 2 * this.entityTypeModel.getNoOfEntityTypes() + 2 * this.partOfSpeechModel.getNoOfPOS();
+        problem.n = this.numberOfFeatures;// number of features
+
+        for (int i = 0; i < problem.l; i++) {
+            trainData.add(corpusDB.getShuffledEntries().get(i));
+            CorpusEntryObject corpusEntryObject = corpusDB.getShuffledEntries().get(i);
+            featureNodes[i] = FeatureExtractor.createFeatureNode(bagOfWordsModel, entityTypeModel, partOfSpeechModel, corpusEntryObject);
             problem.y[i] = corpusDB.getIndices().get(corpusEntryObject.getPredicate());
         }
 
+        partOfSpeechModel.saveModel();
         createAndSaveTestData(problem, numberOfTestExamples);
 
         //System.out.println(corpusDB.getIndices().keySet());
 
         problem.x =  featureNodes;// feature nodes
+
+        int idx = 0;
+        for (Feature[] nodes : problem.x) {
+            if (nodes == null)
+                System.out.println(idx);
+
+            for (Feature n : nodes) {
+                if (n == null) {
+                    System.out.println(idx);
+                }
+            }
+            idx++;
+        }
+
 
         SolverType solver = SolverType.L2R_LR; // -s 0
         double C = 1.0;    // cost of constraints violation
@@ -231,9 +258,12 @@ public class Classifier {
 
                 int subjectStart = results.get(i).getStart();
                 int subjectEnd = results.get(i).getEnd();
+                String subject = test.getWords().get(subjectStart);
 
                 int objectStart = results.get(j).getStart();
                 int objectEnd = results.get(j).getEnd();
+                String object = test.getWords().get(objectStart);
+
 
                 String jomle = new Sentence(sentenceString).getNormalized();
                 jomle = jomle.replace(test.getWords().get(objectStart), Constants.sentenceAttribs.OBJECT_ABV);
@@ -257,8 +287,10 @@ public class Classifier {
 
                 corpusEntryObject.setSubjectType(subjectType);
                 corpusEntryObject.setObjectType(objectType);
+                corpusEntryObject.setSubject(subject);
+                corpusEntryObject.setObject(object);
 
-                Feature[] instance = FeatureExtractor.createFeatureNode(bagOfWordsModel, entityTypeModel, corpusEntryObject);
+                Feature[] instance = FeatureExtractor.createFeatureNode(bagOfWordsModel, entityTypeModel, partOfSpeechModel, corpusEntryObject);
 
                 double[] probs = new double[model.getNrClass()];
                 double prediction = Linear.predictProbability(model, instance, probs);

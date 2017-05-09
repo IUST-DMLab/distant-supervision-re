@@ -13,7 +13,6 @@ import ir.ac.iust.dml.kg.raw.distantsupervison.*;
 import ir.ac.iust.dml.kg.resource.extractor.client.ExtractorClient;
 import ir.ac.iust.dml.kg.resource.extractor.client.MatchedResource;
 import org.bson.Document;
-import org.junit.Test;
 
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -153,8 +152,8 @@ public class CorpusDbHandler extends DbHandler {
 
 
     //TODO: :)
-    @Test
     public void saveCorpusJasonToDB(){
+
         String tempCorpusJasonPath = "Corpus.json";
         try (JsonReader reader = new JsonReader(new FileReader(tempCorpusJasonPath));
         ){
@@ -205,8 +204,8 @@ public class CorpusDbHandler extends DbHandler {
 
 
                         Sentence sentence = new Sentence(originalSentence);
-                        String generalizedNormalizedSentence = sentence.getNormalized().replace(subject, "$SUBJ");
-                        generalizedNormalizedSentence = generalizedNormalizedSentence.replace(object, "$OBJ");
+                        String generalizedNormalizedSentence = sentence.getNormalized().replace(subject, Constants.sentenceAttribs.SUBJECT_ABV);
+                        generalizedNormalizedSentence = generalizedNormalizedSentence.replace(object, Constants.sentenceAttribs.OBJECT_ABV);
                         CorpusEntryObject corpusEntryObject = new CorpusEntryObject(sentence,generalizedNormalizedSentence,object,subject,objectType,subjectType,predicate,occur);
                         corpusDbHandler.insert(corpusEntryObject);
                         nextToken2 = reader.peek();
