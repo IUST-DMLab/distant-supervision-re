@@ -29,6 +29,13 @@ public class Constants {
         public static final String TOKEN = "token";
     }
 
+    public static class segmentedBagOfWordsAttribs {
+        public static final String SUBJECT_PRECEDING = "subjectPreceding.model";
+        public static final String OBJECT_PRECEDING = "objectPreceding.model";
+        public static final String SUBJECT_FOLLOWING = "subjectFollowing.model";
+        public static final String OBJECT_FOLLOWING = "objectFollowing.model";
+    }
+
     public static class corpusDbEntryAttribs {
         public static final String GENERALIZED_SENTENCE = "generalized_sentence";
         public static final String OCCURRENCE = "occurrence";

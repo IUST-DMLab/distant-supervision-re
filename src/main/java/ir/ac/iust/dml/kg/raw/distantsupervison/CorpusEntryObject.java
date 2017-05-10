@@ -1,5 +1,8 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
+import ir.ac.iust.dml.kg.raw.WordTokenizer;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -91,5 +94,93 @@ public class CorpusEntryObject {
 
     public void setSubjectType(List<String> subjectType) {
         this.subjectType = subjectType;
+    }
+
+    public String toString() {
+        return getOriginalSentence().getNormalized()
+                + "\t" + this.getSubject()
+                + "\t" + this.getObject()
+                + "\t" + "predicate: " + this.getPredicate() + "\n";
+    }
+
+    public List<String> getSubjectPrecedingWords() {
+        List<String> words = new ArrayList<>();
+
+        List<String> allQueryWords = WordTokenizer.tokenize(getGeneralizedSentence());
+        int subjIdx = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
+        int objIdx = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
+        int startIdx;
+        int endIdx = subjIdx;
+
+
+        if (subjIdx < objIdx) {
+            startIdx = (subjIdx - Configuration.maxWindowSize < 0) ? 0 : subjIdx - Configuration.maxWindowSize;
+        } else {
+            startIdx = objIdx;
+        }
+
+        words = allQueryWords.subList(startIdx, endIdx);
+        return words;
+    }
+
+    public List<String> getSubjectFollowingWords() {
+        List<String> words = new ArrayList<>();
+
+        List<String> allQueryWords = WordTokenizer.tokenize(getGeneralizedSentence());
+        int subjIdx = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
+        int objIdx = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
+        int startIdx = subjIdx;
+        int endIdx;
+
+        if (subjIdx < objIdx) {
+            endIdx = objIdx;
+        } else {
+            endIdx = (subjIdx + Configuration.maxWindowSize >= allQueryWords.size()) ? allQueryWords.size() - 1 : subjIdx + Configuration.maxWindowSize;
+        }
+
+        words = allQueryWords.subList(startIdx, endIdx);
+        return words;
+    }
+
+    public List<String> getObjectPrecedingWords() {
+        List<String> words = new ArrayList<>();
+
+        List<String> allQueryWords = WordTokenizer.tokenize(getGeneralizedSentence());
+        int subjIdx = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
+        int objIdx = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
+        int startIdx;
+        int endIdx = objIdx;
+
+
+        if (objIdx < subjIdx) {
+            startIdx = (objIdx - Configuration.maxWindowSize < 0) ? 0 : objIdx - Configuration.maxWindowSize;
+        } else {
+            startIdx = subjIdx;
+        }
+
+        words = allQueryWords.subList(startIdx, endIdx);
+
+
+        return words;
+    }
+
+    public List<String> getObjectFollowingWords() {
+        List<String> words = new ArrayList<>();
+
+        List<String> allQueryWords = WordTokenizer.tokenize(getGeneralizedSentence());
+        int subjIdx = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
+        int objIdx = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
+        int startIdx = objIdx;
+        int endIdx;
+
+        if (objIdx < subjIdx) {
+            endIdx = subjIdx;
+        } else {
+            endIdx = (objIdx + Configuration.maxWindowSize >= allQueryWords.size()) ? allQueryWords.size() - 1 : objIdx + Configuration.maxWindowSize;
+        }
+
+        words = allQueryWords.subList(startIdx, endIdx);
+
+        return words;
     }
 }

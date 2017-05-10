@@ -27,11 +27,11 @@ public class Test {
         System.setOut(out);
 
         SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
-        sentenceDbHandler.loadCorpusTable();
+        sentenceDbHandler.loadSentenceTable();
 
         Classifier classifier = new Classifier();
 
-        classifier.train(Configuration.noOfTrainExamples, Configuration.noOfTestExamples);
+        classifier.train(Configuration.noOfTrainExamples, Configuration.noOfTestExamples, true);
 
         classifier.testForSingleSentenceString("پروین اعتصامی متولد قم است");
         classifier.testForSingleSentenceString("مولوی متولد قم است");
@@ -73,7 +73,7 @@ public class Test {
 
         SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
         //sentenceDbHandler.createCorpusTableFromWikiDump();
-        sentenceDbHandler.loadCorpusTable();
+        sentenceDbHandler.loadSentenceTable();
         BagOfWordsModel bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false, 10000);
 
 

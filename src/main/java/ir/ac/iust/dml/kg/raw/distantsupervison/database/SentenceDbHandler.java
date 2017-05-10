@@ -40,7 +40,7 @@ public class SentenceDbHandler extends DbHandler {
 
     }
 
-    public void loadCorpusTable(){
+    public void loadSentenceTable() {
         //if (corpus.getSentences().isEmpty())
         //  createCorpusTableFromWikiDump();
 

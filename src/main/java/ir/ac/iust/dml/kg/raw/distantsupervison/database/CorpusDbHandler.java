@@ -1,20 +1,14 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison.database;
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
 import com.mongodb.BasicDBList;
 import com.mongodb.MongoClient;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import ir.ac.iust.dml.kg.raw.Normalizer;
 import ir.ac.iust.dml.kg.raw.distantsupervison.*;
-import ir.ac.iust.dml.kg.resource.extractor.client.ExtractorClient;
-import ir.ac.iust.dml.kg.resource.extractor.client.MatchedResource;
 import org.bson.Document;
 
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,10 +22,14 @@ public class CorpusDbHandler extends DbHandler {
     private MongoDatabase distantSupervisionDB;
     private MongoCollection<Document> corpusTable;
 
-    public CorpusDbHandler() {
+    public CorpusDbHandler(String tableName) {
         mongo = new MongoClient(host, port);
         distantSupervisionDB = mongo.getDatabase(distantSupervisionDBName);
-        corpusTable = distantSupervisionDB.getCollection(corpusTableName);
+        corpusTable = distantSupervisionDB.getCollection(tableName);
+    }
+
+    public void deleteAll() {
+        corpusTable.deleteMany(new Document());
     }
 
     public void insert(CorpusEntryObject corpusEntryObject) {
@@ -150,78 +148,6 @@ public class CorpusDbHandler extends DbHandler {
             }
     }
 
-
-    //TODO: :)
-    public void saveCorpusJasonToDB(){
-
-        String tempCorpusJasonPath = "Corpus.json";
-        try (JsonReader reader = new JsonReader(new FileReader(tempCorpusJasonPath));
-        ){
-            reader.beginArray();
-            int cnt = 0;
-            JsonToken nextToken = reader.peek();
-
-            CorpusDbHandler corpusDbHandler = new CorpusDbHandler();
-            ExtractorClient client = new ExtractorClient(Configuration.extractorClient);
-
-            while(reader.hasNext()) {
-                if (JsonToken.BEGIN_OBJECT.equals(nextToken)){
-                    reader.beginObject();
-                    String name = reader.nextName();
-                    String subject = Normalizer.normalize(reader.nextString());
-                    name = reader.nextName();
-                    String object = Normalizer.normalize(reader.nextString());
-                    name = reader.nextName();
-                    String predicate = reader.nextString();
-                    name = reader.nextName();
-                    reader.beginObject();
-                    JsonToken nextToken2 = reader.peek();
-                    while (!JsonToken.END_OBJECT.equals(nextToken2)){
-                        String newSentence = reader.nextName();
-                        int occur = Integer.valueOf(reader.nextString());
-
-                        String originalSentence = newSentence.replace(Constants.sentenceAttribs.SUBJECT_ABV, subject);
-                        originalSentence = originalSentence.replace(Constants.sentenceAttribs.OBJECT_ABV, object);
-
-
-                        List<String> objectType = new ArrayList<>();
-                        List<String> subjectType = new ArrayList<>();
-
-                        final List<MatchedResource> result_object = client.match(object);
-                        final List<MatchedResource> result_subject = client.match(subject);
-
-                        if (result_object == null || result_object.size()==0 || result_object.get(0).getResource()==null)
-                            objectType.add("null");
-                        else if (result_object.get(0).getResource().getClassTree() == null || result_object.get(0).getResource().getClassTree().size()==0)
-                            objectType.add(result_object.get(0).getResource().getIri());
-                        else objectType.addAll(result_object.get(0).getResource().getClassTree());
-
-                        if (result_subject == null || result_subject.size()==0 || result_subject.get(0).getResource()==null)
-                            subjectType.add("null");
-                        else if (result_subject.get(0).getResource().getClassTree() == null || result_subject.get(0).getResource().getClassTree().size()==0)
-                            subjectType.add(result_subject.get(0).getResource().getIri());
-                        else subjectType.addAll(result_subject.get(0).getResource().getClassTree());
-
-
-                        Sentence sentence = new Sentence(originalSentence);
-                        String generalizedNormalizedSentence = sentence.getNormalized().replace(subject, Constants.sentenceAttribs.SUBJECT_ABV);
-                        generalizedNormalizedSentence = generalizedNormalizedSentence.replace(object, Constants.sentenceAttribs.OBJECT_ABV);
-                        CorpusEntryObject corpusEntryObject = new CorpusEntryObject(sentence,generalizedNormalizedSentence,object,subject,objectType,subjectType,predicate,occur);
-                        corpusDbHandler.insert(corpusEntryObject);
-                        nextToken2 = reader.peek();
-                    }
-                    reader.endObject();
-                    reader.endObject();
-                    nextToken = reader.peek();
-                    cnt++;
-                }
-            }
-            reader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 
     public List<String> getMostFrequentPredicates(int numberOfEntriesToLoad){
         Document firstGroup = new Document("$group",

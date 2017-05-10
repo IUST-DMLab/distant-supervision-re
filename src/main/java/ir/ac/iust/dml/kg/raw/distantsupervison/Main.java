@@ -17,11 +17,11 @@ public class Main {
     private static void process(boolean train) {
         //TODO: these two lines should be remove because the corpus table loads in Classifier()!
         SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
-        sentenceDbHandler.loadCorpusTable();
+        sentenceDbHandler.loadSentenceTable();
 
         Classifier classifier = new Classifier();
 
-        if (train) classifier.train(Configuration.noOfTrainExamples, Configuration.noOfTestExamples);
+        if (train) classifier.train(Configuration.noOfTrainExamples, Configuration.noOfTestExamples, true);
 
 
         classifier.testForSingleSentenceString("پروین اعتصامی متولد قم است");
@@ -44,7 +44,7 @@ public class Main {
 
 //    public void test() {
 //        SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
-//        sentenceDbHandler.loadCorpusTable();
+//        sentenceDbHandler.loadSentenceTable();
 //
 //        CorpusDbHandler corpusDbHandler = new CorpusDbHandler();
 //        corpusDbHandler.loadByMostFrequentPredicates(corpusDB, 1000);
