@@ -31,19 +31,21 @@ public class FeatureExtractor {
         String jomle = corpusEntryObject.getGeneralizedSentence();
         List<String> tokenized = WordTokenizer.tokenize(jomle);
         FeatureNode[] bagOfWordsFeatureNodes1 = segmentedBagOfWordsHashMap.get(Constants.segmentedBagOfWordsAttribs.SUBJECT_PRECEDING)
-                .createBowLibLinearFeatureNodeForQuery(corpusEntryObject);
+                .createBowLibLinearFeatureNodeForQuery(corpusEntryObject, 0);
         FeatureNode[] bagOfWordsFeatureNodes2 = segmentedBagOfWordsHashMap.get(Constants.segmentedBagOfWordsAttribs.SUBJECT_FOLLOWING)
-                .createBowLibLinearFeatureNodeForQuery(corpusEntryObject);
+                .createBowLibLinearFeatureNodeForQuery(corpusEntryObject, bagOfWordsFeatureNodes1.length);
         FeatureNode[] bagOfWordsFeatureNodes3 = segmentedBagOfWordsHashMap.get(Constants.segmentedBagOfWordsAttribs.OBJECT_PRECEDING)
-                .createBowLibLinearFeatureNodeForQuery(corpusEntryObject);
+                .createBowLibLinearFeatureNodeForQuery(corpusEntryObject, 2 * bagOfWordsFeatureNodes1.length);
         FeatureNode[] bagOfWordsFeatureNodes4 = segmentedBagOfWordsHashMap.get(Constants.segmentedBagOfWordsAttribs.OBJECT_FOLLOWING)
-                .createBowLibLinearFeatureNodeForQuery(corpusEntryObject);
+                .createBowLibLinearFeatureNodeForQuery(corpusEntryObject, 3 * bagOfWordsFeatureNodes1.length);
         FeatureNode[] bagOfWordsFeatureNodes = ArrayUtils.addAll(
                 ArrayUtils.addAll(bagOfWordsFeatureNodes1, bagOfWordsFeatureNodes2),
                 ArrayUtils.addAll(bagOfWordsFeatureNodes3, bagOfWordsFeatureNodes4));
         FeatureNode[] entityTypesFeatureNodes = createNamedEntityFeature(entityTypeModel, corpusEntryObject, bagOfWordsFeatureNodes.length);
         FeatureNode[] posFeatureNodes = createPosFeature(partOfSpeechModel, corpusEntryObject, bagOfWordsFeatureNodes.length + entityTypesFeatureNodes.length);
         FeatureNode[] featureNodes = ArrayUtils.addAll(ArrayUtils.addAll(bagOfWordsFeatureNodes, entityTypesFeatureNodes), posFeatureNodes);
+
+
         return featureNodes;
     }
 
@@ -117,7 +119,7 @@ public class FeatureExtractor {
             }
         } else {
             for (int i = 0; i < partOfSpeechModel.getNoOfPOS(); i++)
-                featureNodes[i] = new FeatureNode(lastIdx + 1 + partOfSpeechModel.getNoOfPOS() + i, 0);
+                featureNodes[partOfSpeechModel.getNoOfPOS() + i] = new FeatureNode(lastIdx + 1 + partOfSpeechModel.getNoOfPOS() + i, 0);
         }
         return featureNodes;
     }

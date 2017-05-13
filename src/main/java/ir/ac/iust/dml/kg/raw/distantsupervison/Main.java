@@ -24,8 +24,8 @@ public class Main {
         if (train) classifier.train(Configuration.noOfTrainExamples, Configuration.noOfTestExamples, true);
 
 
-        classifier.testForSingleSentenceString("پروین اعتصامی متولد قم است");
-        classifier.testForSingleSentenceString("مولوی متولد قم است");
+        classifier.testForSingleSentenceString("پروین اعتصامی در سال 1357 متولد شده است");
+        /*classifier.testForSingleSentenceString("مولوی متولد قم است");
         classifier.testForSingleSentenceString("حافظ متولد قم است");
         classifier.testForSingleSentenceString("حسن روحانی متولد قم است");
         classifier.testForSingleSentenceString("محمد اصفهانی متولد قم است");
@@ -39,7 +39,7 @@ public class Main {
         classifier.testForSingleSentenceString("حافظ در شیراز به دنیا آمد");
         classifier.testForSingleSentenceString("حسن روحانی در خانواده تهیدست در  مشهد متولد گشت");
         classifier.testForSingleSentenceString("محمد اصفهانی در سال ۱۳۳۰ در تهران به دنیا آمد");
-        classifier.testForSingleSentenceString("علی لاریجانی در بهمن ۱۳۵۷ در  گرگان متولد شد");
+        classifier.testForSingleSentenceString("علی لاریجانی در بهمن ۱۳۵۷ در  گرگان متولد شد");*/
     }
 
 //    public void test() {

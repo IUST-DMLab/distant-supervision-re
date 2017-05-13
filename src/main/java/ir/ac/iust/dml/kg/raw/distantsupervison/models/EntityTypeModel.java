@@ -4,6 +4,7 @@ import ir.ac.iust.dml.kg.ontology.tree.client.OntologyClass;
 import ir.ac.iust.dml.kg.ontology.tree.client.OntologyClient;
 import ir.ac.iust.dml.kg.ontology.tree.client.PagedData;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
+import ir.ac.iust.dml.kg.raw.distantsupervison.Constants;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +26,7 @@ public class EntityTypeModel {
         int lastIdx = 0;
         for (OntologyClass ontologyClass:
              this.entities) {
-            String temp = "http://fkg.iust.ac.ir/ontology/" + ontologyClass.getOntologyClass();
+            String temp = Constants.entityModelAttribs.PREFIX + ontologyClass.getOntologyClass();
             if (!entityIndex.containsKey((temp))) {
                 entityIndex.put(temp, lastIdx);
                 entityInvertedIndex.put(lastIdx, temp);

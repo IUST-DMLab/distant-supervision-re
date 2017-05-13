@@ -151,12 +151,12 @@ public class SegmentedBagOfWords {
         return featureVector;
     }
 
-    public FeatureNode[] createBowLibLinearFeatureNodeForQuery(CorpusEntryObject corpusEntryObject) {
+    public FeatureNode[] createBowLibLinearFeatureNodeForQuery(CorpusEntryObject corpusEntryObject, int lastIdx) {
         List<String> queryWords = getSegmentWords(corpusEntryObject);
         FeatureNode[] featureNodes = new FeatureNode[this.maximumNoOfVocabulary];
         List<Double> featureVector = this.createBowFeatureVectorForQuery(corpusEntryObject);
         for (int i = 0; i < featureVector.size(); i++) {
-            featureNodes[i] = new FeatureNode(i + 1, featureVector.get(i));
+            featureNodes[i] = new FeatureNode(lastIdx + i + 1, featureVector.get(i));
         }
         return featureNodes;
     }

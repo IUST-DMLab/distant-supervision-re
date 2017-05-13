@@ -45,4 +45,8 @@ public class Constants {
         public static final String OBJECT_TYPE = "object_type";
         public static final String PREDICATE = "predicate";
     }
+
+    public static class entityModelAttribs {
+        public static final String PREFIX = "fkgo:"; // "http://fkg.iust.ac.ir/ontology/"
+    }
 }

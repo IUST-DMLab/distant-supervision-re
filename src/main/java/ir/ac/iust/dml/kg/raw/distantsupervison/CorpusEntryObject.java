@@ -116,10 +116,13 @@ public class CorpusEntryObject {
         if (subjIdx < objIdx) {
             startIdx = (subjIdx - Configuration.maxWindowSize < 0) ? 0 : subjIdx - Configuration.maxWindowSize;
         } else {
-            startIdx = objIdx;
+            startIdx = objIdx + 1;
         }
 
-        words = allQueryWords.subList(startIdx, endIdx);
+        if (startIdx > endIdx)
+            words = new ArrayList<>();
+        else
+            words = allQueryWords.subList(startIdx, endIdx);
         return words;
     }
 
@@ -129,7 +132,7 @@ public class CorpusEntryObject {
         List<String> allQueryWords = WordTokenizer.tokenize(getGeneralizedSentence());
         int subjIdx = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
         int objIdx = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
-        int startIdx = subjIdx;
+        int startIdx = subjIdx + 1;
         int endIdx;
 
         if (subjIdx < objIdx) {
@@ -138,7 +141,11 @@ public class CorpusEntryObject {
             endIdx = (subjIdx + Configuration.maxWindowSize >= allQueryWords.size()) ? allQueryWords.size() - 1 : subjIdx + Configuration.maxWindowSize;
         }
 
-        words = allQueryWords.subList(startIdx, endIdx);
+        if (startIdx > endIdx)
+            words = new ArrayList<>();
+        else
+            words = allQueryWords.subList(startIdx, endIdx);
+
         return words;
     }
 
@@ -155,11 +162,13 @@ public class CorpusEntryObject {
         if (objIdx < subjIdx) {
             startIdx = (objIdx - Configuration.maxWindowSize < 0) ? 0 : objIdx - Configuration.maxWindowSize;
         } else {
-            startIdx = subjIdx;
+            startIdx = subjIdx + 1;
         }
 
-        words = allQueryWords.subList(startIdx, endIdx);
-
+        if (startIdx > endIdx)
+            words = new ArrayList<>();
+        else
+            words = allQueryWords.subList(startIdx, endIdx);
 
         return words;
     }
@@ -170,7 +179,7 @@ public class CorpusEntryObject {
         List<String> allQueryWords = WordTokenizer.tokenize(getGeneralizedSentence());
         int subjIdx = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
         int objIdx = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
-        int startIdx = objIdx;
+        int startIdx = objIdx + 1;
         int endIdx;
 
         if (objIdx < subjIdx) {
@@ -179,7 +188,11 @@ public class CorpusEntryObject {
             endIdx = (objIdx + Configuration.maxWindowSize >= allQueryWords.size()) ? allQueryWords.size() - 1 : objIdx + Configuration.maxWindowSize;
         }
 
-        words = allQueryWords.subList(startIdx, endIdx);
+        if (startIdx > endIdx)
+            words = new ArrayList<>();
+        else
+            words = allQueryWords.subList(startIdx, endIdx);
+
 
         return words;
     }

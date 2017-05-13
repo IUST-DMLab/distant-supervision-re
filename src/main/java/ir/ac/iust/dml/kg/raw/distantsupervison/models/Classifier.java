@@ -10,9 +10,7 @@ import ir.ac.iust.dml.kg.resource.extractor.client.MatchedResource;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.*;
 
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
@@ -109,6 +107,9 @@ public class Classifier {
             }
             trainData.shuffle();
             trainDbHandler.insertAll(trainData.getEntries());
+
+            createAndSaveTestData(problem, numberOfTestExamples);
+
         } else {
             trainDbHandler.load(trainData);
         }
@@ -127,7 +128,8 @@ public class Classifier {
             problem.y[i] = corpusDB.getIndices().get(corpusEntryObject.getPredicate());
         }
 
-        createAndSaveTestData(problem, numberOfTestExamples);
+
+        System.out.print(numberOfFeatures);
 
         problem.x =  featureNodes;// feature nodes
 
@@ -138,6 +140,19 @@ public class Classifier {
         Parameter parameter = new Parameter(solver, C, eps);
 
         File modelFile = new File(this.modelFilePath);
+
+
+        int k, l = 0;
+        for (Feature[] nodes : problem.x) {
+            k = 0;
+            for (Feature n : nodes) {
+                if (n == null)
+                    System.out.println(k + " " + l);
+                k++;
+            }
+            l++;
+        }
+
         Model model = Linear.train(problem, parameter);
 
         try {
@@ -180,7 +195,17 @@ public class Classifier {
     }
 
     private void createAndSaveTestData(Problem problem, int numberOfTestExamples) {
-        try (Writer fileWriter = new FileWriter(this.testDataFile)) {
+        CorpusDbHandler testDbHandler = new CorpusDbHandler("test");
+        testDbHandler.deleteAll();
+
+        for (int i = problem.l; i < corpusDB.getShuffledEntries().size(); i++) {
+            System.out.println(i + "\t" + "test: " + corpusDB.getShuffledEntries().get(i).toString());
+            testData.addEntry(corpusDB.getShuffledEntries().get(i));
+        }
+        testData.shuffle();
+        testDbHandler.insertAll(testData.getEntries());
+
+        /*try (Writer fileWriter = new FileWriter(this.testDataFile)) {
             CorpusEntryObject currentTestData;
             for (int i = problem.l; i<problem.l+numberOfTestExamples; i++){
                 currentTestData = corpusDB.getShuffledEntries().get(i);
@@ -193,7 +218,7 @@ public class Classifier {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
 
@@ -216,6 +241,10 @@ public class Classifier {
     }
 
     public void testForSingleSentenceString(String sentenceString){
+        CorpusDbHandler trainDbHandler = new CorpusDbHandler("train");
+        trainDbHandler.load(trainData);
+        trainData.shuffle();
+
         initializeModels(false);
 
         Sentence test = new Sentence(sentenceString);
@@ -286,7 +315,7 @@ public class Classifier {
                 corpusEntryObject.setSubject(subject);
                 corpusEntryObject.setObject(object);
 
-                Feature[] instance = FeatureExtractor.createFeatureNode(bagOfWordsModel, entityTypeModel, partOfSpeechModel, corpusEntryObject);
+                Feature[] instance = FeatureExtractor.createFeatureNode(segmentedBagOfWordsHashMap, entityTypeModel, partOfSpeechModel, corpusEntryObject);
 
                 double[] probs = new double[model.getNrClass()];
                 double prediction = Linear.predictProbability(model, instance, probs);
@@ -295,7 +324,7 @@ public class Classifier {
                 if ((double) Collections.max(a) > Configuration.confidenceThreshold) {
                     System.out.println(subjectType);
                     System.out.println(objectType);
-                    System.out.println("\n" + "Subject: " + results.get(i).getResource().getLabel() + "\n" + "Object: " + results.get(j).getResource().getLabel() + "\n" + "Predicate: " + corpusDB.getInvertedIndices().get(prediction));
+                    System.out.println("\n" + "Subject: " + results.get(i).getResource().getLabel() + "\n" + "Object: " + results.get(j).getResource().getLabel() + "\n" + "Predicate: " + trainData.getInvertedIndices().get(prediction));
                     System.out.println("Confidence: " + Collections.max(a));
                 }
             }

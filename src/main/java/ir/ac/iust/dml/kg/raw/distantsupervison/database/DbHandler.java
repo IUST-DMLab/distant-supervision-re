@@ -44,7 +44,7 @@ public class DbHandler {
     @org.junit.Test
     public void saveCorpusJasonToDB() {
 
-        String tempCorpusJasonPath = "Corpus4.json";
+        String tempCorpusJasonPath = "C:\\Users\\hemmatan\\IdeaProjects\\RE\\Corpus4.json";
         try (JsonReader reader = new JsonReader(new FileReader(tempCorpusJasonPath));
         ) {
             reader.beginArray();
@@ -94,8 +94,9 @@ public class DbHandler {
 
 
                         Sentence sentence = new Sentence(originalSentence);
-                        String generalizedNormalizedSentence = sentence.getNormalized().replace(subject, Constants.sentenceAttribs.SUBJECT_ABV);
-                        generalizedNormalizedSentence = generalizedNormalizedSentence.replace(object, Constants.sentenceAttribs.OBJECT_ABV);
+                        //String generalizedNormalizedSentence = sentence.getNormalized().replace(subject, Constants.sentenceAttribs.SUBJECT_ABV);
+                        //generalizedNormalizedSentence = generalizedNormalizedSentence.replace(object, Constants.sentenceAttribs.OBJECT_ABV);
+                        String generalizedNormalizedSentence = Normalizer.normalize(newSentence);
                         CorpusEntryObject corpusEntryObject = new CorpusEntryObject(sentence, generalizedNormalizedSentence, object, subject, objectType, subjectType, predicate, occur);
                         corpusDbHandler.insert(corpusEntryObject);
                         nextToken2 = reader.peek();

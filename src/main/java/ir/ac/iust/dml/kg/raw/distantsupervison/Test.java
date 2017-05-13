@@ -1,5 +1,7 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
+import ir.ac.iust.dml.kg.raw.POSTagger;
+import ir.ac.iust.dml.kg.raw.WordTokenizer;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.BagOfWordsModel;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
@@ -14,6 +16,12 @@ import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
  * Created by hemmatan on 4/4/2017.
  */
 public class Test {
+
+    @org.junit.Test
+    public void postest() {
+        System.out.print(POSTagger.tag(WordTokenizer.tokenize("۱۳۳۰")));
+    }
+
 
     @org.junit.Test
     public void test() {
