@@ -50,6 +50,7 @@ public class Test {
         classifier.testForSingleSentenceString("رفسنجانی متولد قم است");
         classifier.testForSingleSentenceString("سعدی متولد قم است");
 
+
     }
 
 

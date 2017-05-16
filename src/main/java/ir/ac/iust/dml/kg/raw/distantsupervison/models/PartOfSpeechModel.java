@@ -36,7 +36,7 @@ public class PartOfSpeechModel {
             Set<String> pos = this.posIndex.keySet();
             for (String s :
                     pos) {
-                fileWriter.write(s + "\n");
+                fileWriter.write(s + "\t" + posIndex.get(s) + "\n");
             }
             fileWriter.close();
         } catch (IOException e) {
@@ -46,12 +46,12 @@ public class PartOfSpeechModel {
 
     public void loadModel() {
         try (Scanner scanner = new Scanner(new FileInputStream(this.posFile))) {
-            int lastIdx = 0;
             while (scanner.hasNextLine()) {
-                String pos = scanner.nextLine();
+                String line = scanner.nextLine();
+                String pos = line.split("\t")[0];
+                int lastIdx = Integer.parseInt(line.split("\t")[1]);
                 posIndex.put(pos, lastIdx);
                 posInvertedIndex.put(lastIdx, pos);
-                lastIdx++;
             }
             noOfPOS = posIndex.keySet().size();
             partsOfSpeech = posIndex.keySet();

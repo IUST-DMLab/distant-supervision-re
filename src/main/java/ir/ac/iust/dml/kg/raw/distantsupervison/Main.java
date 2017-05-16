@@ -1,6 +1,5 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
-import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
 
 /**
@@ -16,17 +15,21 @@ public class Main {
 
     private static void process(boolean train) {
         //TODO: these two lines should be remove because the corpus table loads in Classifier()!
-        SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
-        sentenceDbHandler.loadSentenceTable();
+        //SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
+        //sentenceDbHandler.loadSentenceTable();
 
         Classifier classifier = new Classifier();
 
         if (train) classifier.train(Configuration.noOfTrainExamples, Configuration.noOfTestExamples, true);
+        else classifier.loadModels();
 
 
-        classifier.testForSingleSentenceString("پروین اعتصامی در سال 1357 متولد شده است");
-        /*classifier.testForSingleSentenceString("مولوی متولد قم است");
+        //classifier.initializeModels(false);
+        classifier.testForSingleSentenceString("عباس میرزا ابوطالبی (متولد سال ۱۳۳۳ خورشیدی، کرج) سیاستمدار اصلاح طلب است.");
+        classifier.testForSingleSentenceString("مولوی متولد قم است");
+
         classifier.testForSingleSentenceString("حافظ متولد قم است");
+        /*
         classifier.testForSingleSentenceString("حسن روحانی متولد قم است");
         classifier.testForSingleSentenceString("محمد اصفهانی متولد قم است");
         classifier.testForSingleSentenceString("علی لاریجانی متولد قم است");

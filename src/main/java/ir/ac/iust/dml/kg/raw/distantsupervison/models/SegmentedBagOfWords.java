@@ -5,9 +5,9 @@ import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Constants;
 import ir.ac.iust.dml.kg.raw.distantsupervison.CorpusEntryObject;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static java.lang.Math.log10;
@@ -32,7 +32,8 @@ public class SegmentedBagOfWords {
     private HashMap<String, Integer> indices = new HashMap<>();
     private List<String> sortedByTf = new ArrayList<>();
 
-    public SegmentedBagOfWords() {
+    public SegmentedBagOfWords(String segment) {
+        this.segment = segment;
     }
 
     public SegmentedBagOfWords(List<CorpusEntryObject> corpusOfBOW, String segment, Boolean doLemmatize, int maximumNoOfVocabulary) {
@@ -47,6 +48,9 @@ public class SegmentedBagOfWords {
         saveModel();
     }
 
+    public HashMap<String, Integer> getIndices() {
+        return indices;
+    }
 
     public List<String> getSegmentWords(CorpusEntryObject corpusEntryObject) {
         List<String> words = new ArrayList<>();
@@ -169,7 +173,6 @@ public class SegmentedBagOfWords {
         String[] parameters = {"tfInCorpus", "df", "idf"};
         System.out.println(this.bowFile);
         try (Writer fileWriter = new FileWriter(this.bowFile)) {
-            fileWriter.write("maximumNoOfVocabulary" + "\t" + this.maximumNoOfVocabulary + "\n");
             for (String token :
                     this.sortedByTf) {
                 fileWriter.write(token + "\t");
@@ -183,6 +186,28 @@ public class SegmentedBagOfWords {
         }
     }
 
+
+    public void loadModel() {
+        int currentIndex = 0;
+        System.out.println(this.bowFile);
+        System.out.println(Files.exists(Paths.get(this.bowFile)));
+        try (Scanner scanner = new Scanner(new FileInputStream(this.bowFile))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] tokens = line.split("\t");
+                this.sortedByTf.add(tokens[0]);
+                this.vocabularySet.add(tokens[0]);
+                this.tfIdfInCorpus.put(tokens[0], Double.valueOf(tokens[1]));
+                this.df.put(tokens[0], Double.valueOf(tokens[2]));
+                this.idf.put(tokens[0], Double.valueOf(tokens[3]));
+                this.indices.put(tokens[0], currentIndex++);
+            }
+            this.vocabularySize = currentIndex;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     public int getMaximumNoOfVocabulary() {
         return maximumNoOfVocabulary;
