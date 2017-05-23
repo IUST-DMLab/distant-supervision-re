@@ -25,8 +25,8 @@ public class DbHandler {
     protected static final String patternsTableName = "patterns";
     protected static final String sentencesTableName = "sentences";
     protected static final String corpusTableName = "corpus";
-    protected static final String trainTableName = "train";
-    protected static final String testTableName = "test";
+    public static final String trainTableName = "train";
+    public static final String testTableName = "test";
 
 
 
@@ -44,7 +44,7 @@ public class DbHandler {
     @org.junit.Test
     public void saveCorpusJasonToDB() {
 
-        String tempCorpusJasonPath = "C:\\Users\\hemmatan\\IdeaProjects\\RE\\Corpus4.json";
+        String tempCorpusJasonPath = "C:\\Users\\hemmatan\\IdeaProjects\\RE\\Corpus5.json";
         try (JsonReader reader = new JsonReader(new FileReader(tempCorpusJasonPath));
         ) {
             reader.beginArray();

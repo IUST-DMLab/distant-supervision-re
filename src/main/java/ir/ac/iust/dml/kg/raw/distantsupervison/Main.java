@@ -25,10 +25,12 @@ public class Main {
 
 
         //classifier.initializeModels(false);
-        classifier.testForSingleSentenceString("عباس میرزا ابوطالبی (متولد سال ۱۳۳۳ خورشیدی، کرج) سیاستمدار اصلاح طلب است.");
-        classifier.testForSingleSentenceString("مولوی متولد قم است");
+        //classifier.testForSingleSentenceString("مرتضی پاشایی متولد سال 1360 خورشیدی در تهران و خواننده پاپ و آهنگساز است.");
+        classifier.testForSingleSentenceString("حسن روحانی ، رییس\u200Cجمهور ایران، در سال ۱۳۳۰ در تهران به دنیا آمد.");
 
-        classifier.testForSingleSentenceString("حافظ متولد قم است");
+        //classifier.testForSingleSentenceString("مولوی متولد قم است");
+
+        //classifier.testForSingleSentenceString("حافظ متولد قم است");
         /*
         classifier.testForSingleSentenceString("حسن روحانی متولد قم است");
         classifier.testForSingleSentenceString("محمد اصفهانی متولد قم است");
