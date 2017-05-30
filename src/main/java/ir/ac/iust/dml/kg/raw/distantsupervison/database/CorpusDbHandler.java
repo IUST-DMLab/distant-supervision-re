@@ -9,9 +9,12 @@ import com.mongodb.client.MongoDatabase;
 import ir.ac.iust.dml.kg.raw.distantsupervison.*;
 import org.bson.Document;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Created by hemmatan on 4/18/2017.
@@ -21,6 +24,7 @@ public class CorpusDbHandler extends DbHandler {
     private MongoClient mongo = null;
     private MongoDatabase distantSupervisionDB;
     private MongoCollection<Document> corpusTable;
+    private String predicatesFile = "predicatesToLoad.txt";
 
     public CorpusDbHandler(String tableName) {
         mongo = new MongoClient(host, port);
@@ -60,6 +64,11 @@ public class CorpusDbHandler extends DbHandler {
     public void loadByMostFrequentPredicates(CorpusDB destinationCorpusDB,
                                              int numberOfEntriesToLoad){
         List<String> predicates = getMostFrequentPredicates(Configuration.numberOfPredicatesToLoad);
+
+        loadByPredicates(destinationCorpusDB, numberOfEntriesToLoad, predicates);
+    }
+
+    private void loadByPredicates(CorpusDB destinationCorpusDB, int numberOfEntriesToLoad, List<String> predicates) {
         MongoCursor cursor = corpusTable.find().iterator();
         Document document;
         String rawString;
@@ -91,8 +100,8 @@ public class CorpusDbHandler extends DbHandler {
             predicate = (String) document.get(Constants.corpusDbEntryAttribs.PREDICATE);
             occurrence = (int) document.get(Constants.corpusDbEntryAttribs.OCCURRENCE);
             if (destinationCorpusDB.getPredicateCounts().containsKey(predicate) &&
-                destinationCorpusDB.getPredicateCounts().get(predicate)>=Configuration.maximumNoOfInstancesForEachPredicate)
-                    continue;
+                    destinationCorpusDB.getPredicateCounts().get(predicate) >= Configuration.maximumNoOfInstancesForEachPredicate)
+                continue;
             //words = convertBasicDBListToJavaListOfStrings(wordsObject);
             //posTags = convertBasicDBListToJavaListOfStrings(postagObject);
             currentSentence = new Sentence(rawString,words,posTags,normalized);
@@ -172,7 +181,7 @@ public class CorpusDbHandler extends DbHandler {
         List<String> result = new ArrayList<>();
         for (Document d:
              biadab) {
-            if (cnt++>numberOfEntriesToLoad)
+            if (cnt++ >= numberOfEntriesToLoad)
                 break;
             String predicate = ((Document) d.get("_id")).get("predicate").toString();
             result.add(predicate);
@@ -187,4 +196,24 @@ public class CorpusDbHandler extends DbHandler {
     }
 
 
+    public void loadByReadingPedicatesFromFile(CorpusDB destinationCorpusDB, int numberOfEntriesToLoad) {
+        List<String> predicates = readPredicatesFromFile(Configuration.numberOfPredicatesToLoad);
+        loadByPredicates(destinationCorpusDB, numberOfEntriesToLoad, predicates);
+    }
+
+    private List<String> readPredicatesFromFile(int numberOfPredicatesToLoad) {
+        List<String> predicates = new ArrayList<>();
+        int cnt = 0;
+        try (Scanner scanner = new Scanner(new FileInputStream(this.predicatesFile))) {
+            while (scanner.hasNextLine() && cnt < numberOfPredicatesToLoad) {
+                String line = scanner.nextLine();
+                predicates.add(line);
+                cnt++;
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return predicates;
+    }
 }

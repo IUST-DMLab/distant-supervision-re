@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpusDB;
 
 /**
@@ -40,7 +39,7 @@ public class Classifier {
         SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
         sentenceDbHandler.loadSentenceTable();
 
-        CorpusDbHandler trainDbHandler = new CorpusDbHandler("train");
+        CorpusDbHandler trainDbHandler = new CorpusDbHandler(DbHandler.trainTableName);
         trainDbHandler.load(trainData);
     }
 
@@ -52,8 +51,11 @@ public class Classifier {
         trainDbHandler.deleteAll();
         trainData.deleteAll();
 
-        CorpusDbHandler corpusDbHandler = new CorpusDbHandler("corpus");
-        corpusDbHandler.loadByMostFrequentPredicates(corpusDB, totalNoOfData);
+        CorpusDbHandler corpusDbHandler = new CorpusDbHandler(DbHandler.corpusTableName);
+        if (Configuration.getPredicatesFromFile)
+            corpusDbHandler.loadByReadingPedicatesFromFile(corpusDB, totalNoOfData);
+        else
+            corpusDbHandler.loadByMostFrequentPredicates(corpusDB, totalNoOfData);
         corpusDB.shuffle();
 
         for (int i = 0; i < numberOfTrainingExamples; i++) {
@@ -129,16 +131,34 @@ public class Classifier {
                 false, defaultMaximumNoOfVocabularyForBOW / 4);
         segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.SUBJECT_PRECEDING, segmentedBagOfWords);
 
-        new SegmentedBagOfWords(trainData.getEntries(), Constants.segmentedBagOfWordsAttribs.SUBJECT_FOLLOWING,
+        segmentedBagOfWords = new SegmentedBagOfWords(trainData.getEntries(), Constants.segmentedBagOfWordsAttribs.SUBJECT_FOLLOWING,
                 false, defaultMaximumNoOfVocabularyForBOW / 4);
         segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.SUBJECT_FOLLOWING, segmentedBagOfWords);
 
-        new SegmentedBagOfWords(trainData.getEntries(), Constants.segmentedBagOfWordsAttribs.OBJECT_PRECEDING,
+        segmentedBagOfWords = new SegmentedBagOfWords(trainData.getEntries(), Constants.segmentedBagOfWordsAttribs.OBJECT_PRECEDING,
                 false, defaultMaximumNoOfVocabularyForBOW / 4);
         segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.OBJECT_PRECEDING, segmentedBagOfWords);
 
-        new SegmentedBagOfWords(trainData.getEntries(), Constants.segmentedBagOfWordsAttribs.OBJECT_FOLLOWING,
+        segmentedBagOfWords = new SegmentedBagOfWords(trainData.getEntries(), Constants.segmentedBagOfWordsAttribs.OBJECT_FOLLOWING,
                 false, defaultMaximumNoOfVocabularyForBOW / 4);
+        segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.OBJECT_FOLLOWING, segmentedBagOfWords);
+    }
+
+    private void loadSegmentedBowModel() {
+        SegmentedBagOfWords segmentedBagOfWords = new SegmentedBagOfWords(Constants.segmentedBagOfWordsAttribs.SUBJECT_PRECEDING);
+        segmentedBagOfWords.loadModel();
+        segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.SUBJECT_PRECEDING, segmentedBagOfWords);
+
+        segmentedBagOfWords = new SegmentedBagOfWords(Constants.segmentedBagOfWordsAttribs.SUBJECT_FOLLOWING);
+        segmentedBagOfWords.loadModel();
+        segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.SUBJECT_FOLLOWING, segmentedBagOfWords);
+
+        segmentedBagOfWords = new SegmentedBagOfWords(Constants.segmentedBagOfWordsAttribs.OBJECT_PRECEDING);
+        segmentedBagOfWords.loadModel();
+        segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.OBJECT_PRECEDING, segmentedBagOfWords);
+
+        segmentedBagOfWords = new SegmentedBagOfWords(Constants.segmentedBagOfWordsAttribs.OBJECT_FOLLOWING);
+        segmentedBagOfWords.loadModel();
         segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.OBJECT_FOLLOWING, segmentedBagOfWords);
     }
 
@@ -146,7 +166,7 @@ public class Classifier {
         entityTypeModel = new EntityTypeModel(true);
         partOfSpeechModel = new PartOfSpeechModel();
         partOfSpeechModel.loadModel();
-        buildSegmentedBowModel();
+        loadSegmentedBowModel();
         trainData.loadPredicateIndices(this.predicatesIndexFile);
     }
 
@@ -158,7 +178,7 @@ public class Classifier {
             partOfSpeechModel.addToModel(corpusEntryObject.getOriginalSentence().getPosTagged());
         }
         partOfSpeechModel.saveModel();
-        bagOfWordsModel = new BagOfWordsModel(corpus.getSentences(), false, defaultMaximumNoOfVocabularyForBOW);
+        bagOfWordsModel = new BagOfWordsModel();//(corpus.getSentences(), false, defaultMaximumNoOfVocabularyForBOW);
         buildSegmentedBowModel();
 
         System.out.println(segmentedBagOfWordsHashMap.get(Constants.segmentedBagOfWordsAttribs.OBJECT_FOLLOWING).getIndices());
@@ -166,7 +186,7 @@ public class Classifier {
     }
 
     private void createAndSaveTestData(Problem problem, int numberOfTestExamples) {
-        CorpusDbHandler testDbHandler = new CorpusDbHandler("test");
+        CorpusDbHandler testDbHandler = new CorpusDbHandler(DbHandler.testTableName);
         testDbHandler.deleteAll();
 
         for (int i = problem.l; i < corpusDB.getShuffledEntries().size(); i++) {
@@ -208,6 +228,59 @@ public class Classifier {
 
 
         return sw;
+    }
+
+    public void testForSingleSentenceStringAndTriple(String sentenceString, String subject, String object) {
+        Sentence test = new Sentence(sentenceString);
+        ExtractorClient client = new ExtractorClient(Configuration.extractorClient);
+        List<MatchedResource> resultsForSubject = client.match(subject);
+        List<MatchedResource> resultsForObject = client.match(object);
+
+
+        //Feature[] instance = bagOfWordsModel.createBowLibLinearFeatureNodeForQueryWithWindow(test.getWords());
+        Model model = null;
+        File modelFile = new File(this.modelFilePath);
+        try {
+            model = Linear.loadModel(modelFile);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        List<String> subjectType = new ArrayList<>();
+        if (resultsForSubject != null && !resultsForSubject.isEmpty())
+            subjectType.addAll(resultsForSubject.get(0).getResource().getClassTree());
+        List<String> objectType = new ArrayList<>();
+        if (resultsForObject != null && !resultsForObject.isEmpty())
+            objectType.addAll(resultsForObject.get(0).getResource().getClassTree());
+
+        String generalized = sentenceString.replace(subject, Constants.sentenceAttribs.SUBJECT_ABV);
+        generalized = generalized.replace(object, Constants.sentenceAttribs.OBJECT_ABV);
+
+        CorpusEntryObject corpusEntryObject = new CorpusEntryObject();
+        corpusEntryObject.setOriginalSentence(test);
+        corpusEntryObject.setObject(object);
+        corpusEntryObject.setSubject(subject);
+        corpusEntryObject.setGeneralizedSentence(generalized);
+        corpusEntryObject.setSubjectType(subjectType);
+        corpusEntryObject.setObjectType(objectType);
+
+        Feature[] instance = FeatureExtractor.createFeatureNode(segmentedBagOfWordsHashMap, entityTypeModel, partOfSpeechModel, corpusEntryObject);
+
+        double[] probs = new double[model.getNrClass()];
+        double prediction = Linear.predictProbability(model, instance, probs);
+        List a = Arrays.asList(ArrayUtils.toObject(probs));
+
+        if ((double) Collections.max(a) > Configuration.confidenceThreshold) {
+            System.out.println(subjectType);
+            System.out.println(objectType);
+            System.out.println("\n" + "Subject: " + subject + " " + "\n" + "Object: " + object + " " + "\n" + "Predicate: " + trainData.getInvertedIndices().get(prediction));
+            System.out.println("Prediction number: " + prediction);
+            System.out.println("Confidence: " + Collections.max(a));
+        }
+
+        System.out.print(trainData.getIndices());
+
     }
 
     public void testForSingleSentenceString(String sentenceString){

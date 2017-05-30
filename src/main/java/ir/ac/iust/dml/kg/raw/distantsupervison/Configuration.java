@@ -7,7 +7,7 @@ public class Configuration {
     public static final int maximumNoOfVocabularyForBagOfWords = 4000;
 
     public static final int maximumNoOfInstancesForEachPredicate = 1000;
-    public static final int noOfTrainExamples = 16000;
+    public static final int noOfTrainExamples = 20000;
     public static final int noOfTestExamples = noOfTrainExamples/5;
     public static final int noOfTotalExamples = noOfTrainExamples+noOfTestExamples;
 
@@ -20,5 +20,7 @@ public class Configuration {
     public static final String ontologyClient = "http://194.225.227.161:8090";
 
     public static final int maxWindowSize = 5;
+
+    public static final boolean getPredicatesFromFile = false;
 
 }

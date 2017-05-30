@@ -28,8 +28,8 @@ public class FeatureExtractor {
 
     public static FeatureNode[] createFeatureNode(HashMap<String, SegmentedBagOfWords> segmentedBagOfWordsHashMap,
                                                   EntityTypeModel entityTypeModel, PartOfSpeechModel partOfSpeechModel, CorpusEntryObject corpusEntryObject) {
-        String jomle = corpusEntryObject.getGeneralizedSentence();
-        List<String> tokenized = WordTokenizer.tokenize(jomle);
+        //String jomle = corpusEntryObject.getGeneralizedSentence();
+        //List<String> tokenized = WordTokenizer.tokenize(jomle);
         FeatureNode[] bagOfWordsFeatureNodes1 = segmentedBagOfWordsHashMap.get(Constants.segmentedBagOfWordsAttribs.SUBJECT_PRECEDING)
                 .createBowLibLinearFeatureNodeForQuery(corpusEntryObject, 0);
         FeatureNode[] bagOfWordsFeatureNodes2 = segmentedBagOfWordsHashMap.get(Constants.segmentedBagOfWordsAttribs.SUBJECT_FOLLOWING)

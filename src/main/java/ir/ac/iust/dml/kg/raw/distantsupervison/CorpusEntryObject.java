@@ -16,6 +16,8 @@ public class CorpusEntryObject {
     private List<String> objectType, subjectType;
     private String predicate;
     private int occurrence;
+    private List<String> allQueryWords = new ArrayList<>();
+
 
     public CorpusEntryObject() {
     }
@@ -29,6 +31,8 @@ public class CorpusEntryObject {
         this.subjectType = subjectType;
         this.predicate = predicate;
         this.occurrence = occurrence;
+
+        allQueryWords = WordTokenizer.tokenize(getGeneralizedSentence());
     }
 
     public String getGeneralizedSentence() {
@@ -36,7 +40,10 @@ public class CorpusEntryObject {
     }
 
     public void setGeneralizedSentence(String generalizedSentence) {
+
         this.generalizedSentence = generalizedSentence;
+        allQueryWords = WordTokenizer.tokenize(getGeneralizedSentence());
+
     }
 
     public String getObject() {
@@ -106,7 +113,6 @@ public class CorpusEntryObject {
     public List<String> getSubjectPrecedingWords() {
         List<String> words = new ArrayList<>();
 
-        List<String> allQueryWords = WordTokenizer.tokenize(getGeneralizedSentence());
         int subjIdx = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
         int objIdx = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
         int startIdx;
@@ -129,7 +135,6 @@ public class CorpusEntryObject {
     public List<String> getSubjectFollowingWords() {
         List<String> words = new ArrayList<>();
 
-        List<String> allQueryWords = WordTokenizer.tokenize(getGeneralizedSentence());
         int subjIdx = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
         int objIdx = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
         int startIdx = subjIdx + 1;
@@ -152,7 +157,6 @@ public class CorpusEntryObject {
     public List<String> getObjectPrecedingWords() {
         List<String> words = new ArrayList<>();
 
-        List<String> allQueryWords = WordTokenizer.tokenize(getGeneralizedSentence());
         int subjIdx = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
         int objIdx = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
         int startIdx;
@@ -176,7 +180,6 @@ public class CorpusEntryObject {
     public List<String> getObjectFollowingWords() {
         List<String> words = new ArrayList<>();
 
-        List<String> allQueryWords = WordTokenizer.tokenize(getGeneralizedSentence());
         int subjIdx = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
         int objIdx = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
         int startIdx = objIdx + 1;

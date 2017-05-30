@@ -24,7 +24,7 @@ public class DbHandler {
     protected static final String distantSupervisionDBName = "DistantSupervision";
     protected static final String patternsTableName = "patterns";
     protected static final String sentencesTableName = "sentences";
-    protected static final String corpusTableName = "corpus";
+    public static final String corpusTableName = "corpus_lt20";
     public static final String trainTableName = "train";
     public static final String testTableName = "test";
 

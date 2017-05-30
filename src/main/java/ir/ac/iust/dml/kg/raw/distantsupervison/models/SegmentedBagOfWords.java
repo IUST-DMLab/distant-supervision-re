@@ -34,6 +34,7 @@ public class SegmentedBagOfWords {
 
     public SegmentedBagOfWords(String segment) {
         this.segment = segment;
+        this.bowFile = segment;
     }
 
     public SegmentedBagOfWords(List<CorpusEntryObject> corpusOfBOW, String segment, Boolean doLemmatize, int maximumNoOfVocabulary) {
