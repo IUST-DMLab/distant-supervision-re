@@ -2,6 +2,10 @@ package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+
 /**
  * Created by hemmatan on 4/26/2017.
  */
@@ -28,7 +32,18 @@ public class Main {
         String sentenceString = "حسن روحانی ، رییس\\u200Cجمهور ایران، در سال ۱۳۳۰ در تهران به دنیا آمد.";
         String subject = "حسن روحانی";
         String object = "تهران";
-        classifier.testForSingleSentenceStringAndTriple(sentenceString, subject, object);
+
+        PrintStream out = null;
+        try {
+            out = new PrintStream(new FileOutputStream("testResults.txt"));
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        System.setOut(out);
+
+        classifier.testJson();
+        //classifier.testForSingleSentenceStringAndTriple(sentenceString, subject, object);
         //classifier.testForSingleSentenceString("حسن روحانی ، رییس\u200Cجمهور ایران، در سال ۱۳۳۰ در تهران به دنیا آمد.");
 
         //classifier.testForSingleSentenceString("مولوی متولد قم است");

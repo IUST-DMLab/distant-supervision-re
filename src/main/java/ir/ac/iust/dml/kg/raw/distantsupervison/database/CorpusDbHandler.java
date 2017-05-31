@@ -216,4 +216,6 @@ public class CorpusDbHandler extends DbHandler {
         }
         return predicates;
     }
+
+
 }

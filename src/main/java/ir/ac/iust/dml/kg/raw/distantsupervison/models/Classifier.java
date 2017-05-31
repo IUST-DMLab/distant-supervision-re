@@ -1,5 +1,7 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import de.bwaldvogel.liblinear.*;
 import edu.stanford.nlp.ling.TaggedWord;
 import ir.ac.iust.dml.kg.raw.POSTagger;
@@ -13,10 +15,13 @@ import ir.ac.iust.dml.kg.resource.extractor.client.MatchedResource;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpusDB;
+import static ir.ac.iust.dml.kg.raw.distantsupervison.database.DbHandler.corpusTableName;
 
 /**
  * Created by hemmatan on 4/10/2017.
@@ -51,7 +56,7 @@ public class Classifier {
         trainDbHandler.deleteAll();
         trainData.deleteAll();
 
-        CorpusDbHandler corpusDbHandler = new CorpusDbHandler(DbHandler.corpusTableName);
+        CorpusDbHandler corpusDbHandler = new CorpusDbHandler(corpusTableName);
         if (Configuration.getPredicatesFromFile)
             corpusDbHandler.loadByReadingPedicatesFromFile(corpusDB, totalNoOfData);
         else
@@ -230,7 +235,7 @@ public class Classifier {
         return sw;
     }
 
-    public void testForSingleSentenceStringAndTriple(String sentenceString, String subject, String object) {
+    public void testForSingleSentenceStringAndTriple(String sentenceString, String subject, String object, String predicate) {
         Sentence test = new Sentence(sentenceString);
         ExtractorClient client = new ExtractorClient(Configuration.extractorClient);
         List<MatchedResource> resultsForSubject = client.match(subject);
@@ -248,10 +253,12 @@ public class Classifier {
         }
 
         List<String> subjectType = new ArrayList<>();
-        if (resultsForSubject != null && !resultsForSubject.isEmpty())
+        if (resultsForSubject != null && !resultsForSubject.isEmpty()
+                && resultsForSubject.get(0).getResource() != null)
             subjectType.addAll(resultsForSubject.get(0).getResource().getClassTree());
         List<String> objectType = new ArrayList<>();
-        if (resultsForObject != null && !resultsForObject.isEmpty())
+        if (resultsForObject != null && !resultsForObject.isEmpty()
+                && resultsForObject.get(0).getResource() != null)
             objectType.addAll(resultsForObject.get(0).getResource().getClassTree());
 
         String generalized = sentenceString.replace(subject, Constants.sentenceAttribs.SUBJECT_ABV);
@@ -275,11 +282,12 @@ public class Classifier {
             System.out.println(subjectType);
             System.out.println(objectType);
             System.out.println("\n" + "Subject: " + subject + " " + "\n" + "Object: " + object + " " + "\n" + "Predicate: " + trainData.getInvertedIndices().get(prediction));
+            System.out.println("Correct Predicate: " + predicate);
             System.out.println("Prediction number: " + prediction);
             System.out.println("Confidence: " + Collections.max(a));
         }
 
-        System.out.print(trainData.getIndices());
+        //System.out.print(trainData.getIndices());
 
     }
 
@@ -386,7 +394,60 @@ public class Classifier {
             }
         }
 
-
     }
 
+    public void testJson() {
+
+        String testFilePath = "export.json";
+        try (JsonReader reader = new JsonReader(new FileReader(testFilePath));
+        ) {
+            reader.beginArray();
+            int cnt = 0;
+            JsonToken nextToken = reader.peek();
+
+            while (reader.hasNext()) {
+                if (JsonToken.BEGIN_OBJECT.equals(nextToken)) {
+                    reader.beginObject();
+                    String name = reader.nextName();
+                    reader.nextString();
+                    name = reader.nextName();
+                    reader.nextString();
+                    name = reader.nextName();
+                    String generalized = reader.nextString();
+                    name = reader.nextName();
+                    String raw = reader.nextString();
+                    name = reader.nextName();
+                    String object = reader.nextString();
+                    name = reader.nextName();
+                    String predicate = reader.nextString();
+                    name = reader.nextName();
+                    String subject = reader.nextString();
+
+                    testForSingleSentenceStringAndTriple(raw, subject, object, predicate);
+
+                    name = reader.nextName();
+                    reader.nextBoolean();
+                    name = reader.nextName();
+
+                    reader.beginObject();
+                    JsonToken nextToken2 = reader.peek();
+                    //while (!JsonToken.END_OBJECT.equals(nextToken2)) {
+                    name = reader.nextName();
+                    reader.nextString();
+                    //}
+                    reader.endObject();
+                    name = reader.nextName();
+                    reader.nextString();
+                    reader.endObject();
+
+                    nextToken = reader.peek();
+
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

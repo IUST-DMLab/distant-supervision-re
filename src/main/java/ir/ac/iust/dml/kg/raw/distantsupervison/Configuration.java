@@ -8,7 +8,7 @@ public class Configuration {
 
     public static final int maximumNoOfInstancesForEachPredicate = 1000;
     public static final int noOfTrainExamples = 20000;
-    public static final int noOfTestExamples = noOfTrainExamples/5;
+    public static final int noOfTestExamples = noOfTrainExamples / 21;
     public static final int noOfTotalExamples = noOfTrainExamples+noOfTestExamples;
 
     public static final int numberOfPredicatesToLoad =
@@ -21,6 +21,6 @@ public class Configuration {
 
     public static final int maxWindowSize = 5;
 
-    public static final boolean getPredicatesFromFile = false;
+    public static final boolean getPredicatesFromFile = true;
 
 }
