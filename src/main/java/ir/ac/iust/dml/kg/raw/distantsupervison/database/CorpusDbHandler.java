@@ -11,10 +11,7 @@ import org.bson.Document;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Created by hemmatan on 4/18/2017.
@@ -65,10 +62,10 @@ public class CorpusDbHandler extends DbHandler {
                                              int numberOfEntriesToLoad){
         List<String> predicates = getMostFrequentPredicates(Configuration.numberOfPredicatesToLoad);
 
-        loadByPredicates(destinationCorpusDB, numberOfEntriesToLoad, predicates);
+        loadByPredicates(destinationCorpusDB, numberOfEntriesToLoad, predicates, new HashSet<>());
     }
 
-    private void loadByPredicates(CorpusDB destinationCorpusDB, int numberOfEntriesToLoad, List<String> predicates) {
+    private void loadByPredicates(CorpusDB destinationCorpusDB, int numberOfEntriesToLoad, List<String> predicates, Set<String> testIDs) {
         MongoCursor cursor = corpusTable.find().iterator();
         Document document;
         String rawString;
@@ -99,8 +96,9 @@ public class CorpusDbHandler extends DbHandler {
             subjectType = (List<String>) document.get(Constants.corpusDbEntryAttribs.SUBJECT_TYPE);
             predicate = (String) document.get(Constants.corpusDbEntryAttribs.PREDICATE);
             occurrence = (int) document.get(Constants.corpusDbEntryAttribs.OCCURRENCE);
-            if (destinationCorpusDB.getPredicateCounts().containsKey(predicate) &&
+            if ((destinationCorpusDB.getPredicateCounts().containsKey(predicate) &&
                     destinationCorpusDB.getPredicateCounts().get(predicate) >= Configuration.maximumNoOfInstancesForEachPredicate)
+                    || testIDs.contains(document.get("_id").toString()))
                 continue;
             //words = convertBasicDBListToJavaListOfStrings(wordsObject);
             //posTags = convertBasicDBListToJavaListOfStrings(postagObject);
@@ -196,9 +194,9 @@ public class CorpusDbHandler extends DbHandler {
     }
 
 
-    public void loadByReadingPedicatesFromFile(CorpusDB destinationCorpusDB, int numberOfEntriesToLoad) {
+    public void loadByReadingPedicatesFromFile(CorpusDB destinationCorpusDB, int numberOfEntriesToLoad, Set<String> testIDs) {
         List<String> predicates = readPredicatesFromFile(Configuration.numberOfPredicatesToLoad);
-        loadByPredicates(destinationCorpusDB, numberOfEntriesToLoad, predicates);
+        loadByPredicates(destinationCorpusDB, numberOfEntriesToLoad, predicates, testIDs);
     }
 
     private List<String> readPredicatesFromFile(int numberOfPredicatesToLoad) {

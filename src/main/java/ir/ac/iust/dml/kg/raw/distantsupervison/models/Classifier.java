@@ -1,7 +1,5 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
 import de.bwaldvogel.liblinear.*;
 import edu.stanford.nlp.ling.TaggedWord;
 import ir.ac.iust.dml.kg.raw.POSTagger;
@@ -10,13 +8,13 @@ import ir.ac.iust.dml.kg.raw.distantsupervison.*;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.CorpusDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.DbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
+import ir.ac.iust.dml.kg.raw.distantsupervison.reUtils.JSONHandler;
 import ir.ac.iust.dml.kg.resource.extractor.client.ExtractorClient;
 import ir.ac.iust.dml.kg.resource.extractor.client.MatchedResource;
 import org.apache.commons.lang3.ArrayUtils;
+import org.json.JSONArray;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
@@ -33,12 +31,14 @@ public class Classifier {
     private int numberOfFeatures;
     private String modelFilePath = "tempTestModel";
     private String predicatesIndexFile = "predicates.txt";
+    private String goldJsonFilePath = "export.json";
     private BagOfWordsModel bagOfWordsModel;
     private HashMap<String, SegmentedBagOfWords> segmentedBagOfWordsHashMap = new HashMap<>();
     private EntityTypeModel entityTypeModel;
     private PartOfSpeechModel partOfSpeechModel;
     private CorpusDB trainData = new CorpusDB();
     private CorpusDB testData = new CorpusDB();
+    private Set<String> testIDs = new HashSet<>();
 
     public Classifier(){
         SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
@@ -51,6 +51,8 @@ public class Classifier {
 
     public void createTrainData(int numberOfTrainingExamples, int numberOfTestExamples,
                                 CorpusDbHandler trainDbHandler) {
+        readTest();
+
         int totalNoOfData = numberOfTestExamples + numberOfTrainingExamples;
 
         trainDbHandler.deleteAll();
@@ -58,7 +60,7 @@ public class Classifier {
 
         CorpusDbHandler corpusDbHandler = new CorpusDbHandler(corpusTableName);
         if (Configuration.getPredicatesFromFile)
-            corpusDbHandler.loadByReadingPedicatesFromFile(corpusDB, totalNoOfData);
+            corpusDbHandler.loadByReadingPedicatesFromFile(corpusDB, totalNoOfData, testIDs);
         else
             corpusDbHandler.loadByMostFrequentPredicates(corpusDB, totalNoOfData);
         corpusDB.shuffle();
@@ -93,6 +95,7 @@ public class Classifier {
         trainDbHandler.close();
 
         initializeModels(true);
+
         numberOfFeatures = 4 * this.segmentedBagOfWordsHashMap.get(Constants.segmentedBagOfWordsAttribs.OBJECT_FOLLOWING).getMaximumNoOfVocabulary() +
                 + 2 * this.entityTypeModel.getNoOfEntityTypes() + 2 * this.partOfSpeechModel.getNoOfPOS();
         problem.n = this.numberOfFeatures;// number of features
@@ -106,16 +109,15 @@ public class Classifier {
 
 
         System.out.print(trainData.getIndices());
-
         System.out.print(numberOfFeatures);
 
         problem.x =  featureNodes;// feature nodes
 
         SolverType solver = SolverType.L2R_LR; // -s 0
-        double C = 1.0;    // cost of constraints violation
-        double eps = 0.1; // stopping criteria
+        double costOfConstraintsViolation = Configuration.libLinearParams.costOfConstraintsViolation;
+        double eps = Configuration.libLinearParams.epsStoppingCriteria;
 
-        Parameter parameter = new Parameter(solver, C, eps);
+        Parameter parameter = new Parameter(solver, costOfConstraintsViolation, eps);
 
         File modelFile = new File(this.modelFilePath);
 
@@ -396,58 +398,23 @@ public class Classifier {
 
     }
 
-    public void testJson() {
 
-        String testFilePath = "export.json";
-        try (JsonReader reader = new JsonReader(new FileReader(testFilePath));
-        ) {
-            reader.beginArray();
-            int cnt = 0;
-            JsonToken nextToken = reader.peek();
+    public void testOnGoldJson() {
+        JSONArray jsonArray = JSONHandler.getJsonArrayFromURL(goldJsonFilePath);
+        for (int i = 0; i < jsonArray.length(); i++) {
+            String sentenceString = jsonArray.getJSONObject(i).getString("raw");
+            String subject = jsonArray.getJSONObject(i).getString("subject");
+            String object = jsonArray.getJSONObject(i).getString("object");
+            String predicate = jsonArray.getJSONObject(i).getString("predicate");
+            testForSingleSentenceStringAndTriple(sentenceString, subject, object, predicate);
+        }
+    }
 
-            while (reader.hasNext()) {
-                if (JsonToken.BEGIN_OBJECT.equals(nextToken)) {
-                    reader.beginObject();
-                    String name = reader.nextName();
-                    reader.nextString();
-                    name = reader.nextName();
-                    reader.nextString();
-                    name = reader.nextName();
-                    String generalized = reader.nextString();
-                    name = reader.nextName();
-                    String raw = reader.nextString();
-                    name = reader.nextName();
-                    String object = reader.nextString();
-                    name = reader.nextName();
-                    String predicate = reader.nextString();
-                    name = reader.nextName();
-                    String subject = reader.nextString();
-
-                    testForSingleSentenceStringAndTriple(raw, subject, object, predicate);
-
-                    name = reader.nextName();
-                    reader.nextBoolean();
-                    name = reader.nextName();
-
-                    reader.beginObject();
-                    JsonToken nextToken2 = reader.peek();
-                    //while (!JsonToken.END_OBJECT.equals(nextToken2)) {
-                    name = reader.nextName();
-                    reader.nextString();
-                    //}
-                    reader.endObject();
-                    name = reader.nextName();
-                    reader.nextString();
-                    reader.endObject();
-
-                    nextToken = reader.peek();
-
-                }
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void readTest() {
+        JSONArray jsonArray = JSONHandler.getJsonArrayFromURL(goldJsonFilePath);
+        for (int i = 0; i < jsonArray.length(); i++) {
+            String id = jsonArray.getJSONObject(i).getString("id");
+            testIDs.add(id);
         }
     }
 }

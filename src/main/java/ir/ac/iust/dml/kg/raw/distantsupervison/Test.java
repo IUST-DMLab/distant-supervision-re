@@ -6,9 +6,13 @@ import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.BagOfWordsModel;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.Scanner;
 
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
 
@@ -53,8 +57,51 @@ public class Test {
 
     }
 
-//    @org.junit.Test
+    @org.junit.Test
+    public void evaluate() {
+        HashMap<String, Integer> mapping = new HashMap<>();
+        int currentIndex = 0;
+        try (Scanner scanner = new Scanner(new FileInputStream("mappings.txt"))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] tokens = line.split("\t");
+                for (int i = 0; i < tokens.length; i++) {
+                    mapping.put(tokens[i], currentIndex);
+                }
+                currentIndex++;
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
+        int total = 0;
+        int correct = 0;
+
+        try (Scanner scanner = new Scanner(new FileInputStream("testResults.txt"))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if (line.startsWith("Predicate")) {
+                    String predicate = line.split(": ")[1];
+                    String nextLine = scanner.nextLine();
+                    String correctPredicate = nextLine.split(": ")[1];
+                    String templine = scanner.nextLine();
+                    String confidence = scanner.nextLine().split(": ")[1];
+                    Double conf = Double.parseDouble(confidence);
+                    if (conf > 0.4) {
+                        total++;
+                        if (Objects.equals(mapping.get(predicate), mapping.get(correctPredicate)))
+                            correct++;
+                        //System.out.println(predicate + " " + correctPredicate);
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println((correct * 100) / total);
+
+    }
 
 
     public static void main(String[] args) {
@@ -91,4 +138,6 @@ public class Test {
 
         int tempp = 0;
     }
+
+
 }

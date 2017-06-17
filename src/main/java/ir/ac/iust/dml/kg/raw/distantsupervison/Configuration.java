@@ -7,7 +7,7 @@ public class Configuration {
     public static final int maximumNoOfVocabularyForBagOfWords = 4000;
 
     public static final int maximumNoOfInstancesForEachPredicate = 1000;
-    public static final int noOfTrainExamples = 20000;
+    public static final int noOfTrainExamples = 21000;
     public static final int noOfTestExamples = noOfTrainExamples / 21;
     public static final int noOfTotalExamples = noOfTrainExamples+noOfTestExamples;
 
@@ -22,5 +22,10 @@ public class Configuration {
     public static final int maxWindowSize = 5;
 
     public static final boolean getPredicatesFromFile = true;
+
+    public static class libLinearParams {
+        public static final double costOfConstraintsViolation = 1.0;
+        public static final double epsStoppingCriteria = 0.1;
+    }
 
 }
