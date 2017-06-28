@@ -1,5 +1,6 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison.reUtils;
 
+import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class JSONHandler {
     @Test
     public void sample() throws Exception {
         // build a URL
-        String s = "http://dmls.iust.ac.ir:8100/rest/v1/raw/export";
+        String s = Configuration.exportURL;
         URL url = new URL(s);
 
         // read from the URL

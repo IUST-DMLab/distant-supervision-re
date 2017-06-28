@@ -1,6 +1,7 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.WordTokenizer;
+import ir.ac.iust.dml.kg.resource.extractor.client.MatchedResource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,8 @@ public class CorpusEntryObject {
     private String predicate;
     private int occurrence;
     private List<String> allQueryWords = new ArrayList<>();
-
+    private int subjectIndex = -1;
+    private int objectIndex = -1;
 
     public CorpusEntryObject() {
     }
@@ -33,6 +35,9 @@ public class CorpusEntryObject {
         this.occurrence = occurrence;
 
         allQueryWords = WordTokenizer.tokenize(getGeneralizedSentence());
+
+        this.subjectIndex = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
+        this.objectIndex = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
     }
 
     public String getGeneralizedSentence() {
@@ -43,6 +48,9 @@ public class CorpusEntryObject {
 
         this.generalizedSentence = generalizedSentence;
         allQueryWords = WordTokenizer.tokenize(getGeneralizedSentence());
+
+        this.subjectIndex = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
+        this.objectIndex = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
 
     }
 
@@ -113,16 +121,14 @@ public class CorpusEntryObject {
     public List<String> getSubjectPrecedingWords() {
         List<String> words = new ArrayList<>();
 
-        int subjIdx = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
-        int objIdx = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
         int startIdx;
-        int endIdx = subjIdx;
+        int endIdx = this.subjectIndex;
 
 
-        if (subjIdx < objIdx) {
-            startIdx = (subjIdx - Configuration.maxWindowSize < 0) ? 0 : subjIdx - Configuration.maxWindowSize;
+        if (this.subjectIndex < this.objectIndex) {
+            startIdx = (this.subjectIndex - Configuration.maxWindowSize < 0) ? 0 : this.subjectIndex - Configuration.maxWindowSize;
         } else {
-            startIdx = objIdx + 1;
+            startIdx = this.objectIndex + 1;
         }
 
         if (startIdx > endIdx)
@@ -135,15 +141,13 @@ public class CorpusEntryObject {
     public List<String> getSubjectFollowingWords() {
         List<String> words = new ArrayList<>();
 
-        int subjIdx = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
-        int objIdx = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
-        int startIdx = subjIdx + 1;
+        int startIdx = this.subjectIndex + 1;
         int endIdx;
 
-        if (subjIdx < objIdx) {
-            endIdx = objIdx;
+        if (this.subjectIndex < this.objectIndex) {
+            endIdx = this.objectIndex;
         } else {
-            endIdx = (subjIdx + Configuration.maxWindowSize >= allQueryWords.size()) ? allQueryWords.size() - 1 : subjIdx + Configuration.maxWindowSize;
+            endIdx = (this.subjectIndex + Configuration.maxWindowSize >= allQueryWords.size()) ? allQueryWords.size() - 1 : this.subjectIndex + Configuration.maxWindowSize;
         }
 
         if (startIdx > endIdx)
@@ -157,16 +161,14 @@ public class CorpusEntryObject {
     public List<String> getObjectPrecedingWords() {
         List<String> words = new ArrayList<>();
 
-        int subjIdx = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
-        int objIdx = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
         int startIdx;
-        int endIdx = objIdx;
+        int endIdx = this.objectIndex;
 
 
-        if (objIdx < subjIdx) {
-            startIdx = (objIdx - Configuration.maxWindowSize < 0) ? 0 : objIdx - Configuration.maxWindowSize;
+        if (this.objectIndex < this.subjectIndex) {
+            startIdx = (this.objectIndex - Configuration.maxWindowSize < 0) ? 0 : this.objectIndex - Configuration.maxWindowSize;
         } else {
-            startIdx = subjIdx + 1;
+            startIdx = this.subjectIndex + 1;
         }
 
         if (startIdx > endIdx)
@@ -180,15 +182,13 @@ public class CorpusEntryObject {
     public List<String> getObjectFollowingWords() {
         List<String> words = new ArrayList<>();
 
-        int subjIdx = allQueryWords.indexOf(Constants.sentenceAttribs.SUBJECT_ABV);
-        int objIdx = allQueryWords.indexOf(Constants.sentenceAttribs.OBJECT_ABV);
-        int startIdx = objIdx + 1;
+        int startIdx = this.objectIndex + 1;
         int endIdx;
 
-        if (objIdx < subjIdx) {
-            endIdx = subjIdx;
+        if (this.objectIndex < this.subjectIndex) {
+            endIdx = this.subjectIndex;
         } else {
-            endIdx = (objIdx + Configuration.maxWindowSize >= allQueryWords.size()) ? allQueryWords.size() - 1 : objIdx + Configuration.maxWindowSize;
+            endIdx = (this.objectIndex + Configuration.maxWindowSize >= allQueryWords.size()) ? allQueryWords.size() - 1 : this.objectIndex + Configuration.maxWindowSize;
         }
 
         if (startIdx > endIdx)
@@ -198,5 +198,13 @@ public class CorpusEntryObject {
 
 
         return words;
+    }
+
+    public static void setEntityType(List<MatchedResource> result_entity, List<String> entityType) {
+        if (result_entity == null || result_entity.size() == 0 || result_entity.get(0).getResource() == null)
+            entityType.add("null");
+        else if (result_entity.get(0).getResource().getClassTree() == null || result_entity.get(0).getResource().getClassTree().size() == 0)
+            entityType.add(result_entity.get(0).getResource().getIri());
+        else entityType.addAll(result_entity.get(0).getResource().getClassTree());
     }
 }

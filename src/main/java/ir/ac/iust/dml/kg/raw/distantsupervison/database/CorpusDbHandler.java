@@ -21,7 +21,6 @@ public class CorpusDbHandler extends DbHandler {
     private MongoClient mongo = null;
     private MongoDatabase distantSupervisionDB;
     private MongoCollection<Document> corpusTable;
-    private String predicatesFile = "predicatesToLoad.txt";
 
     public CorpusDbHandler(String tableName) {
         mongo = new MongoClient(host, port);
@@ -98,8 +97,11 @@ public class CorpusDbHandler extends DbHandler {
             occurrence = (int) document.get(Constants.corpusDbEntryAttribs.OCCURRENCE);
             if ((destinationCorpusDB.getPredicateCounts().containsKey(predicate) &&
                     destinationCorpusDB.getPredicateCounts().get(predicate) >= Configuration.maximumNoOfInstancesForEachPredicate)
-                    || testIDs.contains(document.get("_id").toString()))
+                    || testIDs.contains(document.get("_id").toString())) {
+                if (testIDs.contains(document.get("_id").toString()))
+                    System.out.println(document.get("_id").toString());
                 continue;
+            }
             //words = convertBasicDBListToJavaListOfStrings(wordsObject);
             //posTags = convertBasicDBListToJavaListOfStrings(postagObject);
             currentSentence = new Sentence(rawString,words,posTags,normalized);
@@ -199,10 +201,10 @@ public class CorpusDbHandler extends DbHandler {
         loadByPredicates(destinationCorpusDB, numberOfEntriesToLoad, predicates, testIDs);
     }
 
-    private List<String> readPredicatesFromFile(int numberOfPredicatesToLoad) {
+    public static List<String> readPredicatesFromFile(int numberOfPredicatesToLoad) {
         List<String> predicates = new ArrayList<>();
         int cnt = 0;
-        try (Scanner scanner = new Scanner(new FileInputStream(this.predicatesFile))) {
+        try (Scanner scanner = new Scanner(new FileInputStream(SharedResources.predicatesToLoadFile))) {
             while (scanner.hasNextLine() && cnt < numberOfPredicatesToLoad) {
                 String line = scanner.nextLine();
                 predicates.add(line);

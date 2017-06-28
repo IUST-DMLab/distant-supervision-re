@@ -2,6 +2,7 @@ package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.POSTagger;
 import ir.ac.iust.dml.kg.raw.WordTokenizer;
+import ir.ac.iust.dml.kg.raw.distantsupervison.database.CorpusDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.BagOfWordsModel;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
@@ -11,6 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -59,6 +61,7 @@ public class Test {
 
     @org.junit.Test
     public void evaluate() {
+        List<String> predicatesToLoad = CorpusDbHandler.readPredicatesFromFile(Configuration.numberOfPredicatesToLoad);
         HashMap<String, Integer> mapping = new HashMap<>();
         int currentIndex = 0;
         try (Scanner scanner = new Scanner(new FileInputStream("mappings.txt"))) {
@@ -87,7 +90,7 @@ public class Test {
                     String templine = scanner.nextLine();
                     String confidence = scanner.nextLine().split(": ")[1];
                     Double conf = Double.parseDouble(confidence);
-                    if (conf > 0.4) {
+                    if (conf > 0.4 && predicatesToLoad.contains(correctPredicate)) {
                         total++;
                         if (Objects.equals(mapping.get(predicate), mapping.get(correctPredicate)))
                             correct++;
@@ -121,14 +124,6 @@ public class Test {
             tripleDataList.add(triple);
         }*/
 
-        /*Pattern pattern = new Pattern();
-        String temp = "حسن روحانی در سال ۱۳۲۷ در شهرستان سرخه در استان سمنان زاده شد.";
-        String subject = "حسن روحانی";
-        String object = "سمنان";
-        String relation = "محل تولد";
-        pattern.extractPattern(temp, subject, object, relation);
-        PatternsDbHandler dbHandler = new PatternsDbHandler();
-        dbHandler.addToPatternTable(pattern);*/
 
         SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
         //sentenceDbHandler.createCorpusTableFromWikiDump();

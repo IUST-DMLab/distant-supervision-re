@@ -15,7 +15,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONArray;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.*;
 
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpusDB;
@@ -31,7 +33,7 @@ public class Classifier {
     private int numberOfFeatures;
     private String modelFilePath = "tempTestModel";
     private String predicatesIndexFile = "predicates.txt";
-    private String goldJsonFilePath = "export.json";
+    private String goldJsonFilePath = Configuration.exportURL;
     private BagOfWordsModel bagOfWordsModel;
     private HashMap<String, SegmentedBagOfWords> segmentedBagOfWordsHashMap = new HashMap<>();
     private EntityTypeModel entityTypeModel;
@@ -202,21 +204,6 @@ public class Classifier {
         }
         testData.shuffle();
         testDbHandler.insertAll(testData.getEntries());
-
-        /*try (Writer fileWriter = new FileWriter(this.testDataFile)) {
-            CorpusEntryObject currentTestData;
-            for (int i = problem.l; i<problem.l+numberOfTestExamples; i++){
-                currentTestData = corpusDB.getShuffledEntries().get(i);
-                testData.addEntry(currentTestData);
-                fileWriter.write(currentTestData.getOriginalSentence().getRaw()+"\t");
-                fileWriter.write(currentTestData.getGeneralizedSentence()+"\t");
-                fileWriter.write(currentTestData.getSubject()+"\t");
-                fileWriter.write(currentTestData.getObject()+"\t");
-                fileWriter.write(currentTestData.getPredicate()+"\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
     }
 
     public boolean ignoreEntity(MatchedResource matchedResource, Sentence test) {
@@ -411,10 +398,22 @@ public class Classifier {
     }
 
     public void readTest() {
+        Set<String> predicates = new HashSet<>();
         JSONArray jsonArray = JSONHandler.getJsonArrayFromURL(goldJsonFilePath);
         for (int i = 0; i < jsonArray.length(); i++) {
             String id = jsonArray.getJSONObject(i).getString("id");
+            String predicate = jsonArray.getJSONObject(i).getString("predicate");
             testIDs.add(id);
+            predicates.add(predicate);
+        }
+
+        try (Writer fileWriter = new FileWriter(SharedResources.predicatesInExportsJsonFile)) {
+            for (String predicate : predicates) {
+                fileWriter.write(predicate + "\r\n");
+            }
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

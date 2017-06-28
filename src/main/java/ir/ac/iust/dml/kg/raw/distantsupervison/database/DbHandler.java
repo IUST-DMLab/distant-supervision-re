@@ -10,6 +10,7 @@ import ir.ac.iust.dml.kg.raw.distantsupervison.CorpusEntryObject;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Sentence;
 import ir.ac.iust.dml.kg.resource.extractor.client.ExtractorClient;
 import ir.ac.iust.dml.kg.resource.extractor.client.MatchedResource;
+import org.junit.Test;
 
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -44,11 +45,10 @@ public class DbHandler {
     @org.junit.Test
     public void saveCorpusJasonToDB() {
 
-        String tempCorpusJasonPath = "C:\\Users\\hemmatan\\IdeaProjects\\RE\\Corpus5.json";
+        String tempCorpusJasonPath = "C:\\Users\\hemmatan\\IdeaProjects\\RE\\corpus.json";
         try (JsonReader reader = new JsonReader(new FileReader(tempCorpusJasonPath));
         ) {
             reader.beginArray();
-            int cnt = 0;
             JsonToken nextToken = reader.peek();
 
             CorpusDbHandler corpusDbHandler = new CorpusDbHandler(corpusTableName);
@@ -80,18 +80,8 @@ public class DbHandler {
                         final List<MatchedResource> result_object = client.match(object);
                         final List<MatchedResource> result_subject = client.match(subject);
 
-                        if (result_object == null || result_object.size() == 0 || result_object.get(0).getResource() == null)
-                            objectType.add("null");
-                        else if (result_object.get(0).getResource().getClassTree() == null || result_object.get(0).getResource().getClassTree().size() == 0)
-                            objectType.add(result_object.get(0).getResource().getIri());
-                        else objectType.addAll(result_object.get(0).getResource().getClassTree());
-
-                        if (result_subject == null || result_subject.size() == 0 || result_subject.get(0).getResource() == null)
-                            subjectType.add("null");
-                        else if (result_subject.get(0).getResource().getClassTree() == null || result_subject.get(0).getResource().getClassTree().size() == 0)
-                            subjectType.add(result_subject.get(0).getResource().getIri());
-                        else subjectType.addAll(result_subject.get(0).getResource().getClassTree());
-
+                        CorpusEntryObject.setEntityType(result_object, objectType);
+                        CorpusEntryObject.setEntityType(result_subject, subjectType);
 
                         Sentence sentence = new Sentence(originalSentence);
                         //String generalizedNormalizedSentence = sentence.getNormalized().replace(subject, Constants.sentenceAttribs.SUBJECT_ABV);
@@ -104,13 +94,17 @@ public class DbHandler {
                     reader.endObject();
                     reader.endObject();
                     nextToken = reader.peek();
-                    cnt++;
                 }
             }
             reader.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+    }
+
+    @Test
+    public void addNegativesToDB() {
 
     }
 

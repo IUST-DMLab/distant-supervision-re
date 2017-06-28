@@ -49,4 +49,10 @@ public class Constants {
     public static class entityModelAttribs {
         public static final String PREFIX = "fkgo:"; // "http://fkg.iust.ac.ir/ontology/"
     }
+
+    public static class trainingSetModes {
+        public static final String USE_ALL_PREDICATES_IN_EXPORTS_JSON = "useAllPredicatesInExportsJson";
+        public static final String LOAD_PREDICATES_FROM_FILE = "loadPredicatesFromFile";
+        public static final String LOAD_CORPUS_FREQUENT_PREDICATES = "loadCorpusFrequentPredicates";
+    }
 }

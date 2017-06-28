@@ -22,4 +22,8 @@ public class SharedResources {
     public static CorpusDB corpusDB = new CorpusDB();
     public static List<TripleData> tripleDataList = new ArrayList<TripleData>();
 
+    public static final String predicatesToLoadFile = "predicatesToLoad.txt";
+    public static final String predicatesInExportsJsonFile = "predicatesInExportsJson.txt";
+
+
 }
