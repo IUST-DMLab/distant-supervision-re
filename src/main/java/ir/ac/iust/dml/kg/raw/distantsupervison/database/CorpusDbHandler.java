@@ -155,6 +155,8 @@ public class CorpusDbHandler extends DbHandler {
                 corpusEntryObject = new CorpusEntryObject(currentSentence, generalizedSentence, object, subject,  objectType, subjectType, predicate, occurrence);
                 destinationCorpusDB.addEntry(corpusEntryObject);
             }
+
+        Configuration.noOfTrainExamples = destinationCorpusDB.getEntries().size();
     }
 
 

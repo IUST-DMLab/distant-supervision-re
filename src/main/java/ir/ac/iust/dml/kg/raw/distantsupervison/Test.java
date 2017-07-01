@@ -11,10 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
 
@@ -31,9 +28,12 @@ public class Test {
 
     @org.junit.Test
     public void test() {
+        Date date = new Date();
+        String dateString = date.toString().replaceAll("[: ]", "-");
+
         PrintStream out = null;
         try {
-            out = new PrintStream(new FileOutputStream("consoleOutput.txt"));
+            out = new PrintStream(new FileOutputStream("consoleOutput-" + dateString + ".txt"));
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -57,8 +57,13 @@ public class Test {
         classifier.testForSingleSentenceString("سعدی متولد قم است");
     }
 
+
     @org.junit.Test
-    public void evaluate() {
+    public void evaluateTest() {
+        evaluate(SharedResources.LastTestResultsFile);
+    }
+
+    public void evaluate(String testResultsFile) {
 
         String predicatesFile = SharedResources.predicatesToLoadFile;
         if (Configuration.trainingSetMode.equalsIgnoreCase(Constants.trainingSetModes.LOAD_PREDICATES_FROM_FILE))
@@ -84,10 +89,13 @@ public class Test {
 
         int total = 0;
         int correct = 0;
+        int rec = 0;
 
-        try (Scanner scanner = new Scanner(new FileInputStream(SharedResources.testResultsFile))) {
+        try (Scanner scanner = new Scanner(new FileInputStream(testResultsFile))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
+                if (line.startsWith("[main]"))
+                    rec++;
                 if (line.startsWith("Predicate")) {
                     String predicate = line.split(": ")[1];
                     String nextLine = scanner.nextLine();
@@ -95,7 +103,7 @@ public class Test {
                     String templine = scanner.nextLine();
                     String confidence = scanner.nextLine().split(": ")[1];
                     Double conf = Double.parseDouble(confidence);
-                    if (conf > 0.45 && predicatesToLoad.contains(correctPredicate)) {
+                    if (conf > 0.4 && predicatesToLoad.contains(correctPredicate)) {
                         total++;
                         if (Objects.equals(mapping.get(predicate), mapping.get(correctPredicate)))
                             correct++;
@@ -106,7 +114,11 @@ public class Test {
             e.printStackTrace();
         }
 
+        rec /= 4;
         System.out.println((correct * 100) / total);
+        System.out.println(correct + " " + rec);
+
+        System.out.println((correct * 100) / rec);
 
     }
 

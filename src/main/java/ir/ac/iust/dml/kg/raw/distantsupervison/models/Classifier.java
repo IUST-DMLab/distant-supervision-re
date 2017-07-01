@@ -80,12 +80,6 @@ public class Classifier {
 
     public void train(int maximumNumberOfTrainingExamples, boolean buildTrainDataFromScratch) {
 
-        Problem problem = new Problem();
-        problem.l = maximumNumberOfTrainingExamples; // number of training examples
-        FeatureNode[][] featureNodes = new FeatureNode[problem.l][];
-        problem.y = new double[problem.l];// target values
-
-
         CorpusDbHandler trainDbHandler = new CorpusDbHandler(DbHandler.trainTableName);
 
         if (buildTrainDataFromScratch) {
@@ -94,8 +88,12 @@ public class Classifier {
         } else {
             trainDbHandler.load(trainData);
         }
-
         trainDbHandler.close();
+
+        Problem problem = new Problem();
+        problem.l = Configuration.noOfTrainExamples; // number of training examples
+        FeatureNode[][] featureNodes = new FeatureNode[problem.l][];
+        problem.y = new double[problem.l];// target values
 
         initializeModels(true);
 
@@ -268,7 +266,7 @@ public class Classifier {
         double prediction = Linear.predictProbability(model, instance, probs);
         List a = Arrays.asList(ArrayUtils.toObject(probs));
 
-        if ((double) Collections.max(a) > Configuration.confidenceThreshold) {
+        if ((double) Collections.max(a) > 0) {
             System.out.println(subjectType);
             System.out.println(objectType);
             System.out.println("\n" + "Subject: " + subject + " " + "\n" + "Object: " + object + " " + "\n" + "Predicate: " + trainData.getInvertedIndices().get(prediction));

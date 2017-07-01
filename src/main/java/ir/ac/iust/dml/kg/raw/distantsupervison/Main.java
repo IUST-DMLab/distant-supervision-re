@@ -2,9 +2,9 @@ package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.util.Date;
 
 /**
  * Created by hemmatan on 4/26/2017.
@@ -21,6 +21,8 @@ public class Main {
         //TODO: these two lines should be remove because the corpus table loads in Classifier()!
         //SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
         //sentenceDbHandler.loadSentenceTable();
+        Date date = new Date();
+        String dateString = date.toString().replaceAll("[: ]", "-");
 
         Classifier classifier = new Classifier();
 
@@ -29,13 +31,10 @@ public class Main {
 
 
         //classifier.initializeModels(false);
-        String sentenceString = "حسن روحانی ، رییس\\u200Cجمهور ایران، در سال ۱۳۳۰ در تهران به دنیا آمد.";
-        String subject = "حسن روحانی";
-        String object = "تهران";
 
         PrintStream out = null;
         try {
-            out = new PrintStream(new FileOutputStream("testResults.txt"));
+            out = new PrintStream(new FileOutputStream("testResults-" + dateString + ".txt"));
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -43,6 +42,14 @@ public class Main {
         System.setOut(out);
 
         classifier.testOnGoldJson();
+
+        try {
+            Files.copy(new File("testResults-" + dateString + ".txt").toPath(), new File(SharedResources.LastTestResultsFile).toPath());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
