@@ -6,13 +6,14 @@ package ir.ac.iust.dml.kg.raw.distantsupervison;
 public class Configuration {
     public static final int maximumNoOfVocabularyForBagOfWords = 4000;
 
-    public static final int maximumNoOfInstancesForEachPredicate = 1000;
-    public static final int noOfTrainExamples = 21000;
-    public static final int noOfTestExamples = noOfTrainExamples / 21;
-    public static final int noOfTotalExamples = noOfTrainExamples+noOfTestExamples;
+    public static final int maximumNumberOfTrainExamples = 36000;
+    public static final int maximumNoOfInstancesForEachPredicate = 500;
 
-    public static final int numberOfPredicatesToLoad =
-            (Integer) noOfTotalExamples/maximumNoOfInstancesForEachPredicate +1;
+    public static int noOfTrainExamples;// = 33000;//21000;
+    public static int noOfTestExamples;
+
+    public static final int maximumNumberOfPredicatesToLoad = 72;
+    //(Integer) noOfTotalExamples/maximumNoOfInstancesForEachPredicate +1;
 
     public static final double confidenceThreshold = 0.4;
 
@@ -22,13 +23,11 @@ public class Configuration {
 
     public static final int maxWindowSize = 5;
 
-    public static final boolean getPredicatesFromFile = true;
-
     public static class libLinearParams {
         public static final double costOfConstraintsViolation = 1.0;
         public static final double epsStoppingCriteria = 0.1;
     }
 
-    public static final String trainingSetMode = Constants.trainingSetModes.LOAD_PREDICATES_FROM_FILE;
+    public static final String trainingSetMode = Constants.trainingSetModes.USE_ALL_PREDICATES_IN_EXPORTS_JSON;
 
 }

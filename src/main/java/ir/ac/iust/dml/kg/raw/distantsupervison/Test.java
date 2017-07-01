@@ -45,7 +45,7 @@ public class Test {
 
         Classifier classifier = new Classifier();
 
-        classifier.train(Configuration.noOfTrainExamples, Configuration.noOfTestExamples, true);
+        classifier.train(Configuration.maximumNumberOfTrainExamples, true);
 
         classifier.testForSingleSentenceString("پروین اعتصامی متولد قم است");
         classifier.testForSingleSentenceString("مولوی متولد قم است");
@@ -55,16 +55,21 @@ public class Test {
         classifier.testForSingleSentenceString("علی لاریجانی متولد قم است");
         classifier.testForSingleSentenceString("رفسنجانی متولد قم است");
         classifier.testForSingleSentenceString("سعدی متولد قم است");
-
-
     }
 
     @org.junit.Test
     public void evaluate() {
-        List<String> predicatesToLoad = CorpusDbHandler.readPredicatesFromFile(Configuration.numberOfPredicatesToLoad);
+
+        String predicatesFile = SharedResources.predicatesToLoadFile;
+        if (Configuration.trainingSetMode.equalsIgnoreCase(Constants.trainingSetModes.LOAD_PREDICATES_FROM_FILE))
+            predicatesFile = SharedResources.predicatesToLoadFile;
+        else if (Configuration.trainingSetMode.equalsIgnoreCase(Constants.trainingSetModes.USE_ALL_PREDICATES_IN_EXPORTS_JSON))
+            predicatesFile = SharedResources.predicatesInExportsJsonFile;
+
+        List<String> predicatesToLoad = CorpusDbHandler.readPredicatesFromFile(Configuration.maximumNumberOfPredicatesToLoad, predicatesFile);
         HashMap<String, Integer> mapping = new HashMap<>();
         int currentIndex = 0;
-        try (Scanner scanner = new Scanner(new FileInputStream("mappings.txt"))) {
+        try (Scanner scanner = new Scanner(new FileInputStream(SharedResources.mappingsFile))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] tokens = line.split("\t");
@@ -80,7 +85,7 @@ public class Test {
         int total = 0;
         int correct = 0;
 
-        try (Scanner scanner = new Scanner(new FileInputStream("testResults.txt"))) {
+        try (Scanner scanner = new Scanner(new FileInputStream(SharedResources.testResultsFile))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 if (line.startsWith("Predicate")) {
@@ -90,11 +95,10 @@ public class Test {
                     String templine = scanner.nextLine();
                     String confidence = scanner.nextLine().split(": ")[1];
                     Double conf = Double.parseDouble(confidence);
-                    if (conf > 0.4 && predicatesToLoad.contains(correctPredicate)) {
+                    if (conf > 0.45 && predicatesToLoad.contains(correctPredicate)) {
                         total++;
                         if (Objects.equals(mapping.get(predicate), mapping.get(correctPredicate)))
                             correct++;
-                        //System.out.println(predicate + " " + correctPredicate);
                     }
                 }
             }

@@ -51,21 +51,24 @@ public class Classifier {
     }
 
 
-    public void createTrainData(int numberOfTrainingExamples, int numberOfTestExamples,
+    public void createTrainData(int maximumNumberOfTrainingExamples,
                                 CorpusDbHandler trainDbHandler) {
         readTest();
-
-        int totalNoOfData = numberOfTestExamples + numberOfTrainingExamples;
 
         trainDbHandler.deleteAll();
         trainData.deleteAll();
 
         CorpusDbHandler corpusDbHandler = new CorpusDbHandler(corpusTableName);
-        if (Configuration.getPredicatesFromFile)
-            corpusDbHandler.loadByReadingPedicatesFromFile(corpusDB, totalNoOfData, testIDs);
-        else
-            corpusDbHandler.loadByMostFrequentPredicates(corpusDB, totalNoOfData);
+        if (Configuration.trainingSetMode.equalsIgnoreCase(Constants.trainingSetModes.LOAD_PREDICATES_FROM_FILE))
+            corpusDbHandler.loadByReadingPedicatesFromFile(corpusDB, maximumNumberOfTrainingExamples, testIDs, SharedResources.predicatesToLoadFile);
+        else if (Configuration.trainingSetMode.equalsIgnoreCase(Constants.trainingSetModes.USE_ALL_PREDICATES_IN_EXPORTS_JSON))
+            corpusDbHandler.loadByReadingPedicatesFromFile(corpusDB, maximumNumberOfTrainingExamples, testIDs, SharedResources.predicatesInExportsJsonFile);
+        else // Configuration.trainingSetMode.equalsIgnoreCase(Constants.trainingSetModes.LOAD_CORPUS_FREQUENT_PREDICATES)
+            corpusDbHandler.loadByMostFrequentPredicates(corpusDB, maximumNumberOfTrainingExamples);
+
         corpusDB.shuffle();
+        int numberOfTrainingExamples = corpusDB.getEntries().size();
+        Configuration.noOfTrainExamples = numberOfTrainingExamples;
 
         for (int i = 0; i < numberOfTrainingExamples; i++) {
             System.out.println(i + "\t" + corpusDB.getShuffledEntries().get(i).toString());
@@ -75,11 +78,10 @@ public class Classifier {
     }
 
 
-    public void train(int numberOfTrainingExamples, int numberOfTestExamples, boolean buildTrainDataFromScratch) {
-
+    public void train(int maximumNumberOfTrainingExamples, boolean buildTrainDataFromScratch) {
 
         Problem problem = new Problem();
-        problem.l = numberOfTrainingExamples; // number of training examples
+        problem.l = maximumNumberOfTrainingExamples; // number of training examples
         FeatureNode[][] featureNodes = new FeatureNode[problem.l][];
         problem.y = new double[problem.l];// target values
 
@@ -87,9 +89,8 @@ public class Classifier {
         CorpusDbHandler trainDbHandler = new CorpusDbHandler(DbHandler.trainTableName);
 
         if (buildTrainDataFromScratch) {
-            createTrainData(numberOfTrainingExamples, numberOfTestExamples, trainDbHandler);
-            createAndSaveTestData(problem, numberOfTestExamples);
-
+            createTrainData(maximumNumberOfTrainingExamples, trainDbHandler);
+            //createAndSaveTestData(problem, numberOfTestExamples);
         } else {
             trainDbHandler.load(trainData);
         }
@@ -400,7 +401,8 @@ public class Classifier {
     public void readTest() {
         Set<String> predicates = new HashSet<>();
         JSONArray jsonArray = JSONHandler.getJsonArrayFromURL(goldJsonFilePath);
-        for (int i = 0; i < jsonArray.length(); i++) {
+        Configuration.noOfTestExamples = jsonArray.length();
+        for (int i = 0; i < Configuration.noOfTestExamples; i++) {
             String id = jsonArray.getJSONObject(i).getString("id");
             String predicate = jsonArray.getJSONObject(i).getString("predicate");
             testIDs.add(id);

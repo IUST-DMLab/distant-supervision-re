@@ -59,7 +59,7 @@ public class CorpusDbHandler extends DbHandler {
 
     public void loadByMostFrequentPredicates(CorpusDB destinationCorpusDB,
                                              int numberOfEntriesToLoad){
-        List<String> predicates = getMostFrequentPredicates(Configuration.numberOfPredicatesToLoad);
+        List<String> predicates = getMostFrequentPredicates(Configuration.maximumNumberOfPredicatesToLoad);
 
         loadByPredicates(destinationCorpusDB, numberOfEntriesToLoad, predicates, new HashSet<>());
     }
@@ -159,11 +159,6 @@ public class CorpusDbHandler extends DbHandler {
 
 
     public List<String> getMostFrequentPredicates(int numberOfEntriesToLoad){
-        Document firstGroup = new Document("$group",
-                new Document("_id",
-                        new Document("predicate", "$predicate")
-                                .append("subject", "$subject")
-                                .append("object", "$object")));
 
         Document secondGroup = new Document("$group",
                 new Document("_id",
@@ -174,13 +169,13 @@ public class CorpusDbHandler extends DbHandler {
 
         List<Document> pipeline = new ArrayList<Document>(Arrays.asList(secondGroup));
         pipeline.add(sort);
-        AggregateIterable<Document> biadab = corpusTable.aggregate(pipeline).allowDiskUse(true);
+        AggregateIterable<Document> documents = corpusTable.aggregate(pipeline).allowDiskUse(true);
 
 
         int cnt = 0;
         List<String> result = new ArrayList<>();
         for (Document d:
-             biadab) {
+                documents) {
             if (cnt++ >= numberOfEntriesToLoad)
                 break;
             String predicate = ((Document) d.get("_id")).get("predicate").toString();
@@ -196,15 +191,15 @@ public class CorpusDbHandler extends DbHandler {
     }
 
 
-    public void loadByReadingPedicatesFromFile(CorpusDB destinationCorpusDB, int numberOfEntriesToLoad, Set<String> testIDs) {
-        List<String> predicates = readPredicatesFromFile(Configuration.numberOfPredicatesToLoad);
+    public void loadByReadingPedicatesFromFile(CorpusDB destinationCorpusDB, int numberOfEntriesToLoad, Set<String> testIDs, String predicatesFile) {
+        List<String> predicates = readPredicatesFromFile(Configuration.maximumNumberOfPredicatesToLoad, predicatesFile);
         loadByPredicates(destinationCorpusDB, numberOfEntriesToLoad, predicates, testIDs);
     }
 
-    public static List<String> readPredicatesFromFile(int numberOfPredicatesToLoad) {
+    public static List<String> readPredicatesFromFile(int numberOfPredicatesToLoad, String predicatesFile) {
         List<String> predicates = new ArrayList<>();
         int cnt = 0;
-        try (Scanner scanner = new Scanner(new FileInputStream(SharedResources.predicatesToLoadFile))) {
+        try (Scanner scanner = new Scanner(new FileInputStream(predicatesFile))) {
             while (scanner.hasNextLine() && cnt < numberOfPredicatesToLoad) {
                 String line = scanner.nextLine();
                 predicates.add(line);

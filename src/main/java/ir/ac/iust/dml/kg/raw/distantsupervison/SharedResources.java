@@ -24,6 +24,6 @@ public class SharedResources {
 
     public static final String predicatesToLoadFile = "predicatesToLoad.txt";
     public static final String predicatesInExportsJsonFile = "predicatesInExportsJson.txt";
-
-
+    public static final String mappingsFile = "mappings.txt";
+    public static final String testResultsFile = "testResults.txt";
 }
