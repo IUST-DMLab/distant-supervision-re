@@ -22,4 +22,10 @@ public class SharedResources {
     public static CorpusDB corpusDB = new CorpusDB();
     public static List<TripleData> tripleDataList = new ArrayList<TripleData>();
 
+    public static final String predicatesToLoadFile = "predicatesToLoad.txt";
+    public static final String predicatesInExportsJsonFile = "predicatesInExportsJson.txt";
+    public static final String mappingsFile = "mappings.txt";
+    public static final String LastTestResultsFile = "testResults.txt";
+    public static final String trainCSV = "C:\\Users\\hemmatan\\Desktop\\KG\\RE segmented-bow\\train.csv";
+    public static final String testCSV = "C:\\Users\\hemmatan\\Desktop\\KG\\RE segmented-bow\\test.csv";
 }

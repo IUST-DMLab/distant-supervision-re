@@ -29,6 +29,13 @@ public class Constants {
         public static final String TOKEN = "token";
     }
 
+    public static class segmentedBagOfWordsAttribs {
+        public static final String SUBJECT_PRECEDING = "subjectPreceding.model";
+        public static final String OBJECT_PRECEDING = "objectPreceding.model";
+        public static final String SUBJECT_FOLLOWING = "subjectFollowing.model";
+        public static final String OBJECT_FOLLOWING = "objectFollowing.model";
+    }
+
     public static class corpusDbEntryAttribs {
         public static final String GENERALIZED_SENTENCE = "generalized_sentence";
         public static final String OCCURRENCE = "occurrence";
@@ -37,5 +44,22 @@ public class Constants {
         public static final String SUBJECT_TYPE = "subject_type";
         public static final String OBJECT_TYPE = "object_type";
         public static final String PREDICATE = "predicate";
+    }
+
+    public static class entityModelAttribs {
+        public static final String PREFIX = "fkgo:"; // "http://fkg.iust.ac.ir/ontology/"
+    }
+
+    public static class trainingSetModes {
+        public static final String USE_ALL_PREDICATES_IN_EXPORTS_JSON = "useAllPredicatesInExportsJson";
+        public static final String LOAD_PREDICATES_FROM_FILE = "loadPredicatesFromFile";
+        public static final String LOAD_CORPUS_FREQUENT_PREDICATES = "loadCorpusFrequentPredicates";
+        public static final String LOAD_DATA_FROM_CSV = "loadDataFromCSV";
+        public static final String LOAD_DATA_FROM_DB = "loadDataFromDB";
+    }
+
+    public static class Classifiers {
+        public static final String LOGISTIC_REGRESSION = "logisticRegression";
+        public static final String DEEP = "deep";
     }
 }

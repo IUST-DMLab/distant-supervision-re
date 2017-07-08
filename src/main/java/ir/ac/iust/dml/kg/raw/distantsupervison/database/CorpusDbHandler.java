@@ -1,23 +1,17 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison.database;
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
 import com.mongodb.BasicDBList;
 import com.mongodb.MongoClient;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import ir.ac.iust.dml.kg.raw.Normalizer;
 import ir.ac.iust.dml.kg.raw.distantsupervison.*;
-import ir.ac.iust.dml.kg.resource.extractor.client.ExtractorClient;
-import ir.ac.iust.dml.kg.resource.extractor.client.MatchedResource;
 import org.bson.Document;
 
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.*;
 
 /**
  * Created by hemmatan on 4/18/2017.
@@ -28,10 +22,14 @@ public class CorpusDbHandler extends DbHandler {
     private MongoDatabase distantSupervisionDB;
     private MongoCollection<Document> corpusTable;
 
-    public CorpusDbHandler() {
+    public CorpusDbHandler(String tableName) {
         mongo = new MongoClient(host, port);
         distantSupervisionDB = mongo.getDatabase(distantSupervisionDBName);
-        corpusTable = distantSupervisionDB.getCollection(corpusTableName);
+        corpusTable = distantSupervisionDB.getCollection(tableName);
+    }
+
+    public void deleteAll() {
+        corpusTable.deleteMany(new Document());
     }
 
     public void insert(CorpusEntryObject corpusEntryObject) {
@@ -61,7 +59,12 @@ public class CorpusDbHandler extends DbHandler {
 
     public void loadByMostFrequentPredicates(CorpusDB destinationCorpusDB,
                                              int numberOfEntriesToLoad){
-        List<String> predicates = getMostFrequentPredicates(Configuration.numberOfPredicatesToLoad);
+        List<String> predicates = getMostFrequentPredicates(Configuration.maximumNumberOfPredicatesToLoad);
+
+        loadByPredicates(destinationCorpusDB, numberOfEntriesToLoad, predicates, new HashSet<>());
+    }
+
+    private void loadByPredicates(CorpusDB destinationCorpusDB, int numberOfEntriesToLoad, List<String> predicates, Set<String> testIDs) {
         MongoCursor cursor = corpusTable.find().iterator();
         Document document;
         String rawString;
@@ -92,9 +95,13 @@ public class CorpusDbHandler extends DbHandler {
             subjectType = (List<String>) document.get(Constants.corpusDbEntryAttribs.SUBJECT_TYPE);
             predicate = (String) document.get(Constants.corpusDbEntryAttribs.PREDICATE);
             occurrence = (int) document.get(Constants.corpusDbEntryAttribs.OCCURRENCE);
-            if (destinationCorpusDB.getPredicateCounts().containsKey(predicate) &&
-                destinationCorpusDB.getPredicateCounts().get(predicate)>=Configuration.maximumNoOfInstancesForEachPredicate)
-                    continue;
+            if ((destinationCorpusDB.getPredicateCounts().containsKey(predicate) &&
+                    destinationCorpusDB.getPredicateCounts().get(predicate) >= Configuration.maximumNoOfInstancesForEachPredicate)
+                    || testIDs.contains(document.get("_id").toString())) {
+                if (testIDs.contains(document.get("_id").toString()))
+                    System.out.println(document.get("_id").toString());
+                continue;
+            }
             //words = convertBasicDBListToJavaListOfStrings(wordsObject);
             //posTags = convertBasicDBListToJavaListOfStrings(postagObject);
             currentSentence = new Sentence(rawString,words,posTags,normalized);
@@ -148,87 +155,12 @@ public class CorpusDbHandler extends DbHandler {
                 corpusEntryObject = new CorpusEntryObject(currentSentence, generalizedSentence, object, subject,  objectType, subjectType, predicate, occurrence);
                 destinationCorpusDB.addEntry(corpusEntryObject);
             }
+
+        Configuration.noOfTrainExamples = destinationCorpusDB.getEntries().size();
     }
 
-
-    //TODO: :)
-    public void saveCorpusJasonToDB(){
-
-        String tempCorpusJasonPath = "Corpus.json";
-        try (JsonReader reader = new JsonReader(new FileReader(tempCorpusJasonPath));
-        ){
-            reader.beginArray();
-            int cnt = 0;
-            JsonToken nextToken = reader.peek();
-
-            CorpusDbHandler corpusDbHandler = new CorpusDbHandler();
-            ExtractorClient client = new ExtractorClient(Configuration.extractorClient);
-
-            while(reader.hasNext()) {
-                if (JsonToken.BEGIN_OBJECT.equals(nextToken)){
-                    reader.beginObject();
-                    String name = reader.nextName();
-                    String subject = Normalizer.normalize(reader.nextString());
-                    name = reader.nextName();
-                    String object = Normalizer.normalize(reader.nextString());
-                    name = reader.nextName();
-                    String predicate = reader.nextString();
-                    name = reader.nextName();
-                    reader.beginObject();
-                    JsonToken nextToken2 = reader.peek();
-                    while (!JsonToken.END_OBJECT.equals(nextToken2)){
-                        String newSentence = reader.nextName();
-                        int occur = Integer.valueOf(reader.nextString());
-
-                        String originalSentence = newSentence.replace(Constants.sentenceAttribs.SUBJECT_ABV, subject);
-                        originalSentence = originalSentence.replace(Constants.sentenceAttribs.OBJECT_ABV, object);
-
-
-                        List<String> objectType = new ArrayList<>();
-                        List<String> subjectType = new ArrayList<>();
-
-                        final List<MatchedResource> result_object = client.match(object);
-                        final List<MatchedResource> result_subject = client.match(subject);
-
-                        if (result_object == null || result_object.size()==0 || result_object.get(0).getResource()==null)
-                            objectType.add("null");
-                        else if (result_object.get(0).getResource().getClassTree() == null || result_object.get(0).getResource().getClassTree().size()==0)
-                            objectType.add(result_object.get(0).getResource().getIri());
-                        else objectType.addAll(result_object.get(0).getResource().getClassTree());
-
-                        if (result_subject == null || result_subject.size()==0 || result_subject.get(0).getResource()==null)
-                            subjectType.add("null");
-                        else if (result_subject.get(0).getResource().getClassTree() == null || result_subject.get(0).getResource().getClassTree().size()==0)
-                            subjectType.add(result_subject.get(0).getResource().getIri());
-                        else subjectType.addAll(result_subject.get(0).getResource().getClassTree());
-
-
-                        Sentence sentence = new Sentence(originalSentence);
-                        String generalizedNormalizedSentence = sentence.getNormalized().replace(subject, Constants.sentenceAttribs.SUBJECT_ABV);
-                        generalizedNormalizedSentence = generalizedNormalizedSentence.replace(object, Constants.sentenceAttribs.OBJECT_ABV);
-                        CorpusEntryObject corpusEntryObject = new CorpusEntryObject(sentence,generalizedNormalizedSentence,object,subject,objectType,subjectType,predicate,occur);
-                        corpusDbHandler.insert(corpusEntryObject);
-                        nextToken2 = reader.peek();
-                    }
-                    reader.endObject();
-                    reader.endObject();
-                    nextToken = reader.peek();
-                    cnt++;
-                }
-            }
-            reader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 
     public List<String> getMostFrequentPredicates(int numberOfEntriesToLoad){
-        Document firstGroup = new Document("$group",
-                new Document("_id",
-                        new Document("predicate", "$predicate")
-                                .append("subject", "$subject")
-                                .append("object", "$object")));
 
         Document secondGroup = new Document("$group",
                 new Document("_id",
@@ -239,14 +171,14 @@ public class CorpusDbHandler extends DbHandler {
 
         List<Document> pipeline = new ArrayList<Document>(Arrays.asList(secondGroup));
         pipeline.add(sort);
-        AggregateIterable<Document> biadab = corpusTable.aggregate(pipeline).allowDiskUse(true);
+        AggregateIterable<Document> documents = corpusTable.aggregate(pipeline).allowDiskUse(true);
 
 
         int cnt = 0;
         List<String> result = new ArrayList<>();
         for (Document d:
-             biadab) {
-            if (cnt++>numberOfEntriesToLoad)
+                documents) {
+            if (cnt++ >= numberOfEntriesToLoad)
                 break;
             String predicate = ((Document) d.get("_id")).get("predicate").toString();
             result.add(predicate);
@@ -258,6 +190,28 @@ public class CorpusDbHandler extends DbHandler {
 
     public void close(){
         mongo.close();
+    }
+
+
+    public void loadByReadingPedicatesFromFile(CorpusDB destinationCorpusDB, int numberOfEntriesToLoad, Set<String> testIDs, String predicatesFile) {
+        List<String> predicates = readPredicatesFromFile(Configuration.maximumNumberOfPredicatesToLoad, predicatesFile);
+        loadByPredicates(destinationCorpusDB, numberOfEntriesToLoad, predicates, testIDs);
+    }
+
+    public static List<String> readPredicatesFromFile(int numberOfPredicatesToLoad, String predicatesFile) {
+        List<String> predicates = new ArrayList<>();
+        int cnt = 0;
+        try (Scanner scanner = new Scanner(new FileInputStream(predicatesFile))) {
+            while (scanner.hasNextLine() && cnt < numberOfPredicatesToLoad) {
+                String line = scanner.nextLine();
+                predicates.add(line);
+                cnt++;
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return predicates;
     }
 
 
