@@ -94,9 +94,7 @@ public class LogitClassifier extends Classifier {
             System.out.println("Prediction number: " + prediction);
             System.out.println("Confidence: " + Collections.max(a));
         }
-
         //System.out.print(trainData.getIndices());
-
     }
 
     public void testForSingleSentenceString(String sentenceString) {

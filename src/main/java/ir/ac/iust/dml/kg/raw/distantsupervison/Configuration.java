@@ -34,6 +34,6 @@ public class Configuration {
         public static final String pathToDirectory = "C:\\Users\\hemmatan\\Desktop\\KG\\RE segmented-bow\\lastDeepModel\\";
     }
 
-    public static final String trainingSetMode = Constants.trainingSetModes.USE_ALL_PREDICATES_IN_EXPORTS_JSON;
+    public static final String trainingSetMode = Constants.trainingSetModes.LOAD_DATA_FROM_CSV;
 
 }

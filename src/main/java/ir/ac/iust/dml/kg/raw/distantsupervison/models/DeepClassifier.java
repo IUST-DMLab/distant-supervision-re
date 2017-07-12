@@ -63,29 +63,29 @@ public class DeepClassifier extends Classifier {
         normalizer.fit(trainingData);           //Collect the statistics (mean/stdev) from the training data. This does not modify the input data
         normalizer.transform(trainingData);     //Apply normalization to the training data
 
-        final int numInputs = problem.n;
+        final int numInputs = this.numberOfFeatures;
         int outputNum = this.numberOfClasses;
-        int iterations = 1000;
-        long seed = 6;
+        int iterations = 10000;
+        long seed = 60;
 
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(seed)
                 .iterations(iterations)
-                .activation(Activation.TANH)
+                .activation(Activation.SIGMOID)
                 .weightInit(WeightInit.XAVIER)
                 .learningRate(0.1)
                 .regularization(true).l2(1e-4)
                 .list()
-                .layer(0, new GravesLSTM.Builder().activation(Activation.TANH).nIn(numInputs).nOut(100).build())
+                .layer(0, new GravesLSTM.Builder().activation(Activation.TANH).nIn(numInputs).nOut(1000).build())
                 .layer(1, new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT)
-                        .activation(Activation.SOFTMAX).nIn(100).nOut(outputNum).build())
+                        .activation(Activation.SOFTMAX).nIn(1000).nOut(outputNum).build())
                 .backprop(true).pretrain(false)
                 .build();
 
         //run the model
         multiLayerNetwork = new MultiLayerNetwork(conf);
         multiLayerNetwork.init();
-        multiLayerNetwork.setListeners(new ScoreIterationListener(100));
+        multiLayerNetwork.setListeners(new ScoreIterationListener(1000));
         multiLayerNetwork.fit(trainingData);
     }
 }

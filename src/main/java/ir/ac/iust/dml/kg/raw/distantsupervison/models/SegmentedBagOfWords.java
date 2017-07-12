@@ -172,7 +172,7 @@ public class SegmentedBagOfWords {
         temp.put("df", 1);
         temp.put("idf", 2);
         String[] parameters = {"tfInCorpus", "df", "idf"};
-        System.out.println(this.bowFile);
+        System.out.println("saving model: "+this.bowFile);
         try (Writer fileWriter = new FileWriter(this.bowFile)) {
             for (String token :
                     this.sortedByTf) {
@@ -190,7 +190,7 @@ public class SegmentedBagOfWords {
 
     public void loadModel() {
         int currentIndex = 0;
-        System.out.println(this.bowFile);
+        System.out.println("loading model: "+this.bowFile);
         System.out.println(Files.exists(Paths.get(this.bowFile)));
         try (Scanner scanner = new Scanner(new FileInputStream(this.bowFile))) {
             while (scanner.hasNextLine()) {

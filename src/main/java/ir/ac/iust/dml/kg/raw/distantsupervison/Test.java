@@ -7,6 +7,7 @@ import ir.ac.iust.dml.kg.raw.distantsupervison.database.CorpusDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.BagOfWordsModel;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
+import ir.ac.iust.dml.kg.raw.distantsupervison.models.DeepClassifier;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.FeatureExtractor;
 import ir.ac.iust.dml.kg.raw.distantsupervison.reUtils.JSONHandler;
 import org.datavec.api.records.reader.RecordReader;
@@ -53,16 +54,14 @@ public class Test {
         SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
         sentenceDbHandler.loadSentenceTable();
 
-        Classifier classifier = new Classifier();
+        DeepClassifier classifier = new DeepClassifier();
 
-        classifier.train(Configuration.maximumNumberOfTrainExamples,
-                Constants.Classifiers.DEEP,
-                true);
+        classifier.train(Configuration.maximumNumberOfTrainExamples);
 
         JSONArray jsonArray = JSONHandler.getJsonArrayFromURL(Configuration.exportURL);
         FeatureNode[][] featureNodes = new FeatureNode[5560][];
         double y[] = new double[5560];
-        for (int i = 0; i < jsonArray.length(); i++) {
+        /*for (int i = 0; i < jsonArray.length(); i++) {
             String sentenceString = jsonArray.getJSONObject(i).getString("raw");
             String subject = jsonArray.getJSONObject(i).getString("subject");
             String object = jsonArray.getJSONObject(i).getString("object");
@@ -72,12 +71,12 @@ public class Test {
             CorpusEntryObject corpusEntryObject = new CorpusEntryObject(sentenceString, subject, object, predicate);
             featureNodes[i] = FeatureExtractor.createFeatureNode(classifier.getSegmentedBagOfWordsHashMap(), classifier.getEntityTypeModel(), classifier.getPartOfSpeechModel(), corpusEntryObject);
         }
-        FeatureExtractor.convertFeatureNodesToCSVandSave(featureNodes, y, SharedResources.testCSV);
+        FeatureExtractor.convertFeatureNodesToCSVandSave(featureNodes, y, SharedResources.testAbsolute);*/
         int batchSizeTest = 44;
         DataSet testData = null;
         try {
             testData = readCSVDataset(SharedResources.testCSV,
-                    batchSizeTest, classifier.getNumberOfFeatures(), classifier.getTrainData().getNumberOfClasses().intValue());
+                    batchSizeTest, classifier.getNumberOfFeatures(), classifier.getNumberOfClasses());
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -85,20 +84,20 @@ public class Test {
         }
 
         classifier.getNormalizer().transform(testData);
-        Evaluation eval = new Evaluation(classifier.getTrainData().getNumberOfClasses().intValue());
-        INDArray output = classifier.getModel_deep().output(testData.getFeatureMatrix());
+        Evaluation eval = new Evaluation(classifier.getNumberOfClasses());
+        INDArray output = classifier.getMultiLayerNetwork().output(testData.getFeatureMatrix());
 
         eval.eval(testData.getLabels(), output);
         System.out.println(eval.stats());
 
-        classifier.testForSingleSentenceString("پروین اعتصامی متولد قم است");
+        /*classifier.testForSingleSentenceString("پروین اعتصامی متولد قم است");
         classifier.testForSingleSentenceString("مولوی متولد قم است");
         classifier.testForSingleSentenceString("حافظ متولد قم است");
         classifier.testForSingleSentenceString("حسن روحانی متولد قم است");
         classifier.testForSingleSentenceString("محمد اصفهانی متولد قم است");
         classifier.testForSingleSentenceString("علی لاریجانی متولد قم است");
         classifier.testForSingleSentenceString("رفسنجانی متولد قم است");
-        classifier.testForSingleSentenceString("سعدی متولد قم است");
+        classifier.testForSingleSentenceString("سعدی متولد قم است");*/
     }
 
     private static DataSet readCSVDataset(
@@ -106,7 +105,7 @@ public class Test {
             throws IOException, InterruptedException{
 
         RecordReader rr = new CSVRecordReader();
-        rr.initialize(new FileSplit(new ClassPathResource(csvFileClasspath).getFile()));
+        rr.initialize(new FileSplit(new File(System.getProperty("user.dir")+csvFileClasspath)));
         DataSetIterator iterator = new RecordReaderDataSetIterator(rr,batchSize,labelIndex,numClasses);
         return iterator.next();
     }

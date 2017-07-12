@@ -55,10 +55,10 @@ public class FeatureExtractor {
 
 
     public static FeatureNode[] createNamedEntityFeature(EntityTypeModel entityTypeModel, CorpusEntryObject corpusEntryObject, int lastIdx) {
-        FeatureNode[] featureNodes = new FeatureNode[2*entityTypeModel.getNoOfEntityTypes()];
+        FeatureNode[] featureNodes = new FeatureNode[2 * entityTypeModel.getNoOfEntityTypes()];
         List<String> subjectType = corpusEntryObject.getSubjectType();//.subList(0, Math.min(2, corpusEntryObject.getSubjectType().size()));
         List<String> objectType = corpusEntryObject.getObjectType();//.subList(0, Math.min(2, corpusEntryObject.getObjectType().size()));
-        for (int i = 0; i<entityTypeModel.getNoOfEntityTypes(); i++){
+        for (int i = 0; i < entityTypeModel.getNoOfEntityTypes(); i++) {
             if (subjectType.contains(entityTypeModel.getEntityInvertedIndex().get(i)))
                 featureNodes[i] = new FeatureNode(lastIdx + 1 + i, 1);
             else
@@ -133,9 +133,9 @@ public class FeatureExtractor {
             for (int i = 0; i < featureNodes.length; i++) {
                 String dataRow = "";
                 for (int j = 0; j < featureNodes[i].length; j++) {
-                    dataRow+=featureNodes[i][j].getValue()+",";
+                    dataRow += featureNodes[i][j].getValue() + ",";
                 }
-                dataRow+=((int)y[i])+"\r\n";
+                dataRow += ((int) y[i]) + "\r\n";
                 fileWriter.write(dataRow);
             }
             fileWriter.close();
@@ -145,9 +145,9 @@ public class FeatureExtractor {
     }
 
     public static void convertCSVRowsToFeatureNode(List<String[]> rows, FeatureNode[][] featureNodes, double[] y, int noOfFeatures) {
-        for (int i = 0; i<rows.size(); i++) {
+        for (int i = 0; i < rows.size(); i++) {
             y[i] = Double.valueOf(rows.get(i)[noOfFeatures]);
-            for (int j = 0; j<rows.get(i).length; j++)
+            for (int j = 0; j < rows.get(i).length; j++)
                 featureNodes[i][j] = new FeatureNode(j + 1, Double.valueOf(rows.get(i)[j]));
         }
     }

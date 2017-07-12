@@ -1,6 +1,7 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
+import ir.ac.iust.dml.kg.raw.distantsupervison.models.LogitClassifier;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -24,10 +25,9 @@ public class Main {
         Date date = new Date();
         String dateString = date.toString().replaceAll("[: ]", "-");
 
-        Classifier classifier = new Classifier();
+        LogitClassifier classifier = new LogitClassifier();
 
-        if (train) classifier.train(Configuration.maximumNumberOfTrainExamples,
-                Constants.Classifiers.DEEP, true);
+        if (train) classifier.train(Configuration.maximumNumberOfTrainExamples);
         else classifier.loadModels();
 
 

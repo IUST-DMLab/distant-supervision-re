@@ -36,6 +36,11 @@ public class Classifier {
     protected Problem problem = new Problem();
     protected int defaultMaximumNoOfVocabularyForBOW = Configuration.maximumNoOfVocabularyForBagOfWords;
     protected int numberOfFeatures;
+
+    public int getNumberOfClasses() {
+        return numberOfClasses;
+    }
+
     protected int numberOfClasses;
     protected String predicatesIndexFile = "predicates.txt";
     protected String goldJsonFilePath = Configuration.exportURL;
@@ -111,8 +116,9 @@ public class Classifier {
     }
 
     protected DataSet loadTrainDataFromCSV() {
+        System.out.println("loadTrainDataFromCSV");
         DataSet trainingData = null;
-        extractProblemParamsFromCSV(SharedResources.trainCSV);
+        loadLatestCSVReaderParams();
         try {
             trainingData = readCSVDataset(
                     SharedResources.trainCSV,
@@ -121,6 +127,7 @@ public class Classifier {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+        loadModels();
         return trainingData;
     }
 
@@ -167,6 +174,7 @@ public class Classifier {
     }
 
     public void loadModels() {
+        System.out.println("loadModels");
         entityTypeModel = new EntityTypeModel(true);
         partOfSpeechModel = new PartOfSpeechModel();
         partOfSpeechModel.loadModel();
@@ -175,6 +183,7 @@ public class Classifier {
     }
 
     public void initializeModels(boolean train) {
+        System.out.println("initializeModels");
         entityTypeModel = new EntityTypeModel(false);
         partOfSpeechModel = new PartOfSpeechModel();
         for (int i = 0; i < trainData.getEntries().size(); i++) {
@@ -247,9 +256,9 @@ public class Classifier {
         Set<String> classes = new HashSet<>();
         List<String[]> lines = new ArrayList<>();
         try (Scanner scanner = new Scanner(new FileInputStream(csvFile))) {
+            String[] lineTokens;
             while (scanner.hasNextLine()){
-                String line = scanner.nextLine();
-                String[] lineTokens = line.split(",");
+                lineTokens = scanner.nextLine().split(",");
                 lines.add(lineTokens);
                 classes.add(lineTokens[lineTokens.length-1]);
                 noOfFeatures = lineTokens.length-1;
@@ -264,6 +273,17 @@ public class Classifier {
         this.numberOfClasses =  classes.size();
         this.problem.n = noOfFeatures;
         this.problem.x = featureNodes;
+    }
+
+    private void loadLatestCSVReaderParams(){
+        String csvReaderParamsFile = "C:\\Users\\hemmatan\\Desktop\\KG\\distant-supervision-re-deep-learning\\lastDeepModel\\csvParams.txt";
+        try (Scanner scanner = new Scanner(new FileInputStream(csvReaderParamsFile))) {
+            problem.l = Integer.parseInt(scanner.nextLine());
+            this.numberOfClasses = Integer.parseInt(scanner.nextLine());
+            this.numberOfFeatures =  Integer.parseInt(scanner.nextLine());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     private void createAndSaveTestData(Problem problem, int numberOfTestExamples) {
