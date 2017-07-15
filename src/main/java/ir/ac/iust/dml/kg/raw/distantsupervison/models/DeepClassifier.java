@@ -59,21 +59,21 @@ public class DeepClassifier extends Classifier {
         }
 
 
-        DataSet trainingData = loadTrainDataFromCSV();
+        //DataSet trainingData = loadTrainDataFromCSV();
         normalizer.fit(trainingData);           //Collect the statistics (mean/stdev) from the training data. This does not modify the input data
         normalizer.transform(trainingData);     //Apply normalization to the training data
 
         final int numInputs = this.numberOfFeatures;
         int outputNum = this.numberOfClasses;
-        int iterations = 10000;
-        long seed = 60;
+        int iterations = 1000;
+        long seed = 500;
 
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(seed)
                 .iterations(iterations)
                 .activation(Activation.SIGMOID)
                 .weightInit(WeightInit.XAVIER)
-                .learningRate(0.1)
+                .learningRate(0.01)
                 .regularization(true).l2(1e-4)
                 .list()
                 .layer(0, new GravesLSTM.Builder().activation(Activation.TANH).nIn(numInputs).nOut(1000).build())
@@ -85,7 +85,9 @@ public class DeepClassifier extends Classifier {
         //run the model
         multiLayerNetwork = new MultiLayerNetwork(conf);
         multiLayerNetwork.init();
-        multiLayerNetwork.setListeners(new ScoreIterationListener(1000));
+        multiLayerNetwork.setListeners(new ScoreIterationListener(500));
+
+
         multiLayerNetwork.fit(trainingData);
     }
 }

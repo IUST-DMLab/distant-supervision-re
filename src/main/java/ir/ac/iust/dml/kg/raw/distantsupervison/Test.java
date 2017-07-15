@@ -60,8 +60,8 @@ public class Test {
 
         JSONArray jsonArray = JSONHandler.getJsonArrayFromURL(Configuration.exportURL);
         FeatureNode[][] featureNodes = new FeatureNode[5560][];
-        double y[] = new double[5560];
-        /*for (int i = 0; i < jsonArray.length(); i++) {
+        /*double y[] = new double[5560];
+        for (int i = 0; i < jsonArray.length(); i++) {
             String sentenceString = jsonArray.getJSONObject(i).getString("raw");
             String subject = jsonArray.getJSONObject(i).getString("subject");
             String object = jsonArray.getJSONObject(i).getString("object");
@@ -76,7 +76,7 @@ public class Test {
         DataSet testData = null;
         try {
             testData = readCSVDataset(SharedResources.testCSV,
-                    batchSizeTest, classifier.getNumberOfFeatures(), classifier.getNumberOfClasses());
+                    5560, classifier.getNumberOfFeatures(), classifier.getNumberOfClasses());
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {

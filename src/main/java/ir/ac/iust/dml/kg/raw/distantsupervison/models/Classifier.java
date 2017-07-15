@@ -36,6 +36,7 @@ public class Classifier {
     protected Problem problem = new Problem();
     protected int defaultMaximumNoOfVocabularyForBOW = Configuration.maximumNoOfVocabularyForBagOfWords;
     protected int numberOfFeatures;
+    protected DataSet trainingData;
 
     public int getNumberOfClasses() {
         return numberOfClasses;
@@ -94,7 +95,7 @@ public class Classifier {
 
         CorpusDbHandler corpusDbHandler = new CorpusDbHandler(corpusTableName);
         if (Configuration.trainingSetMode.equalsIgnoreCase(Constants.trainingSetModes.LOAD_DATA_FROM_CSV)) {
-            loadTrainDataFromCSV();
+            this.trainingData = loadTrainDataFromCSV();
         } else {
             if (Configuration.trainingSetMode.equalsIgnoreCase(Constants.trainingSetModes.LOAD_PREDICATES_FROM_FILE))
                 corpusDbHandler.loadByReadingPedicatesFromFile(corpusDB, maximumNumberOfTrainingExamples, testIDs, SharedResources.predicatesToLoadFile);
@@ -276,7 +277,7 @@ public class Classifier {
     }
 
     private void loadLatestCSVReaderParams(){
-        String csvReaderParamsFile = "C:\\Users\\hemmatan\\Desktop\\KG\\distant-supervision-re-deep-learning\\lastDeepModel\\csvParams.txt";
+        String csvReaderParamsFile = "C:\\Users\\hemmatan\\Desktop\\KG\\RE deep-learning\\lastDeepModel\\csvParams.txt";
         try (Scanner scanner = new Scanner(new FileInputStream(csvReaderParamsFile))) {
             problem.l = Integer.parseInt(scanner.nextLine());
             this.numberOfClasses = Integer.parseInt(scanner.nextLine());
