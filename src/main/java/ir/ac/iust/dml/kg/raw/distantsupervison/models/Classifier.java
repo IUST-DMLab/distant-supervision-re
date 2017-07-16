@@ -3,15 +3,12 @@ package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 import de.bwaldvogel.liblinear.*;
 import edu.stanford.nlp.ling.TaggedWord;
 import ir.ac.iust.dml.kg.raw.POSTagger;
-import ir.ac.iust.dml.kg.raw.WordTokenizer;
 import ir.ac.iust.dml.kg.raw.distantsupervison.*;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.CorpusDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.DbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.reUtils.JSONHandler;
-import ir.ac.iust.dml.kg.resource.extractor.client.ExtractorClient;
 import ir.ac.iust.dml.kg.resource.extractor.client.MatchedResource;
-import org.apache.commons.lang3.ArrayUtils;
 import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
 import org.datavec.api.split.FileSplit;
@@ -36,7 +33,7 @@ public class Classifier {
     protected Problem problem = new Problem();
     protected int defaultMaximumNoOfVocabularyForBOW = Configuration.maximumNoOfVocabularyForBagOfWords;
     protected int numberOfFeatures;
-    protected DataSet trainingData;
+    protected DataSet DataSetBatch;
 
     public int getNumberOfClasses() {
         return numberOfClasses;
@@ -51,6 +48,8 @@ public class Classifier {
     protected CorpusDB trainData = new CorpusDB();
     protected CorpusDB testData = new CorpusDB();
     protected Set<String> testIDs = new HashSet<>();
+    DataSetIterator iteratorTrain;
+    DataSetIterator iteratorTest;
 
     public Classifier() {
         SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
@@ -60,14 +59,14 @@ public class Classifier {
         trainDbHandler.load(trainData);
     }
 
-    private static DataSet readCSVDataset(
+    private static DataSetIterator readCSVDataset(
             String csvFileClasspath, int batchSize, int labelIndex, int numClasses)
             throws IOException, InterruptedException {
 
         RecordReader rr = new CSVRecordReader();
         rr.initialize(new FileSplit(new ClassPathResource(csvFileClasspath).getFile()));
         DataSetIterator iterator = new RecordReaderDataSetIterator(rr, batchSize, labelIndex, numClasses);
-        return iterator.next();
+        return iterator;
     }
 
     public HashMap<String, SegmentedBagOfWords> getSegmentedBagOfWordsHashMap() {
@@ -95,7 +94,7 @@ public class Classifier {
 
         CorpusDbHandler corpusDbHandler = new CorpusDbHandler(corpusTableName);
         if (Configuration.trainingSetMode.equalsIgnoreCase(Constants.trainingSetModes.LOAD_DATA_FROM_CSV)) {
-            this.trainingData = loadTrainDataFromCSV();
+            this.iteratorTrain = loadTrainDataFromCSV();
         } else {
             if (Configuration.trainingSetMode.equalsIgnoreCase(Constants.trainingSetModes.LOAD_PREDICATES_FROM_FILE))
                 corpusDbHandler.loadByReadingPedicatesFromFile(corpusDB, maximumNumberOfTrainingExamples, testIDs, SharedResources.predicatesToLoadFile);
@@ -116,12 +115,13 @@ public class Classifier {
         }
     }
 
-    protected DataSet loadTrainDataFromCSV() {
+    protected DataSetIterator loadTrainDataFromCSV() {
         System.out.println("loadTrainDataFromCSV");
         DataSet trainingData = null;
+        DataSetIterator dataSetIterator = null;
         loadLatestCSVReaderParams();
         try {
-            trainingData = readCSVDataset(
+            dataSetIterator = readCSVDataset(
                     SharedResources.trainCSV,
                     Configuration.dl4jParams.batchSizeTraining,
                     numberOfFeatures, numberOfClasses);
@@ -129,7 +129,7 @@ public class Classifier {
             e.printStackTrace();
         }
         loadModels();
-        return trainingData;
+        return dataSetIterator;
     }
 
 

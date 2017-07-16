@@ -30,7 +30,7 @@ public class Configuration {
     }
 
     public static class dl4jParams {
-        public static final int batchSizeTraining = 33837;
+        public static final int batchSizeTraining = 100;
         public static final String pathToDirectory = "C:\\Users\\hemmatan\\Desktop\\KG\\RE segmented-bow\\lastDeepModel\\";
     }
 
