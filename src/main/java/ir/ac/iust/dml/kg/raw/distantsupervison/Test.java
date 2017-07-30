@@ -16,6 +16,8 @@ import org.datavec.api.split.FileSplit;
 import org.datavec.api.util.ClassPathResource;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.util.ModelSerializer;
 import org.json.JSONArray;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -83,6 +85,9 @@ public class Test {
             e.printStackTrace();
         }
 
+
+
+
         classifier.getNormalizer().transform(testData);
         Evaluation eval = new Evaluation(classifier.getNumberOfClasses());
         INDArray output = classifier.getMultiLayerNetwork().output(testData.getFeatureMatrix());
@@ -102,11 +107,11 @@ public class Test {
 
     private static DataSet readCSVDataset(
             String csvFileClasspath, int batchSize, int labelIndex, int numClasses)
-            throws IOException, InterruptedException{
+            throws IOException, InterruptedException {
 
         RecordReader rr = new CSVRecordReader();
-        rr.initialize(new FileSplit(new File(System.getProperty("user.dir")+csvFileClasspath)));
-        DataSetIterator iterator = new RecordReaderDataSetIterator(rr,batchSize,labelIndex,numClasses);
+        rr.initialize(new FileSplit(new File(System.getProperty("user.dir") + csvFileClasspath)));
+        DataSetIterator iterator = new RecordReaderDataSetIterator(rr, batchSize, labelIndex, numClasses);
         return iterator.next();
     }
 
@@ -203,5 +208,59 @@ public class Test {
         int tempp = 0;
     }
 
+    @org.junit.Test
+    public void eval() {
+        HashMap<String, String> predicates = new HashMap<>();
+        HashMap<String, String> predicatesInv = new HashMap<>();
 
+        try (Scanner scanner = new Scanner(new FileInputStream("predicates.txt"))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] tokens = line.split("\t");
+                predicates.put(tokens[0], tokens[1]);
+                predicatesInv.put(tokens[1], tokens[0]);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        HashMap<String, String> mapping = new HashMap<>();
+        try (Scanner scanner = new Scanner(new FileInputStream("mappings2.txt"))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] tokens = line.split("\t");
+                for (int i = 1; i < tokens.length; i++) {
+                    mapping.put(tokens[i], tokens[0]);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        //int tp = 0;
+        //int fp = 0;
+        //try (Writer fileWriter = new FileWriter("train2.csv")) {
+        try (Scanner scanner = new Scanner(new FileInputStream("test.csv"))) {
+            String[] tokens;
+            Writer fileWriter = new FileWriter("test2.csv");
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                tokens = line.split(",");
+                String correct = mapping.get(predicatesInv.get(tokens[4146]));
+                System.out.println(tokens[4146]+" "+correct);
+                tokens[4146] = correct;
+                String write = "";
+                for(int i = 0; i<tokens.length-1; i++)
+                    write+=tokens[i]+",";
+                write+=tokens[4146]+"\r\n";
+                fileWriter.write(write);
+
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //System.out.println( ((double) tp) / (tp+fp));
+    }
 }

@@ -1,6 +1,7 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
+import ir.ac.iust.dml.kg.raw.distantsupervison.models.DeepClassifier;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.LogitClassifier;
 
 import java.io.*;
@@ -19,19 +20,21 @@ public class Main {
     }
 
     private static void process(boolean train) {
-        //TODO: these two lines should be remove because the corpus table loads in Classifier()!
+        //TODO: these two lines should be removed because the corpus table loads in Classifier()!
         //SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
         //sentenceDbHandler.loadSentenceTable();
         Date date = new Date();
         String dateString = date.toString().replaceAll("[: ]", "-");
 
-        LogitClassifier classifier = new LogitClassifier();
+        DeepClassifier classifier = new DeepClassifier();
 
         if (train) classifier.train(Configuration.maximumNumberOfTrainExamples);
-        else classifier.loadModels();
+        else {
+            classifier.loadModels();
+            classifier.loadNetworkAndNormalizer();
+        }
 
 
-        //classifier.initializeModels(false);
 
         PrintStream out = null;
         try {
@@ -42,7 +45,7 @@ public class Main {
         }
         System.setOut(out);
 
-        classifier.testOnGoldJson();
+        classifier.testOnGoldCSV();
 
         try {
             Files.deleteIfExists(new File(SharedResources.LastTestResultsFile).toPath());

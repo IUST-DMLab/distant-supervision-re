@@ -26,7 +26,7 @@ public class SharedResources {
     public static final String predicatesInExportsJsonFile = "predicatesInExportsJson.txt";
     public static final String mappingsFile = "mappings.txt";
     public static final String LastTestResultsFile = "testResults.txt";
-    public static final String trainCSV = "/lastDeepModel/train.csv";
+    public static final String trainCSV = "C:\\Users\\hemmatan\\Desktop\\KG\\RE deep-learning\\lastDeepModel\\train.csv";
     public static final String testCSV = "/lastDeepModel/test.csv";
     public static final String testAbsolute = "C:\\Users\\hemmatan\\Desktop\\KG\\RE deep-learning\\lastDeepModel\\test.csv";
 }

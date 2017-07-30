@@ -59,12 +59,12 @@ public class Classifier {
         trainDbHandler.load(trainData);
     }
 
-    private static DataSetIterator readCSVDataset(
+    protected static DataSetIterator readCSVDataset(
             String csvFileClasspath, int batchSize, int labelIndex, int numClasses)
             throws IOException, InterruptedException {
 
         RecordReader rr = new CSVRecordReader();
-        rr.initialize(new FileSplit(new ClassPathResource(csvFileClasspath).getFile()));
+        rr.initialize(new FileSplit(new File(csvFileClasspath)/*.getFile()*/));
         DataSetIterator iterator = new RecordReaderDataSetIterator(rr, batchSize, labelIndex, numClasses);
         return iterator;
     }
