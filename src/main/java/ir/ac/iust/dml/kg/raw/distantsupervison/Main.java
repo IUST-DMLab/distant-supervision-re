@@ -44,6 +44,7 @@ public class Main {
         classifier.testOnGoldJson();
 
         try {
+            Files.deleteIfExists(new File(SharedResources.LastTestResultsFile).toPath());
             Files.copy(new File("testResults-" + dateString + ".txt").toPath(), new File(SharedResources.LastTestResultsFile).toPath());
         } catch (FileNotFoundException e) {
             e.printStackTrace();

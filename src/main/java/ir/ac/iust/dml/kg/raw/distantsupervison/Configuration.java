@@ -15,7 +15,7 @@ public class Configuration {
     public static final int maximumNumberOfPredicatesToLoad = 72;
     //(Integer) noOfTotalExamples/maximumNoOfInstancesForEachPredicate +1;
 
-    public static final double confidenceThreshold = 0.4;
+    public static final double confidenceThreshold = 0.5;
 
     public static final String extractorClient = "http://194.225.227.161:8094";
     public static final String ontologyClient = "http://194.225.227.161:8090";
@@ -25,7 +25,7 @@ public class Configuration {
 
     public static class libLinearParams {
         public static final double costOfConstraintsViolation = 1.0;
-        public static final double epsStoppingCriteria = 0.1;
+        public static final double epsStoppingCriteria = 0.05;
     }
 
     public static final String trainingSetMode = Constants.trainingSetModes.USE_ALL_PREDICATES_IN_EXPORTS_JSON;

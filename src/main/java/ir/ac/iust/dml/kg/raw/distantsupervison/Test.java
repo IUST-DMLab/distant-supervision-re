@@ -1,16 +1,16 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.POSTagger;
+import ir.ac.iust.dml.kg.raw.SentenceTokenizer;
 import ir.ac.iust.dml.kg.raw.WordTokenizer;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.CorpusDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.BagOfWordsModel;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
+import ir.ac.iust.dml.kg.raw.distantsupervison.reUtils.JSONHandler;
+import org.json.JSONArray;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.*;
 
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
@@ -150,5 +150,54 @@ public class Test {
         int tempp = 0;
     }
 
+    @org.junit.Test
+    public void extract() {
+        Classifier classifier = new Classifier();
+        classifier.loadModels();
+        String text = "";
+        try {
+            try (Scanner scanner = new Scanner(new FileInputStream("textToExtract.txt"))) {
+                while (scanner.hasNextLine()) {
+                    text += scanner.nextLine();
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
+        List<String> sentences = SentenceTokenizer.tokenizeRaw(text);
+        for (String sentence :
+                sentences) {
+            classifier.testForSingleSentenceString(sentence);
+        }
+    }
+
+    @org.junit.Test
+    public void statsForExport() {
+        try (Writer fileWriter = new FileWriter("stats.txt")) {
+            fileWriter.write("predicate" + "\t" + "depTree.getNearestFollowingVerb(subject)" + "\t" + "depTree.getNearestFollowingVerb(object)" +
+                    "\t"+
+                    "depTree.getHead(subject)" + "\t" + "depTree.getHead(object)" + "\t" + "sentence"+ "\r\n");
+            JSONArray jsonArray = JSONHandler.getJsonArrayFromURL(Configuration.exportURL);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                Object depTreeHash = jsonArray.getJSONObject(i).get("depTreeHash");
+                if (depTreeHash.equals(null) || ((String) depTreeHash).equalsIgnoreCase("error"))
+                    continue;
+
+                String sentenceString = jsonArray.getJSONObject(i).getString("normalized");
+                String subject = jsonArray.getJSONObject(i).getString("subject").split(" ")[0];
+                String object = jsonArray.getJSONObject(i).getString("object").split(" ")[0];
+                String predicate = jsonArray.getJSONObject(i).getString("predicate");
+                String[] sentenceTokens = sentenceString.split(" ");
+                DepTree depTree = new DepTree((String) depTreeHash, sentenceString);
+                fileWriter.write(predicate + "\t" + depTree.getNearestFollowingVerb(subject) + "\t" + depTree.getNearestFollowingVerb(object) +
+                        "\t"+
+                        depTree.getHead(subject) + "\t" + depTree.getHead(object) + "\t"+ sentenceString+"\r\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 }
