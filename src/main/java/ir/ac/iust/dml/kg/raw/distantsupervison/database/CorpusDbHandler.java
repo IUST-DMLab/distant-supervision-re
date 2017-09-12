@@ -7,7 +7,11 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import ir.ac.iust.dml.kg.raw.distantsupervison.*;
+import ir.ac.iust.dml.kg.raw.extractor.EnhancedEntityExtractor;
+import ir.ac.iust.dml.kg.raw.extractor.ResolvedEntityToken;
+import ir.ac.iust.dml.kg.raw.extractor.ResolvedEntityTokenResource;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,7 +28,7 @@ public class CorpusDbHandler extends DbHandler {
 
     public CorpusDbHandler(String tableName) {
         mongo = new MongoClient(host, port);
-        distantSupervisionDB = mongo.getDatabase(distantSupervisionDBName);
+        distantSupervisionDB = mongo.getDatabase(Configuration.distantSupervisionDBName);
         corpusTable = distantSupervisionDB.getCollection(tableName);
     }
 
@@ -46,6 +50,9 @@ public class CorpusDbHandler extends DbHandler {
         document.put(Constants.corpusDbEntryAttribs.OBJECT_TYPE, corpusEntryObject.getObjectType());
         document.put(Constants.corpusDbEntryAttribs.PREDICATE, corpusEntryObject.getPredicate());
         document.put(Constants.corpusDbEntryAttribs.OCCURRENCE, corpusEntryObject.getOccurrence());
+        document.put(Constants.corpusDbEntryAttribs.OBJECT_HEAD, corpusEntryObject.getObjectHead());
+        document.put(Constants.corpusDbEntryAttribs.SUBJECT_HEAD, corpusEntryObject.getSubjectHead());
+
 
         corpusTable.insertOne(document);
     }
@@ -73,7 +80,9 @@ public class CorpusDbHandler extends DbHandler {
         BasicDBList postagObject;
         String generalizedSentence;
         String object;
+        String objectHead;
         String subject;
+        String subjectHead;
         List<String> objectType;
         List<String> subjectType;
         String predicate;
@@ -84,17 +93,7 @@ public class CorpusDbHandler extends DbHandler {
         CorpusEntryObject corpusEntryObject;
         while (cursor.hasNext() && destinationCorpusDB.getEntries().size()<numberOfEntriesToLoad){
             document = (Document) cursor.next();
-            rawString = (String) document.get(Constants.sentenceAttribs.RAW);
-            normalized = (String) document.get(Constants.sentenceAttribs.NORMALIZED);
-            words = (List<String>) document.get(Constants.sentenceAttribs.WORDS);
-            posTags = (List<String>) document.get(Constants.sentenceAttribs.POSTAG);
-            generalizedSentence = (String) document.get(Constants.corpusDbEntryAttribs.GENERALIZED_SENTENCE);
-            object = (String) document.get(Constants.corpusDbEntryAttribs.OBJECT);
-            subject = (String) document.get(Constants.corpusDbEntryAttribs.SUBJECT);
-            objectType = (List<String>) document.get(Constants.corpusDbEntryAttribs.OBJECT_TYPE);
-            subjectType = (List<String>) document.get(Constants.corpusDbEntryAttribs.SUBJECT_TYPE);
             predicate = (String) document.get(Constants.corpusDbEntryAttribs.PREDICATE);
-            occurrence = (int) document.get(Constants.corpusDbEntryAttribs.OCCURRENCE);
             if ((destinationCorpusDB.getPredicateCounts().containsKey(predicate) &&
                     destinationCorpusDB.getPredicateCounts().get(predicate) >= Configuration.maximumNoOfInstancesForEachPredicate)
                     || testIDs.contains(document.get("_id").toString())) {
@@ -102,12 +101,29 @@ public class CorpusDbHandler extends DbHandler {
                     System.out.println(document.get("_id").toString());
                 continue;
             }
+            if (!predicates.contains(predicate))
+                continue;
+            rawString = (String) document.get(Constants.sentenceAttribs.RAW);
+            normalized = (String) document.get(Constants.sentenceAttribs.NORMALIZED);
+            words = (List<String>) document.get(Constants.sentenceAttribs.WORDS);
+            posTags = (List<String>) document.get(Constants.sentenceAttribs.POSTAG);
+            generalizedSentence = (String) document.get(Constants.corpusDbEntryAttribs.GENERALIZED_SENTENCE);
+            object = (String) document.get(Constants.corpusDbEntryAttribs.OBJECT);
+            subject = (String) document.get(Constants.corpusDbEntryAttribs.SUBJECT);
+            objectHead = (String) document.get(Constants.corpusDbEntryAttribs.OBJECT_HEAD);
+            subjectHead = (String) document.get(Constants.corpusDbEntryAttribs.SUBJECT_HEAD);
+            objectType = (List<String>) document.get(Constants.corpusDbEntryAttribs.OBJECT_TYPE);
+            subjectType = (List<String>) document.get(Constants.corpusDbEntryAttribs.SUBJECT_TYPE);
+            if (subjectType.size() <= 1 || objectType.size() <= 1)
+                continue;
+            occurrence = (int) document.get(Constants.corpusDbEntryAttribs.OCCURRENCE);
+
             //words = convertBasicDBListToJavaListOfStrings(wordsObject);
             //posTags = convertBasicDBListToJavaListOfStrings(postagObject);
             currentSentence = new Sentence(rawString,words,posTags,normalized);
-            corpusEntryObject = new CorpusEntryObject(currentSentence, generalizedSentence, object, subject, objectType, subjectType, predicate, occurrence);
-            if (predicates.contains(corpusEntryObject.getPredicate()))
-                destinationCorpusDB.addEntry(corpusEntryObject);
+            corpusEntryObject = new CorpusEntryObject(currentSentence, generalizedSentence, object, subject, objectType, subjectType, predicate, occurrence,
+                    subjectHead, objectHead);
+            destinationCorpusDB.addEntry(corpusEntryObject);
         }
     }
 
@@ -127,6 +143,8 @@ public class CorpusDbHandler extends DbHandler {
         String generalizedSentence;
         String object;
         String subject;
+        String objectHead;
+        String subjectHead;
         List<String> objectType;
         List<String> subjectType;
         String predicate;
@@ -143,6 +161,8 @@ public class CorpusDbHandler extends DbHandler {
                 words = (List<String>) document.get(Constants.sentenceAttribs.WORDS);
                 posTags = (List<String>) document.get(Constants.sentenceAttribs.POSTAG);
                 generalizedSentence = (String) document.get(Constants.corpusDbEntryAttribs.GENERALIZED_SENTENCE);
+                objectHead = (String) document.get(Constants.corpusDbEntryAttribs.OBJECT_HEAD);
+                subjectHead = (String) document.get(Constants.corpusDbEntryAttribs.SUBJECT_HEAD);
                 object = (String) document.get(Constants.corpusDbEntryAttribs.OBJECT);
                 subject = (String) document.get(Constants.corpusDbEntryAttribs.SUBJECT);
                 objectType = (List<String>) document.get(Constants.corpusDbEntryAttribs.OBJECT_TYPE);
@@ -152,7 +172,8 @@ public class CorpusDbHandler extends DbHandler {
                 //words = convertBasicDBListToJavaListOfStrings(wordsObject);
                 //posTags = convertBasicDBListToJavaListOfStrings(postagObject);
                 currentSentence = new Sentence(rawString,words,posTags,normalized);
-                corpusEntryObject = new CorpusEntryObject(currentSentence, generalizedSentence, object, subject,  objectType, subjectType, predicate, occurrence);
+                corpusEntryObject = new CorpusEntryObject(currentSentence, generalizedSentence, object, subject, objectType, subjectType, predicate, occurrence,
+                        subjectHead, objectHead);
                 destinationCorpusDB.addEntry(corpusEntryObject);
             }
 
@@ -212,6 +233,101 @@ public class CorpusDbHandler extends DbHandler {
             e.printStackTrace();
         }
         return predicates;
+    }
+
+    public void updateEntityTypes() {
+        final EnhancedEntityExtractor extractor = new EnhancedEntityExtractor();
+        MongoCursor cursor = corpusTable.find().iterator();
+        Document document;
+        String rawString;
+        String subject;
+        String object;
+        List<ResolvedEntityTokenResource> objectType;
+        List<ResolvedEntityTokenResource> subjectType;
+        List<List<ResolvedEntityToken>> result;
+        List<List<ResolvedEntityToken>> curObjectType;
+        List<List<ResolvedEntityToken>> curSubjectType;
+        ResolvedEntityTokenResource entityTypeGuess;
+        while (cursor.hasNext()) {
+            objectType = new ArrayList<>();
+            subjectType = new ArrayList<>();
+            document = (Document) cursor.next();
+            rawString = (String) document.get(Constants.sentenceAttribs.RAW);
+            if (rawString.length() > Configuration.maxLengthForRawString) {
+                corpusTable.deleteOne(document);
+                continue;
+            }
+            object = (String) document.get(Constants.corpusDbEntryAttribs.OBJECT);
+            System.out.println("object: " + object);
+            curObjectType = extractor.extract(object);
+            if (curObjectType != null && !curObjectType.isEmpty() && curObjectType.get(0) != null && !curObjectType.get(0).isEmpty()) {
+                if (curObjectType.get(0).get(0).getAmbiguities() != null &&
+                        !curObjectType.get(0).get(0).getAmbiguities().isEmpty())
+                    objectType.addAll(curObjectType.get(0).get(0).getAmbiguities());
+                if (curObjectType.get(0).get(0).getResource() != null)
+                    objectType.add(curObjectType.get(0).get(0).getResource());
+            }
+            subject = (String) document.get(Constants.corpusDbEntryAttribs.SUBJECT);
+            System.out.println("subject: " + subject);
+            curSubjectType = extractor.extract(subject);
+            if (curSubjectType != null && !curSubjectType.isEmpty() && curSubjectType.get(0) != null && !curSubjectType.get(0).isEmpty()) {
+                if (curSubjectType.get(0).get(0).getAmbiguities() != null &&
+                        !curSubjectType.get(0).get(0).getAmbiguities().isEmpty())
+                    subjectType.addAll(curSubjectType.get(0).get(0).getAmbiguities());
+                if (curSubjectType.get(0).get(0).getResource() != null)
+                    subjectType.add(curSubjectType.get(0).get(0).getResource());
+            }
+            result = extractor.extract(rawString);
+            List<String> newObjectType = new ArrayList<>();
+            List<String> newSubjectType = new ArrayList<>();
+            extractor.disambiguateByContext(result, Configuration.contextDisambiguationThreshold);
+            int i = 0;
+            int j;
+            boolean objSw = false;
+            boolean subjSw = false;
+            while (i < result.size()) {
+                j = 0;
+                while (j < result.get(i).size()) {
+                    if (!result.get(i).get(j).getIobType().name().equalsIgnoreCase("Beginning")) {
+                        j++;
+                        continue;
+                    }
+                    entityTypeGuess = result.get(i).get(j).getResource();
+                    for (ResolvedEntityTokenResource resolvedEntityTokenResource :
+                            objectType) {
+                        if (resolvedEntityTokenResource.equals(entityTypeGuess)) {
+                            objSw = true;
+                            newObjectType = new ArrayList<>(entityTypeGuess.getClasses());
+                            break;
+                        }
+                    }
+                    for (ResolvedEntityTokenResource resolvedEntityTokenResource :
+                            subjectType) {
+                        if (resolvedEntityTokenResource.equals(entityTypeGuess)) {
+                            subjSw = true;
+                            newSubjectType = new ArrayList<>(entityTypeGuess.getClasses());
+                            break;
+                        }
+                    }
+                    j++;
+                }
+                i++;
+            }
+
+            if (!objSw || !subjSw)
+                corpusTable.deleteOne(document);
+
+            Bson filter = new Document("_id", document.get("_id"));
+
+            Bson newValue = new Document("object_type", newObjectType);
+            Bson newValue2 = new Document("subject_type", newSubjectType);
+
+            Bson updateOperationDocumentObj = new Document("$set", newValue);
+            corpusTable.updateOne(filter, updateOperationDocumentObj);
+            Bson updateOperationDocumentSubj = new Document("$set", newValue2);
+            corpusTable.updateOne(filter, updateOperationDocumentSubj);
+
+        }
     }
 
 

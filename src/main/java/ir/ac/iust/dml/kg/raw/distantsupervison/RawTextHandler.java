@@ -40,7 +40,7 @@ public class RawTextHandler {
         List<Sentence> sentenceList = new ArrayList<Sentence>();
         for (String line:
              rawTextLines) {
-            List<String> lineSentences = SentenceTokenizer.tokenizeRaw(line);
+            List<String> lineSentences = SentenceTokenizer.SentenceSplitterRaw(line);
             for (String sentenceString:
                  lineSentences) {
                 Sentence sentence = new Sentence(sentenceString);

@@ -27,8 +27,18 @@ public class EntityTypeModel {
             this.loadModel();
         else {
             OntologyClient client = new OntologyClient(Configuration.ontologyClient);
-            final PagedData<OntologyClass> result = client.search(0, 1000, null, "Thing", false);
-            this.noOfEntityTypes = result.getRowCount();
+            final PagedData<OntologyClass> things = client.search(0, 1000, null, "Thing", false);
+            final PagedData<OntologyClass> agents = client.search(0, 1000, null, "Agent", false);
+            final PagedData<OntologyClass> places = client.search(0, 1000, null, "Place", false);
+
+            List<OntologyClass> ontologyClassList = things.getData();
+            //ontologyClassList.addAll(agents.getData());
+            //ontologyClassList.addAll(places.getData());
+
+            PagedData<OntologyClass> result = new PagedData<>();
+            result.setData(ontologyClassList);
+
+            this.noOfEntityTypes = result.getData().size();
             this.entities = result.getData();
             int lastIdx = 0;
             for (OntologyClass ontologyClass :

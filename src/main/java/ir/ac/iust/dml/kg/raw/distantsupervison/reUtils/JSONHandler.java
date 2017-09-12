@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -39,6 +40,14 @@ public class JSONHandler {
         JSONArray arr = new JSONArray(str);
 
         return arr;
+    }
+
+    public static void appendJsonObjectToFile(JSONObject jsonObject, FileWriter fileWriter) {
+        try {
+            fileWriter.append(jsonObject.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

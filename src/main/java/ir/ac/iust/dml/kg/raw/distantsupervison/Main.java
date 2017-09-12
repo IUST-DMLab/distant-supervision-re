@@ -1,5 +1,6 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
+import ir.ac.iust.dml.kg.raw.distantsupervison.database.DbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
 
 import java.io.*;
@@ -13,12 +14,13 @@ public class Main {
 
     public static void main(String[] args) {
         if (args.length > 0 && args[0].equals("train")) process(true);
+        else if (args.length > 0 && args[0].equals("makeDB")) DbHandler.saveCorpusJasonToDB();
         else process(false);
 
     }
 
     private static void process(boolean train) {
-        //TODO: these two lines should be remove because the corpus table loads in Classifier()!
+        //TODO: these two lines should be removed because the corpus table loads in Classifier()!
         //SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
         //sentenceDbHandler.loadSentenceTable();
         Date date = new Date();

@@ -44,15 +44,32 @@ public class Constants {
         public static final String SUBJECT_TYPE = "subject_type";
         public static final String OBJECT_TYPE = "object_type";
         public static final String PREDICATE = "predicate";
+        public static final String OBJECT_HEAD = "object_head";
+        public static final String SUBJECT_HEAD = "subject_head";
     }
 
     public static class entityModelAttribs {
-        public static final String PREFIX = "fkgo:"; // "http://fkg.iust.ac.ir/ontology/"
+        public static final String PREFIX = "http://fkg.iust.ac.ir/ontology/"; // "http://fkg.iust.ac.ir/ontology/"
     }
 
     public static class trainingSetModes {
         public static final String USE_ALL_PREDICATES_IN_EXPORTS_JSON = "useAllPredicatesInExportsJson";
         public static final String LOAD_PREDICATES_FROM_FILE = "loadPredicatesFromFile";
         public static final String LOAD_CORPUS_FREQUENT_PREDICATES = "loadCorpusFrequentPredicates";
+    }
+
+    public static class triplesAttribs {
+        public static final String SUBJECT = "subject";
+        public static final String OBJECT = "object";
+        public static final String PREDICATE = "predicate";
+        public static final String CONFIDENCE = "confidence";
+        public static final String SOURCE = "source";
+        public static final String ORIGIN_SENTENCE = "origin_sentence";
+    }
+
+    public static class trainCorpusNames {
+        public static final String ALL_WIKI_WITHOUT_DEPENDENCY_FEATURES = "corpus";
+        public static final String WIKI_PLUS_DEPENDENCY_FEATURES = "corpus_with_dependency";
+        public static final String WIKI_PLUS_DEPENDENCY_MINUS_FREQUENT_TRIPLES = "corpus_with_dependency_1_2_copy";
     }
 }

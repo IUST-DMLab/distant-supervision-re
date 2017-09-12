@@ -1,6 +1,9 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
+import ir.ac.iust.dml.kg.raw.DependencyParser;
 import ir.ac.iust.dml.kg.raw.WordTokenizer;
+import org.maltparser.concurrent.graph.ConcurrentDependencyGraph;
+import org.maltparser.concurrent.graph.ConcurrentDependencyNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +33,26 @@ public class DepTree {
 
     }
 
+    public String getEntitysVerbHead(String sentence, String entity) {
+        ConcurrentDependencyGraph result = DependencyParser.parseRaw(sentence).get(0);
+        int idx = -1;
+        for (int i = 1; i < result.nTokenNodes() + 1; i++) {
+            ConcurrentDependencyNode node = result.getDependencyNode(i);
+            if (node.getLabel("FORM").equalsIgnoreCase(entity))
+                idx = i;
+        }
+        if (idx == -1)
+            return "null";
+
+        ConcurrentDependencyNode node = result.getDependencyNode(idx);
+        while (true) {
+            ConcurrentDependencyNode parent = node.getHead();
+            if (parent.getLabel("POSTAG").equalsIgnoreCase("V"))
+                return parent.getLabel("FORM");
+            node = node.getHead();
+        }
+    }
+
     public String getNearestFollowingVerb(String entity){
         String entity1 = WordTokenizer.tokenize(entity).get(0);
         for(int i = words.indexOf(entity1); i<words.size(); i++){
@@ -56,5 +79,21 @@ public class DepTree {
         if (idx == -1)
             return "null";
         return words.get(idx);
+    }
+
+    public static String getDepTreeHash(String sentence) {
+        if (sentence.isEmpty()) return "";
+        String depTreeHash = "";
+        ConcurrentDependencyGraph result = DependencyParser.parseRaw(sentence).get(0);
+        for (int i = 1; i < result.nTokenNodes() + 1; i++) {
+            ConcurrentDependencyNode node = result.getDependencyNode(i);
+            String postag = node.getLabel("POSTAG");
+            String headid = "0";
+            if (!node.getHead().getLabel("ID").equalsIgnoreCase(""))
+                headid = node.getHead().getLabel("ID");
+            String deprel = node.getLabel("DEPREL");
+            depTreeHash += "[" + postag + "," + headid + "," + deprel + "]";
+        }
+        return depTreeHash;
     }
 }

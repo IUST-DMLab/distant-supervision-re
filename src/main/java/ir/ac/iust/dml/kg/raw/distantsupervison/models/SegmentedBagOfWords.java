@@ -27,7 +27,7 @@ public class SegmentedBagOfWords {
     private HashMap<String, Double> idf = new HashMap<>();
     private HashMap<String, Double> tfInCorpus = new HashMap<>();
     private HashMap<String, Double> df = new HashMap<>();
-    private HashMap<String, Double> tfIdfInCorpus = new HashMap<>();
+    //private HashMap<String, Double> tfIdfInCorpus = new HashMap<>();
     private Boolean doLemmatize = false;
     private HashMap<String, Integer> indices = new HashMap<>();
     private List<String> sortedByTf = new ArrayList<>();
@@ -100,7 +100,7 @@ public class SegmentedBagOfWords {
             Map.Entry pair = (Map.Entry) it.next();
             idf.put((String) pair.getKey(), log10(this.numberOfSentences / (Double) pair.getValue()));
             Double currentTfIdf = tfInCorpus.get((String) pair.getKey()) * idf.get((String) pair.getKey());
-            tfIdfInCorpus.put((String) pair.getKey(), currentTfIdf);
+            //tfIdfInCorpus.put((String) pair.getKey(), currentTfIdf);
         }
 
         // sort the vocabulary by term frequency
@@ -134,9 +134,10 @@ public class SegmentedBagOfWords {
         }
         for (String queryWord :
                 queryWords) {
-            if (idf.containsKey(queryWord))
+            tf_idf.put(queryWord, 1.0);
+            /*if (idf.containsKey(queryWord))
                 tf_idf.put(queryWord, tf.get(queryWord) * idf.get(queryWord));
-            else tf_idf.put(queryWord, log10(this.numberOfSentences));
+            else tf_idf.put(queryWord, log10(this.numberOfSentences));*/
         }
         return tf_idf;
     }
@@ -167,10 +168,10 @@ public class SegmentedBagOfWords {
     }
 
     public void saveModel() {
-        HashMap<String, Integer> temp = new HashMap<>();
-        temp.put("tfInCorpus", 0);
-        temp.put("df", 1);
-        temp.put("idf", 2);
+        // HashMap<String, Integer> temp = new HashMap<>();
+        // temp.put("tfInCorpus", 0);
+        // temp.put("df", 1);
+        // temp.put("idf", 2);
         String[] parameters = {"tfInCorpus", "df", "idf"};
         System.out.println(this.bowFile);
         try (Writer fileWriter = new FileWriter(this.bowFile)) {
@@ -198,7 +199,8 @@ public class SegmentedBagOfWords {
                 String[] tokens = line.split("\t");
                 this.sortedByTf.add(tokens[0]);
                 this.vocabularySet.add(tokens[0]);
-                this.tfIdfInCorpus.put(tokens[0], Double.valueOf(tokens[1]));
+                this.tfInCorpus.put(tokens[0], Double.valueOf(tokens[1]));
+                //this.tfIdfInCorpus.put(tokens[0], Double.valueOf(tokens[1])*Double.valueOf(tokens[3]));
                 this.df.put(tokens[0], Double.valueOf(tokens[2]));
                 this.idf.put(tokens[0], Double.valueOf(tokens[3]));
                 this.indices.put(tokens[0], currentIndex++);

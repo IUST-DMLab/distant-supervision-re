@@ -27,7 +27,7 @@ public class FeatureExtractor {
     }
 
     public static FeatureNode[] createFeatureNode(HashMap<String, SegmentedBagOfWords> segmentedBagOfWordsHashMap,
-                                                  EntityTypeModel entityTypeModel, PartOfSpeechModel partOfSpeechModel, CorpusEntryObject corpusEntryObject) {
+                                                  EntityTypeModel entityTypeModel, PartOfSpeechModel partOfSpeechModel, ObjectHeadModel objectHeadModel, CorpusEntryObject corpusEntryObject) {
         //String jomle = corpusEntryObject.getGeneralizedSentence();
         //List<String> tokenized = WordTokenizer.tokenize(jomle);
         FeatureNode[] bagOfWordsFeatureNodes1 = segmentedBagOfWordsHashMap.get(Constants.segmentedBagOfWordsAttribs.SUBJECT_PRECEDING)
@@ -43,12 +43,26 @@ public class FeatureExtractor {
                 ArrayUtils.addAll(bagOfWordsFeatureNodes3, bagOfWordsFeatureNodes4));
         FeatureNode[] entityTypesFeatureNodes = createNamedEntityFeature(entityTypeModel, corpusEntryObject, bagOfWordsFeatureNodes.length);
         FeatureNode[] posFeatureNodes = createPosFeature(partOfSpeechModel, corpusEntryObject, bagOfWordsFeatureNodes.length + entityTypesFeatureNodes.length);
-        FeatureNode[] featureNodes = ArrayUtils.addAll(ArrayUtils.addAll(bagOfWordsFeatureNodes, entityTypesFeatureNodes), posFeatureNodes);
-
-
+        /*FeatureNode[] objectHeadFeatureNodes = createObjectHeadFeature(objectHeadModel, corpusEntryObject, bagOfWordsFeatureNodes.length + entityTypesFeatureNodes.length+posFeatureNodes.length);
+        FeatureNode[] featureNodes = ArrayUtils.addAll(ArrayUtils.addAll(bagOfWordsFeatureNodes, entityTypesFeatureNodes),
+                ArrayUtils.addAll(posFeatureNodes,objectHeadFeatureNodes));*/
+        FeatureNode[] featureNodes = ArrayUtils.addAll(ArrayUtils.addAll(bagOfWordsFeatureNodes, entityTypesFeatureNodes),
+                posFeatureNodes);
         return featureNodes;
     }
 
+
+    public static FeatureNode[] createObjectHeadFeature(ObjectHeadModel objectHeadModel, CorpusEntryObject corpusEntryObject, int lastIdx) {
+        FeatureNode[] featureNodes = new FeatureNode[objectHeadModel.getNoOfHeads()];
+        String objectHead = corpusEntryObject.getObjectHead();
+        for (int i = 0; i < objectHeadModel.getNoOfHeads(); i++) {
+            if (objectHeadModel.getHeadIndex().containsKey(objectHead) && i == objectHeadModel.getHeadIndex().get(objectHead))
+                featureNodes[i] = new FeatureNode(lastIdx + 1 + i, 1);
+            else
+                featureNodes[i] = new FeatureNode(lastIdx + 1 + i, 0);
+        }
+        return featureNodes;
+    }
 
     public static FeatureNode[] createNamedEntityFeature(EntityTypeModel entityTypeModel, CorpusEntryObject corpusEntryObject, int lastIdx) {
         FeatureNode[] featureNodes = new FeatureNode[2*entityTypeModel.getNoOfEntityTypes()];
