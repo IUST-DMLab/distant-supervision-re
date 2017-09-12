@@ -292,8 +292,8 @@ public class Classifier {
         }
         //this.loadModels();
 
-        for (List<ResolvedEntityToken> sentence :
-                sentences) {
+        for (List<ResolvedEntityToken> sentence : sentences) {
+            if (sentence.size() > 30) continue;
             subjects = new ArrayList<>();
             objects = new ArrayList<>();
             subjectTypes = new ArrayList<>();

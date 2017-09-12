@@ -8,8 +8,6 @@ import ir.ac.iust.dml.kg.raw.distantsupervison.CorpusEntryObject;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 import static java.lang.Math.log10;
@@ -193,8 +191,6 @@ public class SegmentedBagOfWords {
 
     public void loadModel() {
         int currentIndex = 0;
-        System.out.println(this.bowFile);
-        System.out.println(Files.exists(Paths.get(this.bowFile)));
         try (Scanner scanner = new Scanner(this.getClass().getClassLoader().getResourceAsStream(this.bowFile))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
