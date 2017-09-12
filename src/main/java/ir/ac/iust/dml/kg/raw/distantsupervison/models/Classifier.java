@@ -226,7 +226,7 @@ public class Classifier {
 
         //Feature[] instance = bagOfWordsModel.createBowLibLinearFeatureNodeForQueryWithWindow(test.getWords());
         Model model = null;
-        File modelFile = new File(this.modelFilePath);
+        File modelFile = new File(String.valueOf(this.getClass().getClassLoader().getResourceAsStream(this.modelFilePath)));
         try {
             model = Linear.loadModel(modelFile);
 
@@ -287,7 +287,7 @@ public class Classifier {
 
 
         Model model = null;
-        File modelFile = new File(this.modelFilePath);
+        File modelFile = new File(this.getClass().getClassLoader().getResource(this.modelFilePath).getFile());
         try {
             model = Linear.loadModel(modelFile);
 

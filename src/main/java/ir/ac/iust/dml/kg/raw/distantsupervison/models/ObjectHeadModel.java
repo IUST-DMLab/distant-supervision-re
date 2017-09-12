@@ -2,7 +2,9 @@ package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
 import ir.ac.iust.dml.kg.raw.distantsupervison.CorpusEntryObject;
 
-import java.io.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.*;
 
 /**
@@ -84,7 +86,7 @@ public class ObjectHeadModel {
     }
 
     public void loadModel() {
-        try (Scanner scanner = new Scanner(new FileInputStream(this.modelFile))) {
+        try (Scanner scanner = new Scanner(this.getClass().getClassLoader().getResourceAsStream(this.modelFile))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String pos = line.split("\t")[0];
@@ -95,7 +97,7 @@ public class ObjectHeadModel {
             noOfHeads = headIndex.keySet().size();
             //heads = headIndex.keySet();
             scanner.close();
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

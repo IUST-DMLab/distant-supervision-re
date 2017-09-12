@@ -1,0 +1,48 @@
+country	3.0
+official_name	38.0
+leader	46.0
+capital	43.0
+occupation	13.0
+classis	37.0
+تاریخ تولد	34.0
+زمینه فعالیت	4.0
+subdivision_name	2.0
+subdivision_name4	5.0
+زبان رسمی	41.0
+subdivision_name3	9.0
+language	26.0
+نویسنده	16.0
+screenplay	23.0
+type	35.0
+subdivision_type	33.0
+زادگاه	30.0
+ordo	7.0
+state	27.0
+محل زندگی	6.0
+فعالیت	10.0
+pushpin_map	40.0
+cities	36.0
+director	11.0
+استان	29.0
+دهستان	19.0
+birth_place	24.0
+کارگردان	14.0
+بخش‌ها	47.0
+پیشه	18.0
+death_date	17.0
+ناشر	31.0
+هنرمند	20.0
+headquarters	15.0
+تهیه کننده	45.0
+field	8.0
+nationality	28.0
+genus	22.0
+تاریخ	39.0
+subdivision_type2	42.0
+regnum	1.0
+position	12.0
+death_place	21.0
+subdivision_type1	32.0
+شماره ثبت	48.0
+region	25.0
+ولایت	44.0

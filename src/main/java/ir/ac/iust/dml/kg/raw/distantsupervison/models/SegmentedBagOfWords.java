@@ -5,7 +5,9 @@ import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Constants;
 import ir.ac.iust.dml.kg.raw.distantsupervison.CorpusEntryObject;
 
-import java.io.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -193,7 +195,7 @@ public class SegmentedBagOfWords {
         int currentIndex = 0;
         System.out.println(this.bowFile);
         System.out.println(Files.exists(Paths.get(this.bowFile)));
-        try (Scanner scanner = new Scanner(new FileInputStream(this.bowFile))) {
+        try (Scanner scanner = new Scanner(this.getClass().getClassLoader().getResourceAsStream(this.bowFile))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] tokens = line.split("\t");
@@ -206,7 +208,7 @@ public class SegmentedBagOfWords {
                 this.indices.put(tokens[0], currentIndex++);
             }
             this.vocabularySize = currentIndex;
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

@@ -1,6 +1,8 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
-import java.io.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.*;
 
 /**
@@ -117,7 +119,7 @@ public class CorpusDB {
     public void loadPredicateIndices(String predicatesIndexFile) {
         this.indices.clear();
         this.invertedIndices.clear();
-        try (Scanner scanner = new Scanner(new FileInputStream(predicatesIndexFile))) {
+        try (Scanner scanner = new Scanner(this.getClass().getClassLoader().getResourceAsStream(predicatesIndexFile))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String pos = line.split("\t")[0];
@@ -126,7 +128,7 @@ public class CorpusDB {
                 this.invertedIndices.put(lastIdx, pos);
             }
             scanner.close();
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

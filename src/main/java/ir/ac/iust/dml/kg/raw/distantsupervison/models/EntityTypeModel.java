@@ -6,7 +6,9 @@ import ir.ac.iust.dml.kg.ontology.tree.client.PagedData;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Constants;
 
-import java.io.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
@@ -69,7 +71,7 @@ public class EntityTypeModel {
     }
 
     public void loadModel() {
-        try (Scanner scanner = new Scanner(new FileInputStream(this.entityModelFile))) {
+        try (Scanner scanner = new Scanner(this.getClass().getClassLoader().getResourceAsStream(this.entityModelFile))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String pos = line.split("\t")[0];
@@ -80,7 +82,7 @@ public class EntityTypeModel {
             noOfEntityTypes = entityIndex.keySet().size();
             //entities = entityIndex.keySet();
             scanner.close();
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
