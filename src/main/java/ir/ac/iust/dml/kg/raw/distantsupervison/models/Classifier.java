@@ -3,7 +3,6 @@ package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 import de.bwaldvogel.liblinear.*;
 import ir.ac.iust.dml.kg.raw.distantsupervison.*;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.CorpusDbHandler;
-import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.reUtils.JSONHandler;
 import ir.ac.iust.dml.kg.raw.extractor.ResolvedEntityToken;
 import ir.ac.iust.dml.kg.resource.extractor.client.ExtractorClient;
@@ -39,9 +38,6 @@ public class Classifier {
     private Set<String> testIDs = new HashSet<>();
 
     public Classifier(){
-        SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
-        sentenceDbHandler.loadSentenceTable();
-
         CorpusDbHandler trainDbHandler = new CorpusDbHandler(Configuration.trainTableName);
         trainDbHandler.load(trainData);
     }
@@ -296,8 +292,8 @@ public class Classifier {
         }
         //this.loadModels();
 
-        for (List<ResolvedEntityToken> sentence :
-                sentences) {
+        for (List<ResolvedEntityToken> sentence : sentences) {
+            if (sentence.size() > 30) continue;
             subjects = new ArrayList<>();
             objects = new ArrayList<>();
             subjectTypes = new ArrayList<>();

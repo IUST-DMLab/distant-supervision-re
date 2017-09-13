@@ -106,7 +106,6 @@ public class CorpusEntryObject {
                 result = parsedSentence.get(idxi).getDependencyNode(idxj).getHead().getLabel("FORM");
             }
         }
-        System.out.println(entity + "'s head:" + result);
         return result;
     }
 

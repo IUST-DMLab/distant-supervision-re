@@ -157,7 +157,7 @@ public class Test {
         //String text = "زاگرس در ایران واقعا است";
         ExtractedTriplesDBHandler extractedTriplesDBHandler = new ExtractedTriplesDBHandler("extracted_triples");
         try {
-            try (Scanner scanner = new Scanner(new FileInputStream("C:\\Users\\hemmatan\\Desktop\\out.txt"))) {
+            try (Scanner scanner = new Scanner(new FileInputStream("/home/asgari/test.txt"))) {
                 while (scanner.hasNextLine()) {
                     text = scanner.nextLine();
                     //text = "زاگرس در ایران واقعا است";

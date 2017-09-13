@@ -16,6 +16,13 @@ import java.util.List;
  */
 public class DistantSupervisionTripleExtractor implements RawTripleExtractor {
 
+    private final Classifier classifier;
+
+    public DistantSupervisionTripleExtractor() {
+        classifier = new Classifier();
+        classifier.loadModels();
+    }
+
     @Override
     public List<RawTriple> extract(String source, String version, String text) {
         List<RawTriple> result;
@@ -30,17 +37,15 @@ public class DistantSupervisionTripleExtractor implements RawTripleExtractor {
     public List<RawTriple> extract(String source, String version, List<List<ResolvedEntityToken>> text) {
         Date date = new Date();
         List<RawTriple> result = new ArrayList<>();
-        Classifier classifier = new Classifier();
-        classifier.loadModels();
         final RawTripleBuilder builder = new RawTripleBuilder(Configuration.moduleName, source, date.getTime(), version);
         List<TripleGuess> triples = classifier.extractFromSingleSentenceString(text);
-
         for (TripleGuess tripleGuess :
                     triples) {
                 RawTriple triple1 = builder.create()
                         .subject(tripleGuess.getSubject()).predicate(tripleGuess.getPredicate())
                         .object(tripleGuess.getObject()).rawText(tripleGuess.getOriginSentence())
                         .accuracy(tripleGuess.getConfidence()).needsMapping(true);
+            if (triple1.getAccuracy() > 0.9)
                 result.add(triple1);
         }
         return result;
