@@ -6,6 +6,7 @@ package ir.ac.iust.dml.kg.raw.distantsupervison;
 public class Configuration {
     public static final String moduleName = "DistantSupervision";
     public static final String trainingSetMode = Constants.trainingSetModes.USE_ALL_PREDICATES_IN_EXPORTS_JSON;
+    public static final boolean omitGoldDataFromTrainData = false;
     //public static final String trainCorpusName
 
 

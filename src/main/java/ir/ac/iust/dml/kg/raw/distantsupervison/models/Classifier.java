@@ -390,7 +390,7 @@ public class Classifier {
         for (int i = 0; i < Configuration.noOfTestExamples; i++) {
             String id = jsonArray.getJSONObject(i).getString("id");
             String predicate = jsonArray.getJSONObject(i).getString("predicate");
-            testIDs.add(id);
+            if (Configuration.omitGoldDataFromTrainData) testIDs.add(id);
             predicates.add(predicate);
         }
 
