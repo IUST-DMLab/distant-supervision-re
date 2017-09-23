@@ -1,11 +1,14 @@
+/*
+ * Farsi Knowledge Graph Project
+ *  Iran University of Science and Technology (Year 2017)
+ *  Developed by Ensieh Hemmatan.
+ */
+
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by hemmatan on 4/5/2017.
- */
 public class Corpus {
     private List<Sentence> sentences;
 

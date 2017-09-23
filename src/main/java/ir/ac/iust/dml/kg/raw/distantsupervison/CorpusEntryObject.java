@@ -1,3 +1,9 @@
+/*
+ * Farsi Knowledge Graph Project
+ *  Iran University of Science and Technology (Year 2017)
+ *  Developed by Ensieh Hemmatan.
+ */
+
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.DependencyParser;
@@ -9,9 +15,6 @@ import org.maltparser.concurrent.graph.ConcurrentDependencyNode;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by hemmatan on 4/18/2017.
- */
 public class CorpusEntryObject {
 
     private String subjectHead;
@@ -191,9 +194,9 @@ public class CorpusEntryObject {
 
     public String toString() {
         return getOriginalSentence().getNormalized()
-                + "\t" + this.getSubject()
-                + "\t" + this.getObject()
-                + "\t" + "predicate: " + this.getPredicate() + "\n";
+            + "\t" + this.getSubject()
+            + "\t" + this.getObject()
+            + "\t" + "predicate: " + this.getPredicate() + "\n";
     }
 
     public List<String> getSubjectPrecedingWords() {

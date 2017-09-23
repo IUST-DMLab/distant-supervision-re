@@ -1,3 +1,9 @@
+/*
+ * Farsi Knowledge Graph Project
+ *  Iran University of Science and Technology (Year 2017)
+ *  Developed by Ensieh Hemmatan.
+ */
+
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
 import de.bwaldvogel.liblinear.*;
@@ -19,9 +25,6 @@ import java.util.*;
 
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpusDB;
 
-/**
- * Created by hemmatan on 4/10/2017.
- */
 public class Classifier {
 
 
@@ -90,7 +93,7 @@ public class Classifier {
         initializeModels(true);
 
         numberOfFeatures = 4 * this.segmentedBagOfWordsHashMap.get(Constants.segmentedBagOfWordsAttribs.OBJECT_FOLLOWING).getMaximumNoOfVocabulary() +
-                +2 * this.entityTypeModel.getNoOfEntityTypes() + 2 * this.partOfSpeechModel.getNoOfPOS();// +this.objectHeadModel.getNoOfHeads();
+            +2 * this.entityTypeModel.getNoOfEntityTypes() + 2 * this.partOfSpeechModel.getNoOfPOS();// +this.objectHeadModel.getNoOfHeads();
         problem.n = this.numberOfFeatures;// number of features
 
         for (int i = 0; i < problem.l; i++) {
@@ -136,19 +139,19 @@ public class Classifier {
 
     private void buildSegmentedBowModel() {
         SegmentedBagOfWords segmentedBagOfWords = new SegmentedBagOfWords(trainData.getEntries(), Constants.segmentedBagOfWordsAttribs.SUBJECT_PRECEDING,
-                false, defaultMaximumNoOfVocabularyForBOW / 4);
+            false, defaultMaximumNoOfVocabularyForBOW / 4);
         segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.SUBJECT_PRECEDING, segmentedBagOfWords);
 
         segmentedBagOfWords = new SegmentedBagOfWords(trainData.getEntries(), Constants.segmentedBagOfWordsAttribs.SUBJECT_FOLLOWING,
-                false, defaultMaximumNoOfVocabularyForBOW / 4);
+            false, defaultMaximumNoOfVocabularyForBOW / 4);
         segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.SUBJECT_FOLLOWING, segmentedBagOfWords);
 
         segmentedBagOfWords = new SegmentedBagOfWords(trainData.getEntries(), Constants.segmentedBagOfWordsAttribs.OBJECT_PRECEDING,
-                false, defaultMaximumNoOfVocabularyForBOW / 4);
+            false, defaultMaximumNoOfVocabularyForBOW / 4);
         segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.OBJECT_PRECEDING, segmentedBagOfWords);
 
         segmentedBagOfWords = new SegmentedBagOfWords(trainData.getEntries(), Constants.segmentedBagOfWordsAttribs.OBJECT_FOLLOWING,
-                false, defaultMaximumNoOfVocabularyForBOW / 4);
+            false, defaultMaximumNoOfVocabularyForBOW / 4);
         segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.OBJECT_FOLLOWING, segmentedBagOfWords);
     }
 
@@ -201,10 +204,10 @@ public class Classifier {
 
 
         sw = (matchedResource.getResource() == null ||
-                matchedResource.getResource().getClassTree() == null ||
-                matchedResource.getResource().getClassTree().size() == 0 ||
-                (matchedResource.getResource().getType() != null &&
-                        matchedResource.getResource().getType() == ResourceType.Property) /*||
+            matchedResource.getResource().getClassTree() == null ||
+            matchedResource.getResource().getClassTree().size() == 0 ||
+            (matchedResource.getResource().getType() != null &&
+                matchedResource.getResource().getType() == ResourceType.Property) /*||
                 (matchedResource.getEnd() == matchedResource.getStart() &&
                         pos.tag().equalsIgnoreCase("P"))*/
         );
@@ -232,11 +235,11 @@ public class Classifier {
 
         List<String> subjectType = new ArrayList<>();
         if (resultsForSubject != null && !resultsForSubject.isEmpty()
-                && resultsForSubject.get(0).getResource() != null)
+            && resultsForSubject.get(0).getResource() != null)
             subjectType.addAll(resultsForSubject.get(0).getResource().getClassTree());
         List<String> objectType = new ArrayList<>();
         if (resultsForObject != null && !resultsForObject.isEmpty()
-                && resultsForObject.get(0).getResource() != null)
+            && resultsForObject.get(0).getResource() != null)
             objectType.addAll(resultsForObject.get(0).getResource().getClassTree());
 
         String generalized = sentenceString.replace(subject, Constants.sentenceAttribs.SUBJECT_ABV);
@@ -308,7 +311,7 @@ public class Classifier {
                 List<String> objectType = new ArrayList<>();
                 raw += sentence.get(s).getWord() + " ";
                 if (sentence.get(s).getIobType().name().equalsIgnoreCase("Beginning") &&
-                        sentence.get(s).getResource() != null & sentence.get(s).getResource().getClasses().size() != 1) {
+                    sentence.get(s).getResource() != null & sentence.get(s).getResource().getClasses().size() != 1) {
                     subjectType.addAll(sentence.get(s).getResource().getClasses());
                     subject += sentence.get(s).getWord() + " ";
                     s++;
@@ -321,7 +324,7 @@ public class Classifier {
                     while (o < sentence.size()) {
                         object = "";
                         if (sentence.get(o).getIobType().name().equalsIgnoreCase("Beginning") &&
-                                sentence.get(o).getResource() != null && sentence.get(o).getResource().getClasses().size() != 1) {
+                            sentence.get(o).getResource() != null && sentence.get(o).getResource().getClasses().size() != 1) {
                             objectType.addAll(sentence.get(o).getResource().getClasses());
                             object += sentence.get(o).getWord() + " ";
                             o++;

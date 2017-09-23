@@ -1,3 +1,9 @@
+/*
+ * Farsi Knowledge Graph Project
+ *  Iran University of Science and Technology (Year 2017)
+ *  Developed by Ensieh Hemmatan.
+ */
+
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
@@ -11,9 +17,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by hemmatan on 9/6/2017.
- */
 public class DistantSupervisionTripleExtractor implements RawTripleExtractor {
 
     private final Classifier classifier;
@@ -40,11 +43,11 @@ public class DistantSupervisionTripleExtractor implements RawTripleExtractor {
         final RawTripleBuilder builder = new RawTripleBuilder(Configuration.moduleName, source, date.getTime(), version);
         List<TripleGuess> triples = classifier.extractFromSingleSentenceString(text);
         for (TripleGuess tripleGuess :
-                    triples) {
-                RawTriple triple1 = builder.create()
-                        .subject(tripleGuess.getSubject()).predicate(tripleGuess.getPredicate())
-                        .object(tripleGuess.getObject()).rawText(tripleGuess.getOriginSentence())
-                        .accuracy(tripleGuess.getConfidence()).needsMapping(true);
+            triples) {
+            RawTriple triple1 = builder.create()
+                .subject(tripleGuess.getSubject()).predicate(tripleGuess.getPredicate())
+                .object(tripleGuess.getObject()).rawText(tripleGuess.getOriginSentence())
+                .accuracy(tripleGuess.getConfidence()).needsMapping(true);
             if (triple1.getAccuracy() > 0.9)
                 result.add(triple1);
         }

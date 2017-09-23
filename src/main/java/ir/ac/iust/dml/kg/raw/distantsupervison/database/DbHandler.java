@@ -1,3 +1,9 @@
+/*
+ * Farsi Knowledge Graph Project
+ *  Iran University of Science and Technology (Year 2017)
+ *  Developed by Ensieh Hemmatan.
+ */
+
 package ir.ac.iust.dml.kg.raw.distantsupervison.database;
 
 import com.google.gson.stream.JsonReader;
@@ -18,9 +24,6 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by hemmatan on 4/9/2017.
- */
 public class DbHandler {
     protected static final String host = "localhost";
     protected static final int port = 27017;
@@ -29,7 +32,7 @@ public class DbHandler {
     public List<String> convertBasicDBListToJavaListOfStrings(BasicDBList basicDBList){
         List<String> result = new ArrayList<>();
         for (Object obj:
-             basicDBList) {
+            basicDBList) {
             result.add((String) obj);
         }
         return result;
@@ -105,7 +108,6 @@ public class DbHandler {
     public void addNegativesToDB() {
         // TODO
     }
-
 
 
 }

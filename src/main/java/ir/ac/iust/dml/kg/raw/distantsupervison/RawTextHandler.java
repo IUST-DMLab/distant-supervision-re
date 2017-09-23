@@ -1,3 +1,8 @@
+/*
+ * Farsi Knowledge Graph Project
+ *  Iran University of Science and Technology (Year 2017)
+ *  Developed by Ensieh Hemmatan.
+ */
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import com.google.gson.stream.JsonReader;
@@ -13,9 +18,6 @@ import java.util.Scanner;
 
 import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.*;
 
-/**
- * Created by hemmatan on 4/5/2017.
- */
 public class RawTextHandler {
     public static void loadRawText(){
         Scanner reader;
@@ -39,10 +41,10 @@ public class RawTextHandler {
         corpus = new Corpus();
         List<Sentence> sentenceList = new ArrayList<Sentence>();
         for (String line:
-             rawTextLines) {
+            rawTextLines) {
             List<String> lineSentences = SentenceTokenizer.SentenceSplitterRaw(line);
             for (String sentenceString:
-                 lineSentences) {
+                lineSentences) {
                 Sentence sentence = new Sentence(sentenceString);
                 corpus.addSentence(sentence);
             }
@@ -57,7 +59,7 @@ public class RawTextHandler {
             List<Sentence> sentenceList = corpus.getSentences();
             writer.beginArray();
             for (Sentence sentence:
-                 sentenceList) {
+                sentenceList) {
                 writer.beginObject();
                 writer.name(Constants.sentenceAttribs.RAW).value(sentence.getRaw());
                 writer.name(Constants.sentenceAttribs.WORDS).value(sentence.getWords().toString());

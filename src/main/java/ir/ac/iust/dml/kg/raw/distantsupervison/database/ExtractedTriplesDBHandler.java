@@ -1,3 +1,9 @@
+/*
+ * Farsi Knowledge Graph Project
+ *  Iran University of Science and Technology (Year 2017)
+ *  Developed by Ensieh Hemmatan.
+ */
+
 package ir.ac.iust.dml.kg.raw.distantsupervison.database;
 
 import com.mongodb.MongoClient;
@@ -9,9 +15,6 @@ import ir.ac.iust.dml.kg.raw.distantsupervison.TripleGuess;
 import ir.ac.iust.dml.kg.raw.triple.RawTriple;
 import org.bson.Document;
 
-/**
- * Created by hemmatan on 8/12/2017.
- */
 public class ExtractedTriplesDBHandler extends DbHandler {
     private MongoClient mongo = null;
     private MongoDatabase extractedTriplesDB;

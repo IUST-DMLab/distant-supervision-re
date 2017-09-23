@@ -1,3 +1,9 @@
+/*
+ * Farsi Knowledge Graph Project
+ *  Iran University of Science and Technology (Year 2017)
+ *  Developed by Ensieh Hemmatan.
+ */
+
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.DependencyParser;
@@ -16,9 +22,6 @@ import org.maltparser.concurrent.graph.ConcurrentDependencyNode;
 import java.io.*;
 import java.util.*;
 
-/**
- * Created by hemmatan on 4/4/2017.
- */
 public class Test {
 
     @org.junit.Test
@@ -163,7 +166,7 @@ public class Test {
                     //text = "زاگرس در ایران واقعا است";
                     List<RawTriple> triples = distantSupervisionTripleExtractor.extract("wiki", "2", text);
                     for (RawTriple tripleGuess :
-                            triples) {
+                        triples) {
                         if (tripleGuess.getAccuracy() > 0.4)
                             extractedTriplesDBHandler.insert(tripleGuess);
                     }
@@ -186,8 +189,8 @@ public class Test {
     public void statsForExport() {
         try (Writer fileWriter = new FileWriter("stats2.txt")) {
             fileWriter.write("subject" + "\t" + "object" + "\t" + "predicate" + "\t" + "depTree.getVerb(subject)" + "\t" + "depTree.getVerb(object)" +
-                    "\t"+
-                    "depTree.getHead(subject)" + "\t" + "depTree.getHead(object)" + "\t" + "sentence"+ "\r\n");
+                "\t"+
+                "depTree.getHead(subject)" + "\t" + "depTree.getHead(object)" + "\t" + "sentence"+ "\r\n");
             JSONArray jsonArray = JSONHandler.getJsonArrayFromURL(Configuration.exportURL);
             for (int i = 0; i < jsonArray.length(); i++) {
                 Object depTreeHash = jsonArray.getJSONObject(i).get("depTreeHash");
@@ -201,8 +204,8 @@ public class Test {
                 String[] sentenceTokens = sentenceString.split(" ");
                 DepTree depTree = new DepTree((String) depTreeHash, sentenceString);
                 fileWriter.write(subject + "\t" + object + "\t" + predicate + "\t" + testGetHeadVerb(sentenceString, subject) + "\t" + testGetHeadVerb(sentenceString, object) +
-                        "\t"+
-                        depTree.getHead(subject) + "\t" + depTree.getHead(object) + "\t"+ sentenceString+"\r\n");
+                    "\t"+
+                    depTree.getHead(subject) + "\t" + depTree.getHead(object) + "\t"+ sentenceString+"\r\n");
             }
         } catch (IOException e) {
             e.printStackTrace();

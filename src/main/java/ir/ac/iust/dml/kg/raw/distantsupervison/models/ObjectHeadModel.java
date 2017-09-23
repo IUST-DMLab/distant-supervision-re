@@ -1,3 +1,9 @@
+/*
+ * Farsi Knowledge Graph Project
+ *  Iran University of Science and Technology (Year 2017)
+ *  Developed by Ensieh Hemmatan.
+ */
+
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
 import ir.ac.iust.dml.kg.raw.distantsupervison.CorpusEntryObject;
@@ -7,9 +13,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
-/**
- * Created by hemmatan on 8/16/2017.
- */
 public class ObjectHeadModel {
     private String modelFile;
     private int noOfHeads;
@@ -34,7 +37,7 @@ public class ObjectHeadModel {
         maxNoOfHeads = i;
         this.modelFile = modelFile;
         for (CorpusEntryObject corpusEntryObject :
-                entries) {
+            entries) {
             System.out.println(corpusEntryObject.getOriginalSentence().getRaw());
             String objectHead;
             if (this.modelFile.equalsIgnoreCase("objectHead"))
@@ -76,7 +79,7 @@ public class ObjectHeadModel {
         try (Writer fileWriter = new FileWriter(this.modelFile)) {
             Set<String> entities = this.headIndex.keySet();
             for (String s :
-                    entities) {
+                entities) {
                 fileWriter.write(s + "\t" + headIndex.get(s) + "\n");
             }
             fileWriter.close();

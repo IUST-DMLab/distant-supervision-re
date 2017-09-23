@@ -1,3 +1,9 @@
+/*
+ * Farsi Knowledge Graph Project
+ *  Iran University of Science and Technology (Year 2017)
+ *  Developed by Ensieh Hemmatan.
+ */
+
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
 import java.io.FileWriter;
@@ -5,9 +11,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
-/**
- * Created by hemmatan on 5/8/2017.
- */
 public class PartOfSpeechModel {
     private String posFile = "posModel.txt";
     private int noOfPOS = 0;
@@ -22,7 +25,7 @@ public class PartOfSpeechModel {
     public void addToModel(List<String> posTagged) {
         int lastIdx = noOfPOS;
         for (String pos :
-                posTagged) {
+            posTagged) {
             if (!posIndex.containsKey((pos))) {
                 posIndex.put(pos, lastIdx);
                 posInvertedIndex.put(lastIdx, pos);
@@ -37,7 +40,7 @@ public class PartOfSpeechModel {
         try (Writer fileWriter = new FileWriter(this.posFile)) {
             Set<String> pos = this.posIndex.keySet();
             for (String s :
-                    pos) {
+                pos) {
                 fileWriter.write(s + "\t" + posIndex.get(s) + "\n");
             }
             fileWriter.close();

@@ -1,3 +1,9 @@
+/*
+ * Farsi Knowledge Graph Project
+ *  Iran University of Science and Technology (Year 2017)
+ *  Developed by Ensieh Hemmatan.
+ */
+
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
 import ir.ac.iust.dml.kg.ontology.tree.client.OntologyClass;
@@ -14,9 +20,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-/**
- * Created by hemmatan on 4/29/2017.
- */
 public class EntityTypeModel {
     private String entityModelFile = "entity.txt";
     private int noOfEntityTypes;
@@ -44,7 +47,7 @@ public class EntityTypeModel {
             this.entities = result.getData();
             int lastIdx = 0;
             for (OntologyClass ontologyClass :
-                    this.entities) {
+                this.entities) {
                 String temp = Constants.entityModelAttribs.PREFIX + ontologyClass.getOntologyClass();
                 if (!entityIndex.containsKey((temp))) {
                     entityIndex.put(temp, lastIdx);
@@ -61,7 +64,7 @@ public class EntityTypeModel {
         try (Writer fileWriter = new FileWriter(this.entityModelFile)) {
             Set<String> entities = this.entityIndex.keySet();
             for (String s :
-                    entities) {
+                entities) {
                 fileWriter.write(s + "\t" + entityIndex.get(s) + "\n");
             }
             fileWriter.close();

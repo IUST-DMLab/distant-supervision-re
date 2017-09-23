@@ -1,8 +1,11 @@
+/*
+ * Farsi Knowledge Graph Project
+ *  Iran University of Science and Technology (Year 2017)
+ *  Developed by Ensieh Hemmatan.
+ */
+
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
-/**
- * Created by hemmatan on 4/26/2017.
- */
 public class Configuration {
     public static final String moduleName = "DistantSupervision";
     public static final String trainingSetMode = Constants.trainingSetModes.USE_ALL_PREDICATES_IN_EXPORTS_JSON;
@@ -26,6 +29,7 @@ public class Configuration {
     public static final double confidenceThreshold = 0.5;
     public static final int maxLengthForRawString = 2000;
     public static final float contextDisambiguationThreshold = 0.001f;
+
     public static class libLinearParams {
         public static final double costOfConstraintsViolation = 1.0;
         public static final double epsStoppingCriteria = 0.05;
@@ -35,8 +39,6 @@ public class Configuration {
     public static final String sentencesTableName = "sentences";
     public static final String corpusTableName = Constants.trainCorpusNames.WIKI_PLUS_DEPENDENCY_MINUS_FREQUENT_TRIPLES;
     public static final String trainTableName = "train";
-
-
 
 
 }

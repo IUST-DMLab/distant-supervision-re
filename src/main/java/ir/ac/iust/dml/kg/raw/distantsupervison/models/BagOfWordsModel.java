@@ -1,3 +1,9 @@
+/*
+ * Farsi Knowledge Graph Project
+ *  Iran University of Science and Technology (Year 2017)
+ *  Developed by Ensieh Hemmatan.
+ */
+
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
 import de.bwaldvogel.liblinear.FeatureNode;
@@ -11,9 +17,6 @@ import java.util.*;
 
 import static java.lang.Math.*;
 
-/**
- * Created by hemmatan on 4/9/2017.
- */
 public class BagOfWordsModel {
 
     private String bowFile = SharedResources.bagOfWordsModelPath.toString();
@@ -47,23 +50,22 @@ public class BagOfWordsModel {
     private void extractVocabulary(List<Sentence> corpusOfBOW) {
         this.corpusOfBOW = corpusOfBOW;
         for (Sentence sentence:
-             corpusOfBOW) {
+            corpusOfBOW) {
             List<String> words = sentence.getWords();
             Set<String> currentSentenceUniqueWords = new HashSet<>();
 
             for (String queryWord:
-                 words) {
+                words) {
                 vocabularySet.add(queryWord);
                 currentSentenceUniqueWords.add(queryWord);
                 if (!tfInCorpus.containsKey(queryWord)) {
                     tfInCorpus.put(queryWord, 1.0);
-                }
-                else
+                } else
                     tfInCorpus.put(queryWord, tfInCorpus.get(queryWord)+1);
             }
 
             for (String word:
-                    currentSentenceUniqueWords) {
+                currentSentenceUniqueWords) {
                 if (!df.containsKey(word))
                     df.put(word, 2.0);
                 else
@@ -103,14 +105,14 @@ public class BagOfWordsModel {
         HashMap<String, Integer> tf = new HashMap<>();
         HashMap<String, Double> tf_idf = new HashMap<>();
         for (String queryWord:
-             queryWords) {
+            queryWords) {
             if (!tf.containsKey(queryWord))
                 tf.put(queryWord, 1);
             else
                 tf.put(queryWord, tf.get(queryWord)+1);
         }
         for (String queryWord:
-             queryWords) {
+            queryWords) {
             if (idf.containsKey(queryWord))
                 tf_idf.put(queryWord, tf.get(queryWord)*idf.get(queryWord));
             else tf_idf.put(queryWord,log10(this.numberOfSentences));
@@ -124,7 +126,7 @@ public class BagOfWordsModel {
             featureVector.add(0.0);
         HashMap<String, Double> tf_idf = computeTfIdfForQuery(queryWords);
         for (String queryWord:
-             queryWords) {
+            queryWords) {
             // TODO: this is temp! did not have time to add OOV
             if (this.indices.containsKey(queryWord))
                 featureVector.set(this.indices.get(queryWord), tf_idf.get(queryWord));
@@ -151,7 +153,7 @@ public class BagOfWordsModel {
         try (Writer fileWriter = new FileWriter(this.bowFile)) {
             fileWriter.write("maximumNoOfVocabulary" + "\t" + this.maximumNoOfVocabulary +"\n");
             for (String token:
-                    this.sortedByTf) {
+                this.sortedByTf) {
                 fileWriter.write(token+"\t");
                 fileWriter.write(this.tfInCorpus.get(token)+"\t");
                 fileWriter.write(this.df.get(token)+"\t");
@@ -239,7 +241,7 @@ public class BagOfWordsModel {
 
         HashMap<String, Double> tf_idf = computeTfIdfForQuery(queryWords);
         for (String queryWord :
-                queryWords) {
+            queryWords) {
             // TODO: this is temp! did not have time to add OOV
             if (this.indices.containsKey(queryWord))
                 featureVector.set(this.indices.get(queryWord), tf_idf.get(queryWord));

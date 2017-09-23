@@ -1,3 +1,9 @@
+/*
+ * Farsi Knowledge Graph Project
+ *  Iran University of Science and Technology (Year 2017)
+ *  Developed by Ensieh Hemmatan.
+ */
+
 package ir.ac.iust.dml.kg.raw.distantsupervison.reUtils;
 
 import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
@@ -11,9 +17,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-/**
- * Created by hemmatan on 6/10/2017.
- */
 public class JSONHandler {
 
     public static JSONArray getJsonArrayFromURL(String urlString) {
