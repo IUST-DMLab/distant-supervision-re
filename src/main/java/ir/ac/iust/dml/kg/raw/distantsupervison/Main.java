@@ -1,23 +1,21 @@
-/*
- * Farsi Knowledge Graph Project
- *  Iran University of Science and Technology (Year 2017)
- *  Developed by Ensieh Hemmatan.
- */
-
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.DbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
+import ir.ac.iust.dml.kg.raw.distantsupervison.reUtils.JSONHandler;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.util.Date;
 
+/**
+ * Created by hemmatan on 4/26/2017.
+ */
 public class Main {
 
     public static void main(String[] args) {
-        if (args.length > 0 && args[0].equals("train")) process(true);
-        else if (args.length > 0 && args[0].equals("makeDB")) DbHandler.saveCorpusJasonToDB();
+        if (args.length > 0 && args[0].equals(Constants.runOptions.TRAIN)) process(true);
+        else if (args.length > 0 && args[0].equals(Constants.runOptions.MAKE_DB)) JSONHandler.makeDBsFromJson();
         else process(false);
 
     }

@@ -1,9 +1,3 @@
-/*
- * Farsi Knowledge Graph Project
- *  Iran University of Science and Technology (Year 2017)
- *  Developed by Ensieh Hemmatan.
- */
-
 package ir.ac.iust.dml.kg.raw.distantsupervison.reUtils;
 
 import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
@@ -17,6 +11,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
+import static ir.ac.iust.dml.kg.raw.distantsupervison.database.DbHandler.saveCorpusJasonToDB;
+
+/**
+ * Created by hemmatan on 6/10/2017.
+ */
 public class JSONHandler {
 
     public static JSONArray getJsonArrayFromURL(String urlString) {
@@ -72,13 +71,10 @@ public class JSONHandler {
         JSONObject temp = arr.getJSONObject(0);
         System.out.println(temp.get("predicate"));
 
+    }
 
-        // get the first result
-        //JSONObject res = obj.getJSONArray("results").getJSONObject(0);
-        // System.out.println(res.getString("formatted_address"));
-        // JSONObject loc =
-        //        res.getJSONObject("geometry").getJSONObject("location");
-        // System.out.println("lat: " + loc.getDouble("lat") +
-        //        ", lng: " + loc.getDouble("lng"));
+    public static void makeDBsFromJson(){
+        saveCorpusJasonToDB(Configuration.corpusTableName);
+        saveCorpusJasonToDB(Configuration.negativesTableName);
     }
 }

@@ -1,9 +1,3 @@
-/*
- * Farsi Knowledge Graph Project
- *  Iran University of Science and Technology (Year 2017)
- *  Developed by Ensieh Hemmatan.
- */
-
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
 import ir.ac.iust.dml.kg.ontology.tree.client.OntologyClass;
@@ -20,14 +14,18 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
+/**
+ * Created by hemmatan on 4/29/2017.
+ */
 public class EntityTypeModel {
-    private String entityModelFile = "entity.txt";
+    private String entityModelFile;
     private int noOfEntityTypes;
     private List<OntologyClass> entities;
     private HashMap<String, Integer> entityIndex = new HashMap<>();
     private HashMap<Integer, String> entityInvertedIndex = new HashMap<>();
 
-    public EntityTypeModel(boolean load) {
+    public EntityTypeModel(boolean load, String entityModelFile ) {
+        this.entityModelFile = entityModelFile;
         if (load)
             this.loadModel();
         else {
@@ -47,7 +45,7 @@ public class EntityTypeModel {
             this.entities = result.getData();
             int lastIdx = 0;
             for (OntologyClass ontologyClass :
-                this.entities) {
+                    this.entities) {
                 String temp = Constants.entityModelAttribs.PREFIX + ontologyClass.getOntologyClass();
                 if (!entityIndex.containsKey((temp))) {
                     entityIndex.put(temp, lastIdx);
@@ -64,7 +62,7 @@ public class EntityTypeModel {
         try (Writer fileWriter = new FileWriter(this.entityModelFile)) {
             Set<String> entities = this.entityIndex.keySet();
             for (String s :
-                entities) {
+                    entities) {
                 fileWriter.write(s + "\t" + entityIndex.get(s) + "\n");
             }
             fileWriter.close();
@@ -74,7 +72,7 @@ public class EntityTypeModel {
     }
 
     public void loadModel() {
-        try (Scanner scanner = new Scanner(this.getClass().getClassLoader().getResourceAsStream(this.entityModelFile))) {
+        try (Scanner scanner = new Scanner(this.getClass().getClassLoader().getResourceAsStream("entity.txt"))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String pos = line.split("\t")[0];

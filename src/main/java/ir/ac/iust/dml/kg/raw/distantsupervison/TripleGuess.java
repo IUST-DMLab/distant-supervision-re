@@ -1,11 +1,8 @@
-/*
- * Farsi Knowledge Graph Project
- *  Iran University of Science and Technology (Year 2017)
- *  Developed by Ensieh Hemmatan.
- */
-
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
+/**
+ * Created by hemmatan on 8/9/2017.
+ */
 public class TripleGuess {
     private String subject;
     private String object;

@@ -1,9 +1,3 @@
-/*
- * Farsi Knowledge Graph Project
- *  Iran University of Science and Technology (Year 2017)
- *  Developed by Ensieh Hemmatan.
- */
-
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import edu.stanford.nlp.ling.TaggedWord;
@@ -14,6 +8,9 @@ import ir.ac.iust.dml.kg.raw.WordTokenizer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Created by hemmatan on 4/5/2017.
+ */
 public class Sentence {
     private String raw;
     private String normalized;
@@ -35,7 +32,7 @@ public class Sentence {
         List<TaggedWord> taggedWords = POSTagger.tag(this.words);
 
         for (TaggedWord taggedWord :
-            taggedWords) {
+                taggedWords) {
             this.posTagged.add(taggedWord.tag());
         }
 

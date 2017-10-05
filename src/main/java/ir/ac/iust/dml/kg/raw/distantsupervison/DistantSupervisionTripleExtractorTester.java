@@ -1,9 +1,3 @@
-/*
- * Farsi Knowledge Graph Project
- *  Iran University of Science and Technology (Year 2017)
- *  Developed by Ensieh Hemmatan.
- */
-
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.triple.RawTriple;
@@ -15,6 +9,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+/**
+ * Created by hemmatan on 9/6/2017.
+ */
 public class DistantSupervisionTripleExtractorTester {
     @org.junit.Test
     public void writeRawTriple() throws IOException {
@@ -29,7 +26,7 @@ public class DistantSupervisionTripleExtractorTester {
         final Path PATH = Paths.get(System.getProperty("user.home"), "distantSupervisionTest.json");
         final RawTripleExporter exporter = new RawTripleExporter(PATH);
         for (RawTriple rawTriple :
-            triples) {
+                triples) {
             exporter.write(rawTriple);
         }
         exporter.close();

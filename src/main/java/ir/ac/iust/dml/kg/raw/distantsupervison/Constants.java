@@ -1,10 +1,8 @@
-/*
- * Farsi Knowledge Graph Project
- *  Iran University of Science and Technology (Year 2017)
- *  Developed by Ensieh Hemmatan.
- */
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
+/**
+ * Created by hemmatan on 4/5/2017.
+ */
 public class Constants {
 
     public static class sentenceAttribs {
@@ -73,5 +71,22 @@ public class Constants {
         public static final String ALL_WIKI_WITHOUT_DEPENDENCY_FEATURES = "corpus";
         public static final String WIKI_PLUS_DEPENDENCY_FEATURES = "corpus_with_dependency";
         public static final String WIKI_PLUS_DEPENDENCY_MINUS_FREQUENT_TRIPLES = "corpus_with_dependency_1_2_copy";
+    }
+
+    public static class classifierTypes {
+        public static final String SPECIES_SPECIES = "species_species";
+        public static final String WORK_AGENT = "work_agent";
+        public static final String PERSON_PERSONFUNCTION = "person_personFunction";
+        public static final String PERSON_PERSON = "person_person";
+        public static final String PERSON_PLACE = "person_place";
+        public static final String THING_PLACE = "thing_place";
+        public static final String GENERAL = "general";
+    }
+
+
+    public static class runOptions {
+        public static final String TRAIN = "train";
+        public static final String TEST = "test";
+        public static final String MAKE_DB = "makeDB";
     }
 }

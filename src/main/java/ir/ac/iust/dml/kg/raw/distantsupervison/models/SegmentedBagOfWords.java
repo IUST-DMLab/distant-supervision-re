@@ -1,9 +1,3 @@
-/*
- * Farsi Knowledge Graph Project
- *  Iran University of Science and Technology (Year 2017)
- *  Developed by Ensieh Hemmatan.
- */
-
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
 import de.bwaldvogel.liblinear.FeatureNode;
@@ -18,6 +12,9 @@ import java.util.*;
 
 import static java.lang.Math.log10;
 
+/**
+ * Created by hemmatan on 5/9/2017.
+ */
 public class SegmentedBagOfWords {
     private String segment;
     private String bowFile;
@@ -35,17 +32,17 @@ public class SegmentedBagOfWords {
     private HashMap<String, Integer> indices = new HashMap<>();
     private List<String> sortedByTf = new ArrayList<>();
 
-    public SegmentedBagOfWords(String segment) {
+    public SegmentedBagOfWords(String segment, String bowFile) {
         this.segment = segment;
-        this.bowFile = segment;
+        this.bowFile = bowFile;
     }
 
-    public SegmentedBagOfWords(List<CorpusEntryObject> corpusOfBOW, String segment, Boolean doLemmatize, int maximumNoOfVocabulary) {
+    public SegmentedBagOfWords(List<CorpusEntryObject> corpusOfBOW, String segment, String bowFile, Boolean doLemmatize, int maximumNoOfVocabulary) {
         this.doLemmatize = doLemmatize;
         this.numberOfSentences = corpusOfBOW.size();
         this.maximumNoOfVocabulary = maximumNoOfVocabulary;
         this.segment = segment;
-        this.bowFile = segment;
+        this.bowFile = bowFile;
         if (!doLemmatize) {
             extractVocabulary(corpusOfBOW);
         }
@@ -71,14 +68,14 @@ public class SegmentedBagOfWords {
     private void extractVocabulary(List<CorpusEntryObject> corpusOfBOW) {
         this.corpusOfBOW = corpusOfBOW;
         for (CorpusEntryObject corpusEntryObject :
-            corpusOfBOW) {
+                corpusOfBOW) {
             List<String> words = getSegmentWords(corpusEntryObject);
 
 
             Set<String> currentSentenceUniqueWords = new HashSet<>();
 
             for (String queryWord :
-                words) {
+                    words) {
                 vocabularySet.add(queryWord);
                 currentSentenceUniqueWords.add(queryWord);
                 if (!tfInCorpus.containsKey(queryWord)) {
@@ -88,7 +85,7 @@ public class SegmentedBagOfWords {
             }
 
             for (String word :
-                currentSentenceUniqueWords) {
+                    currentSentenceUniqueWords) {
                 if (!df.containsKey(word))
                     df.put(word, 2.0);
                 else
@@ -129,14 +126,14 @@ public class SegmentedBagOfWords {
         HashMap<String, Integer> tf = new HashMap<>();
         HashMap<String, Double> tf_idf = new HashMap<>();
         for (String queryWord :
-            queryWords) {
+                queryWords) {
             if (!tf.containsKey(queryWord))
                 tf.put(queryWord, 1);
             else
                 tf.put(queryWord, tf.get(queryWord) + 1);
         }
         for (String queryWord :
-            queryWords) {
+                queryWords) {
             tf_idf.put(queryWord, 1.0);
             /*if (idf.containsKey(queryWord))
                 tf_idf.put(queryWord, tf.get(queryWord) * idf.get(queryWord));
@@ -152,7 +149,7 @@ public class SegmentedBagOfWords {
         HashMap<String, Double> tf_idf = computeTfIdfForQuery(corpusEntryObject);
         List<String> queryWords = getSegmentWords(corpusEntryObject);
         for (String queryWord :
-            queryWords) {
+                queryWords) {
             // TODO: this is temp! did not have time to add OOV
             if (this.indices.containsKey(queryWord))
                 featureVector.set(this.indices.get(queryWord), tf_idf.get(queryWord));
@@ -179,7 +176,7 @@ public class SegmentedBagOfWords {
         System.out.println(this.bowFile);
         try (Writer fileWriter = new FileWriter(this.bowFile)) {
             for (String token :
-                this.sortedByTf) {
+                    this.sortedByTf) {
                 fileWriter.write(token + "\t");
                 fileWriter.write(this.tfInCorpus.get(token) + "\t");
                 fileWriter.write(this.df.get(token) + "\t");
@@ -194,7 +191,7 @@ public class SegmentedBagOfWords {
 
     public void loadModel() {
         int currentIndex = 0;
-        try (Scanner scanner = new Scanner(this.getClass().getClassLoader().getResourceAsStream(this.bowFile))) {
+        try (Scanner scanner = new Scanner(this.getClass().getClassLoader().getResourceAsStream(this.segment))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] tokens = line.split("\t");

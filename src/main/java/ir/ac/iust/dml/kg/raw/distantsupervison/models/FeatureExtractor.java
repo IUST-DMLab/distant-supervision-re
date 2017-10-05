@@ -1,9 +1,3 @@
-/*
- * Farsi Knowledge Graph Project
- *  Iran University of Science and Technology (Year 2017)
- *  Developed by Ensieh Hemmatan.
- */
-
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
 import de.bwaldvogel.liblinear.FeatureNode;
@@ -15,6 +9,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Created by hemmatan on 4/5/2017.
+ */
 public class FeatureExtractor {
     public static int maxWindowSize = 2;
 
@@ -34,23 +31,23 @@ public class FeatureExtractor {
         //String jomle = corpusEntryObject.getGeneralizedSentence();
         //List<String> tokenized = WordTokenizer.tokenize(jomle);
         FeatureNode[] bagOfWordsFeatureNodes1 = segmentedBagOfWordsHashMap.get(Constants.segmentedBagOfWordsAttribs.SUBJECT_PRECEDING)
-            .createBowLibLinearFeatureNodeForQuery(corpusEntryObject, 0);
+                .createBowLibLinearFeatureNodeForQuery(corpusEntryObject, 0);
         FeatureNode[] bagOfWordsFeatureNodes2 = segmentedBagOfWordsHashMap.get(Constants.segmentedBagOfWordsAttribs.SUBJECT_FOLLOWING)
-            .createBowLibLinearFeatureNodeForQuery(corpusEntryObject, bagOfWordsFeatureNodes1.length);
+                .createBowLibLinearFeatureNodeForQuery(corpusEntryObject, bagOfWordsFeatureNodes1.length);
         FeatureNode[] bagOfWordsFeatureNodes3 = segmentedBagOfWordsHashMap.get(Constants.segmentedBagOfWordsAttribs.OBJECT_PRECEDING)
-            .createBowLibLinearFeatureNodeForQuery(corpusEntryObject, 2 * bagOfWordsFeatureNodes1.length);
+                .createBowLibLinearFeatureNodeForQuery(corpusEntryObject, 2 * bagOfWordsFeatureNodes1.length);
         FeatureNode[] bagOfWordsFeatureNodes4 = segmentedBagOfWordsHashMap.get(Constants.segmentedBagOfWordsAttribs.OBJECT_FOLLOWING)
-            .createBowLibLinearFeatureNodeForQuery(corpusEntryObject, 3 * bagOfWordsFeatureNodes1.length);
+                .createBowLibLinearFeatureNodeForQuery(corpusEntryObject, 3 * bagOfWordsFeatureNodes1.length);
         FeatureNode[] bagOfWordsFeatureNodes = ArrayUtils.addAll(
-            ArrayUtils.addAll(bagOfWordsFeatureNodes1, bagOfWordsFeatureNodes2),
-            ArrayUtils.addAll(bagOfWordsFeatureNodes3, bagOfWordsFeatureNodes4));
+                ArrayUtils.addAll(bagOfWordsFeatureNodes1, bagOfWordsFeatureNodes2),
+                ArrayUtils.addAll(bagOfWordsFeatureNodes3, bagOfWordsFeatureNodes4));
         FeatureNode[] entityTypesFeatureNodes = createNamedEntityFeature(entityTypeModel, corpusEntryObject, bagOfWordsFeatureNodes.length);
         FeatureNode[] posFeatureNodes = createPosFeature(partOfSpeechModel, corpusEntryObject, bagOfWordsFeatureNodes.length + entityTypesFeatureNodes.length);
         /*FeatureNode[] objectHeadFeatureNodes = createObjectHeadFeature(objectHeadModel, corpusEntryObject, bagOfWordsFeatureNodes.length + entityTypesFeatureNodes.length+posFeatureNodes.length);
         FeatureNode[] featureNodes = ArrayUtils.addAll(ArrayUtils.addAll(bagOfWordsFeatureNodes, entityTypesFeatureNodes),
                 ArrayUtils.addAll(posFeatureNodes,objectHeadFeatureNodes));*/
         FeatureNode[] featureNodes = ArrayUtils.addAll(ArrayUtils.addAll(bagOfWordsFeatureNodes, entityTypesFeatureNodes),
-            posFeatureNodes);
+                posFeatureNodes);
         return featureNodes;
     }
 

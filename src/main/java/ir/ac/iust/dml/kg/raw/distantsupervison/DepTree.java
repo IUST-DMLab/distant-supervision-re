@@ -1,9 +1,3 @@
-/*
- * Farsi Knowledge Graph Project
- *  Iran University of Science and Technology (Year 2017)
- *  Developed by Ensieh Hemmatan.
- */
-
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.DependencyParser;
@@ -14,10 +8,14 @@ import org.maltparser.concurrent.graph.ConcurrentDependencyNode;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Created by hemmatan on 8/2/2017.
+ */
 public class DepTree {
     private final List<String> words;
     private List<DepTreeNone> nodes = new ArrayList<>();
     private String raw = "";
+
 
 
     public DepTree(String depTreeHash, String raw){
@@ -26,7 +24,7 @@ public class DepTree {
         temp = temp.replace("]" , "");
         String[] tokens = temp.split(" ");
         for (String token:
-            tokens) {
+             tokens) {
             String[] tmp = token.split(",");
             nodes.add(new DepTreeNone(tmp[0], Integer.valueOf(tmp[1]), tmp[2]));
         }

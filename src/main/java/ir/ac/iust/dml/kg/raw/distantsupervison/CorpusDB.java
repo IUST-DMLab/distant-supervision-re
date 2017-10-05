@@ -1,16 +1,14 @@
-/*
- * Farsi Knowledge Graph Project
- *  Iran University of Science and Technology (Year 2017)
- *  Developed by Ensieh Hemmatan.
- */
-
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
+/**
+ * Created by hemmatan on 4/18/2017.
+ */
 public class CorpusDB {
     private List<CorpusEntryObject> entries = new ArrayList<>();
     private List<CorpusEntryObject> shuffledEntries = new ArrayList<>();
@@ -71,9 +69,10 @@ public class CorpusDB {
             indices.put(corpusEntryObject.getPredicate(), ++numberOfClasses);
             invertedIndices.put(numberOfClasses, corpusEntryObject.getPredicate());
             predicateCounts.put(corpusEntryObject.getPredicate(), 1.0);
-        } else
+        }
+        else
             predicateCounts.put(corpusEntryObject.getPredicate(),
-                predicateCounts.get(corpusEntryObject.getPredicate())+1);
+                    predicateCounts.get(corpusEntryObject.getPredicate())+1);
     }
 
     public List<CorpusEntryObject> getEntries() {
@@ -91,7 +90,7 @@ public class CorpusDB {
 
     public void index() {
         for (CorpusEntryObject corpusEntryObject :
-            this.entries) {
+                this.entries) {
             if (!indices.containsKey(corpusEntryObject.getPredicate())) {
                 indices.put(corpusEntryObject.getPredicate(), ++numberOfClasses);
                 invertedIndices.put(numberOfClasses, corpusEntryObject.getPredicate());
@@ -109,7 +108,7 @@ public class CorpusDB {
         try (Writer fileWriter = new FileWriter(predicatesIndexFile)) {
             Set<String> pos = this.getIndices().keySet();
             for (String s :
-                pos) {
+                    pos) {
                 fileWriter.write(s + "\t" + getIndices().get(s) + "\n");
             }
             fileWriter.close();
@@ -121,7 +120,7 @@ public class CorpusDB {
     public void loadPredicateIndices(String predicatesIndexFile) {
         this.indices.clear();
         this.invertedIndices.clear();
-        try (Scanner scanner = new Scanner(this.getClass().getClassLoader().getResourceAsStream(predicatesIndexFile))) {
+        try (Scanner scanner = new Scanner(new FileInputStream(predicatesIndexFile))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String pos = line.split("\t")[0];
