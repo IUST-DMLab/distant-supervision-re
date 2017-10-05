@@ -1,8 +1,6 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
-import ir.ac.iust.dml.kg.raw.distantsupervison.database.DbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
-import ir.ac.iust.dml.kg.raw.distantsupervison.reUtils.JSONHandler;
 
 import java.io.*;
 import java.nio.file.Files;

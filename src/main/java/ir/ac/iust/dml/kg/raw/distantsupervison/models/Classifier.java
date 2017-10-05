@@ -3,7 +3,7 @@ package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 import de.bwaldvogel.liblinear.*;
 import ir.ac.iust.dml.kg.raw.distantsupervison.*;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.CorpusDbHandler;
-import ir.ac.iust.dml.kg.raw.distantsupervison.reUtils.JSONHandler;
+import ir.ac.iust.dml.kg.raw.distantsupervison.JSONHandler;
 import ir.ac.iust.dml.kg.raw.extractor.ResolvedEntityToken;
 import ir.ac.iust.dml.kg.resource.extractor.client.ExtractorClient;
 import ir.ac.iust.dml.kg.resource.extractor.client.MatchedResource;

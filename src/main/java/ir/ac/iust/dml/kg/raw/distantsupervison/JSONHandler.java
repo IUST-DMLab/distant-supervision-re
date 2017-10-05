@@ -1,4 +1,4 @@
-package ir.ac.iust.dml.kg.raw.distantsupervison.reUtils;
+package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
 import org.json.JSONArray;

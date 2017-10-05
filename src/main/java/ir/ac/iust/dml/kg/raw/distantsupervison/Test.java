@@ -1,23 +1,15 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
-import ir.ac.iust.dml.kg.raw.DependencyParser;
 import ir.ac.iust.dml.kg.raw.POSTagger;
 import ir.ac.iust.dml.kg.raw.WordTokenizer;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.CorpusDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.ExtractedTriplesDBHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
-import ir.ac.iust.dml.kg.raw.distantsupervison.reUtils.JSONHandler;
-import ir.ac.iust.dml.kg.raw.extractor.ResolvedEntityToken;
 import ir.ac.iust.dml.kg.raw.triple.RawTriple;
-import org.json.JSONArray;
-import org.maltparser.concurrent.graph.ConcurrentDependencyGraph;
-import org.maltparser.concurrent.graph.ConcurrentDependencyNode;
 
 import java.io.*;
 import java.util.*;
-
-import static ir.ac.iust.dml.kg.raw.distantsupervison.database.DbHandler.saveCorpusJasonToDB;
 
 /**
  * Created by hemmatan on 4/4/2017.
