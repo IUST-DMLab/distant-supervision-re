@@ -169,7 +169,7 @@ public class BagOfWordsModel {
         System.out.println(Files.exists(Paths.get(this.bowFile)));
         try (Scanner scanner = new Scanner(new FileInputStream(this.bowFile))) {
             while (scanner.hasNextLine()){
-                String line = scanner.nextLine();
+                String line = scanner.nextLine().replace("\uFEFF", "");
                 String[] tokens = line.split("\t");
                 this.sortedByTf.add(tokens[0]);
                 this.vocabularySet.add(tokens[0]);

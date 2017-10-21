@@ -27,7 +27,7 @@ public class Main {
 
         Classifier classifier = new Classifier();
 
-        if (train) classifier.train(Configuration.maximumNumberOfTrainExamples, true);
+        if (train) classifier.train((int) Configuration.maximumNumberOfTrainExamples, true);
         else classifier.loadModels();
 
 

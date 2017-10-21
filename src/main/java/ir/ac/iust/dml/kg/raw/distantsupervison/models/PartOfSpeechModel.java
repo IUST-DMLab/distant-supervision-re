@@ -1,5 +1,6 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -47,9 +48,9 @@ public class PartOfSpeechModel {
     }
 
     public void loadModel() {
-        try (Scanner scanner = new Scanner(this.getClass().getClassLoader().getResourceAsStream("posModel.txt"))) {
+        try (Scanner scanner = new Scanner(new FileInputStream(this.posFile))) {
             while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
+                String line = scanner.nextLine().replace("\uFEFF", "");
                 String pos = line.split("\t")[0];
                 int lastIdx = Integer.parseInt(line.split("\t")[1]);
                 posIndex.put(pos, lastIdx);

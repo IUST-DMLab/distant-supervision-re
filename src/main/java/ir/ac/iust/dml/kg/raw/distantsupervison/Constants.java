@@ -75,11 +75,14 @@ public class Constants {
 
     public static class classifierTypes {
         public static final String SPECIES_SPECIES = "species_species";
+        public static final String ATHLETE_SPORTSTEAM = "athlete_sportsTeam";
         public static final String WORK_AGENT = "work_agent";
         public static final String PERSON_PERSONFUNCTION = "person_personFunction";
         public static final String PERSON_PERSON = "person_person";
         public static final String PERSON_PLACE = "person_place";
         public static final String THING_PLACE = "thing_place";
+        public static final String THING_PERSON = "thing_person";
+        public static final String THING_AGENT = "thing_agent";
         public static final String GENERAL = "general";
     }
 

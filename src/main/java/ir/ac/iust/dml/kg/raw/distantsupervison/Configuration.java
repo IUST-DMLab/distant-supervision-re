@@ -10,12 +10,13 @@ public class Configuration {
     //public static final String trainCorpusName
 
 
-    public static final int maximumNoOfVocabularyForBagOfWords = 800;
-    public static final int maximumNoOfInstancesForEachPredicate = 200;
+    public static final int maximumNoOfVocabularyForBagOfWords = 500;
+    public static long maximumNoOfInstancesForEachPredicate = 1000;
+    public static final long initialMaximumNoOfInstancesForEachPredicate = 1000;
     public static int noOfTrainExamples;// = 33000;//21000;
     public static int noOfTestExamples;
-    public static final int maximumNumberOfPredicatesToLoad = 4;
-    public static final int maximumNumberOfTrainExamples = (maximumNumberOfPredicatesToLoad+1)*maximumNoOfInstancesForEachPredicate;
+    public static final int maximumNumberOfPredicatesToLoad = 60;
+    public static final long maximumNumberOfTrainExamples = (maximumNumberOfPredicatesToLoad+1)*maximumNoOfInstancesForEachPredicate;
     //+1 is for negatives
 
     //(Integer) noOfTotalExamples/maximumNoOfInstancesForEachPredicate +1;
@@ -25,12 +26,14 @@ public class Configuration {
     public static final String exportURL = "http://dmls.iust.ac.ir:8100/rest/v1/raw/export";
 
     public static final int maxWindowSize = 4;
-    public static final double confidenceThreshold = 0.45;
+    public static final double confidenceThreshold = 0.95;
     public static final int maxLengthForRawString = 2000;
     public static final float contextDisambiguationThreshold = 0.001f;
+
+
     public static class libLinearParams {
         public static final double costOfConstraintsViolation = 1.0;
-        public static final double epsStoppingCriteria = 0.001;
+        public static final double epsStoppingCriteria = 0.0001;
     }
 
     public static final String distantSupervisionDBName = "DistantSupervision";
@@ -41,11 +44,14 @@ public class Configuration {
 
     public static final String[] classifierTypes = new String[]{
             Constants.classifierTypes.SPECIES_SPECIES,
+            Constants.classifierTypes.ATHLETE_SPORTSTEAM,
             Constants.classifierTypes.PERSON_PERSONFUNCTION,
             Constants.classifierTypes.PERSON_PERSON,
             Constants.classifierTypes.PERSON_PLACE,
             Constants.classifierTypes.WORK_AGENT,
             Constants.classifierTypes.THING_PLACE,
+            Constants.classifierTypes.THING_PERSON,
+            Constants.classifierTypes.THING_AGENT,
             Constants.classifierTypes.GENERAL
     };
 

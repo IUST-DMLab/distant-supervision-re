@@ -28,6 +28,7 @@ public class Classifier {
     private String modelFilePath;
     private String predicatesIndexFile;
     public String predicatesToLoadFile;
+    private String mappingsFile;
 
     private String goldJsonFilePath = Configuration.exportURL;
     private HashMap<String, SegmentedBagOfWords> segmentedBagOfWordsHashMap = new HashMap<>();
@@ -46,6 +47,7 @@ public class Classifier {
         modelFilePath = fullPath("model");
         predicatesIndexFile = fullPath("predicates.txt");
         predicatesToLoadFile = fullPath( "predicatesToLoad.txt");
+        mappingsFile = fullPath("mappings.txt");
     }
 
     public Classifier(String modelType){
@@ -55,6 +57,7 @@ public class Classifier {
         modelFilePath = fullPath("model");
         predicatesIndexFile = fullPath("predicates.txt");
         predicatesToLoadFile = fullPath( "predicatesToLoad.txt");
+        mappingsFile = fullPath("mappings.txt");
         extractAllowedEntityTypes();
     }
 
@@ -62,7 +65,7 @@ public class Classifier {
         String allowedEntityTypesFile = fullPath("allowedEntityTypes.txt");
         try {
             Scanner scanner = new Scanner(new FileInputStream(allowedEntityTypesFile));
-            this.allowedSubjectType = scanner.next();
+            this.allowedSubjectType = scanner.next().replace("\uFEFF", "");
             this.allowedObjectType = scanner.next();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -77,6 +80,8 @@ public class Classifier {
 
     public void createTrainData(int maximumNumberOfTrainingExamples,
                                 CorpusDbHandler trainDbHandler) {
+        Configuration.maximumNoOfInstancesForEachPredicate = Configuration.initialMaximumNoOfInstancesForEachPredicate;
+        Configuration.maximumNoOfInstancesForEachPredicate = Configuration.initialMaximumNoOfInstancesForEachPredicate;
         readTest();
 
         trainDbHandler.deleteAll();
@@ -84,9 +89,10 @@ public class Classifier {
 
         CorpusDbHandler corpusDbHandler = new CorpusDbHandler(Configuration.corpusTableName);
         if (Configuration.trainingSetMode.equalsIgnoreCase(Constants.trainingSetModes.LOAD_PREDICATES_FROM_FILE))
-            corpusDbHandler.loadByReadingPedicatesFromFile(corpusDB, maximumNumberOfTrainingExamples, testIDs, this.predicatesToLoadFile);
+            corpusDbHandler.loadByReadingPedicatesFromFile(corpusDB, maximumNumberOfTrainingExamples, testIDs, this.predicatesToLoadFile,
+                    this.mappingsFile);
         else if (Configuration.trainingSetMode.equalsIgnoreCase(Constants.trainingSetModes.USE_ALL_PREDICATES_IN_EXPORTS_JSON))
-            corpusDbHandler.loadByReadingPedicatesFromFile(corpusDB, maximumNumberOfTrainingExamples, testIDs, SharedResources.predicatesInExportsJsonFile);
+            corpusDbHandler.loadByReadingPedicatesFromFile(corpusDB, maximumNumberOfTrainingExamples, testIDs, SharedResources.predicatesInExportsJsonFile, this.mappingsFile);
         else // Configuration.trainingSetMode.equalsIgnoreCase(Constants.trainingSetModes.LOAD_CORPUS_FREQUENT_PREDICATES)
             corpusDbHandler.loadByMostFrequentPredicates(corpusDB, maximumNumberOfTrainingExamples);
 
@@ -107,8 +113,8 @@ public class Classifier {
         neg.add("negative");
         CorpusDbHandler negativeCorpusDbHandler = new CorpusDbHandler(Configuration.negativesTableName);
         negativeCorpusDbHandler.loadByPredicates(corpusDB,
-                corpusDB.getEntries().size()+Configuration.maximumNoOfInstancesForEachPredicate,
-               neg, new HashSet<>(), true , allowedSubjectType, allowedObjectType );
+                (int) (corpusDB.getEntries().size()+Configuration.maximumNoOfInstancesForEachPredicate),
+               neg, new HashSet<>(), true , allowedSubjectType, allowedObjectType , false, new HashMap<>());
     }
 
 

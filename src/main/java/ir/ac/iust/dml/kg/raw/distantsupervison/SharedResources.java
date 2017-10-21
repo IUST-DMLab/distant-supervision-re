@@ -15,13 +15,15 @@ public class SharedResources {
     public static final Path rawTextPath = ConfigReader.INSTANCE.getPath("raw.text.file", "~/.pkg/data/raw.txt");
     public static final Path corpusPath = ConfigReader.INSTANCE.getPath("corpus.file", "~/.pkg/data/corpus.txt");
     public static final Path bagOfWordsModelPath = ConfigReader.INSTANCE.getPath("bagOfWords.model", "~/.pkg/data/bagOfWords");
+    public static final Path logitPath = ConfigReader.INSTANCE.getPath("logit.folder", "~/.pkg/data/logit");
+
 
     public static String rawText = "";
     public static List<String> rawTextLines = new ArrayList<String>();
 
     public static CorpusDB negativeSamlpesDB = new CorpusDB();
 
-    public static final String logitDirectory = "logit\\";
+    public static final String logitDirectory = logitPath+"\\";
     public static final String predicatesToLoadFile_shared = logitDirectory+"predicatesToLoad.txt";
     public static final String predicatesInExportsJsonFile = logitDirectory+"predicatesInExportsJson.txt";
     public static final String mappingsFile = logitDirectory+"mappings.txt";

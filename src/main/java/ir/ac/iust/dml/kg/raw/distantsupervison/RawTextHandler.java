@@ -24,7 +24,7 @@ public class RawTextHandler {
             reader = new Scanner(new FileInputStream(rawTextPath.toString()));
             //TODO: move numberOfLines to Configuartion
             while (reader.hasNextLine() && numberOfLines<=50000){
-                String line = reader.nextLine();
+                String line = reader.nextLine().replace("\uFEFF", "");
                 rawText += line;
                 rawTextLines.add(line);
                 numberOfLines++;

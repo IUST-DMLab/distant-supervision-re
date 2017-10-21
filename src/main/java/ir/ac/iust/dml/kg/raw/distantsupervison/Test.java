@@ -46,7 +46,7 @@ public class Test {
 
         Classifier classifier = new Classifier();
 
-        classifier.train(Configuration.maximumNumberOfTrainExamples, true);
+        classifier.train((int) Configuration.maximumNumberOfTrainExamples, true);
     }
 
 
@@ -68,7 +68,7 @@ public class Test {
         int currentIndex = 0;
         try (Scanner scanner = new Scanner(new FileInputStream(SharedResources.mappingsFile))) {
             while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
+                String line = scanner.nextLine().replace("\uFEFF", "");
                 String[] tokens = line.split("\t");
                 for (int i = 0; i < tokens.length; i++) {
                     mapping.put(tokens[i], currentIndex);
@@ -85,7 +85,7 @@ public class Test {
 
         try (Scanner scanner = new Scanner(new FileInputStream(testResultsFile))) {
             while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
+                String line = scanner.nextLine().replace("\uFEFF", "");
                 if (line.startsWith("[main]"))
                     rec++;
                 if (line.startsWith("Predicate")) {
@@ -150,13 +150,15 @@ public class Test {
         try {
             try (Scanner scanner = new Scanner(new FileInputStream("C:\\Users\\hemmatan\\Desktop\\out.txt"/*"/home/asgari/test.txt"*/))) {
                 while (scanner.hasNextLine()) {
-                    text = scanner.nextLine();
+                    text = scanner.nextLine().replace("\uFEFF", "");
                     //text = "زاگرس در ایران واقعا است";
                     List<RawTriple> triples = distantSupervisionTripleExtractor.extract("wiki", "2", text);
                     int tem = 0;
                     for (RawTriple tripleGuess :
                             triples) {
-                        if (tripleGuess.getAccuracy() > Configuration.confidenceThreshold)
+                        if (tripleGuess.getAccuracy() > Configuration.confidenceThreshold
+                                &&
+                                !tripleGuess.getPredicate().equalsIgnoreCase("negative"))
                             extractedTriplesDBHandler.insert(tripleGuess);
                     }
                 }
@@ -189,6 +191,6 @@ public class Test {
         System.setOut(out);
 
         Classifier classifier = new Classifier(Constants.classifierTypes.WORK_AGENT);
-        classifier.train(Configuration.maximumNumberOfTrainExamples, true);
+        classifier.train((int) Configuration.maximumNumberOfTrainExamples, true);
     }
 }

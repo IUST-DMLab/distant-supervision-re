@@ -35,7 +35,7 @@ public class JSONHandler {
         }
         String str = new String();
         while (scan.hasNext())
-            str += scan.nextLine();
+            str += scan.nextLine().replace("\uFEFF", "");
         scan.close();
 
         // build a JSON array
@@ -62,7 +62,7 @@ public class JSONHandler {
         Scanner scan = new Scanner(url.openStream());
         String str = new String();
         while (scan.hasNext())
-            str += scan.nextLine();
+            str += scan.nextLine().replace("\uFEFF", "");
         scan.close();
 
         // build a JSON object

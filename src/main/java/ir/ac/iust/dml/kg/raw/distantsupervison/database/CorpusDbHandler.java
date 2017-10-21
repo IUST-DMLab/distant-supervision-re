@@ -69,11 +69,26 @@ public class CorpusDbHandler extends DbHandler {
         List<String> predicates = getMostFrequentPredicates(Configuration.maximumNumberOfPredicatesToLoad);
 
         loadByPredicates(destinationCorpusDB, numberOfEntriesToLoad, predicates, new HashSet<>(),
-                false, "", "");
+                false, "", "", false, null);
     }
 
     public void loadByPredicates(CorpusDB destinationCorpusDB, int numberOfEntriesToLoad, List<String> predicates, Set<String> testIDs,
-                                 boolean typeChecking, String allowedSubjectType, String allowedObjectType) {
+                                 boolean typeChecking, String allowedSubjectType, String allowedObjectType,
+                                 boolean useMappings, HashMap<String, String> mapping) {
+        if (!useMappings)
+            for (String predicate:
+                 predicates) {
+                mapping.put(predicate, predicate);
+            }
+        List<CorpusEntryObject> corpusEntryObjects = new ArrayList<>();
+        long minValue = corpusTable.count();
+        for (String value:
+             mapping.values()) {
+            long tempCnt = corpusTable.count(new Document("predicate", value));
+            if (tempCnt<=minValue)
+                minValue = tempCnt;
+        }
+
         MongoCursor cursor = corpusTable.find().iterator();
         Document document;
         String rawString;
@@ -93,11 +108,17 @@ public class CorpusDbHandler extends DbHandler {
         List<String> posTags;
         Sentence currentSentence;
         CorpusEntryObject corpusEntryObject;
+        long noOfInstacesForEachPredicate ;
+        if (minValue<50)
+            noOfInstacesForEachPredicate = Configuration.maximumNoOfInstancesForEachPredicate;
+        else
+            noOfInstacesForEachPredicate = Math.min(Configuration.maximumNoOfInstancesForEachPredicate, minValue);
+        Configuration.maximumNoOfInstancesForEachPredicate = noOfInstacesForEachPredicate;
         while (cursor.hasNext() && destinationCorpusDB.getEntries().size()<numberOfEntriesToLoad){
             document = (Document) cursor.next();
-            predicate = (String) document.get(Constants.corpusDbEntryAttribs.PREDICATE);
+            predicate = mapping.get((String) document.get(Constants.corpusDbEntryAttribs.PREDICATE));
             if ((destinationCorpusDB.getPredicateCounts().containsKey(predicate) &&
-                    destinationCorpusDB.getPredicateCounts().get(predicate) >= Configuration.maximumNoOfInstancesForEachPredicate)
+                    destinationCorpusDB.getPredicateCounts().get(predicate) >= noOfInstacesForEachPredicate)
                     || testIDs.contains(document.get("_id").toString())) {
                 continue;
             }
@@ -125,6 +146,7 @@ public class CorpusDbHandler extends DbHandler {
             currentSentence = new Sentence(rawString,words,posTags,normalized);
             corpusEntryObject = new CorpusEntryObject(currentSentence, generalizedSentence, object, subject, objectType, subjectType, predicate, occurrence,
                     subjectHead, objectHead);
+            corpusEntryObjects.add(corpusEntryObject);
             destinationCorpusDB.addEntry(corpusEntryObject);
         }
     }
@@ -216,10 +238,30 @@ public class CorpusDbHandler extends DbHandler {
     }
 
 
-    public void loadByReadingPedicatesFromFile(CorpusDB destinationCorpusDB, int numberOfEntriesToLoad, Set<String> testIDs, String predicatesFile) {
+    public void loadByReadingPedicatesFromFile(CorpusDB destinationCorpusDB, int numberOfEntriesToLoad, Set<String> testIDs,
+                                               String predicatesFile, String mappingsFile) {
         List<String> predicates = readPredicatesFromFile(Configuration.maximumNumberOfPredicatesToLoad, predicatesFile);
+        HashMap<String, String> mappings = readMappings(mappingsFile);
         loadByPredicates(destinationCorpusDB, numberOfEntriesToLoad, predicates, testIDs,
-                false, "", "");
+                false, "", "", true, mappings);
+    }
+
+    private HashMap<String,String> readMappings(String mappingsFile) {
+        HashMap<String, String> mappings = new HashMap<>();
+        try (Scanner scanner = new Scanner(new FileInputStream(mappingsFile))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine().replace("\uFEFF", "");
+                String[] mapped = line.split("\t");
+                for (String token:
+                     mapped) {
+                    mappings.put(token, mapped[0]);
+                }
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return mappings;
     }
 
     public static List<String> readPredicatesFromFile(int numberOfPredicatesToLoad, String predicatesFile) {
@@ -227,7 +269,7 @@ public class CorpusDbHandler extends DbHandler {
         int cnt = 0;
         try (Scanner scanner = new Scanner(new FileInputStream(predicatesFile))) {
             while (scanner.hasNextLine() && cnt < numberOfPredicatesToLoad) {
-                String line = scanner.nextLine();
+                String line = scanner.nextLine().replace("\uFEFF", "");
                 predicates.add(line);
                 cnt++;
             }

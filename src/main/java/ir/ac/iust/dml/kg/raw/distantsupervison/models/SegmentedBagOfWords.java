@@ -5,6 +5,7 @@ import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Constants;
 import ir.ac.iust.dml.kg.raw.distantsupervison.CorpusEntryObject;
 
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -151,8 +152,9 @@ public class SegmentedBagOfWords {
         for (String queryWord :
                 queryWords) {
             // TODO: this is temp! did not have time to add OOV
-            if (this.indices.containsKey(queryWord))
-                featureVector.set(this.indices.get(queryWord), tf_idf.get(queryWord));
+            if (this.indices.containsKey(queryWord)){
+                //System.out.println("indices: " + indices.toString() + " queryWord:" + queryWord);
+                featureVector.set(this.indices.get(queryWord), tf_idf.get(queryWord));}
         }
         return featureVector;
     }
@@ -191,9 +193,9 @@ public class SegmentedBagOfWords {
 
     public void loadModel() {
         int currentIndex = 0;
-        try (Scanner scanner = new Scanner(this.getClass().getClassLoader().getResourceAsStream(this.segment))) {
+        try (Scanner scanner = new Scanner(new FileInputStream(this.bowFile))) {
             while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
+                String line = scanner.nextLine().replace("\uFEFF", "");
                 String[] tokens = line.split("\t");
                 this.sortedByTf.add(tokens[0]);
                 this.vocabularySet.add(tokens[0]);

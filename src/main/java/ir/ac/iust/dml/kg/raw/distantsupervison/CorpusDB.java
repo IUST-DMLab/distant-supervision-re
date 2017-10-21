@@ -122,7 +122,7 @@ public class CorpusDB {
         this.invertedIndices.clear();
         try (Scanner scanner = new Scanner(new FileInputStream(predicatesIndexFile))) {
             while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
+                String line = scanner.nextLine().replace("\uFEFF", "");
                 String pos = line.split("\t")[0];
                 Double lastIdx = Double.parseDouble(line.split("\t")[1]);
                 this.indices.put(pos, lastIdx);
