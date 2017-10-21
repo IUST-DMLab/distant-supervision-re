@@ -18,7 +18,7 @@ public class ModelHandler {
                 names){
             File curFile = new File(SharedResources.logitDirectory + name);
             if (curFile.isDirectory()){
-                try (Scanner scanner = new Scanner(new FileInputStream(curFile + "\\AllowedEntityTypes.txt"))) {
+                try (Scanner scanner = new Scanner(new FileInputStream(curFile + File.separator + "allowedEntityTypes.txt"))) {
                     String subjectType = scanner.nextLine().replace("\uFEFF", "");
                     String objectType = scanner.nextLine();
                     if (corpusEntryObject.getSubjectType().contains(subjectType) &&
