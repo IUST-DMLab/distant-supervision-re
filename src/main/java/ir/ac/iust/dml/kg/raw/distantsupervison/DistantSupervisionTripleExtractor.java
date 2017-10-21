@@ -57,7 +57,8 @@ public class DistantSupervisionTripleExtractor implements RawTripleExtractor {
                         .subject(tripleGuess.getSubject()).predicate(tripleGuess.getPredicate())
                         .object(tripleGuess.getObject()).rawText(tripleGuess.getOriginSentence())
                         .accuracy(tripleGuess.getConfidence()).needsMapping(true);
-            if (triple1.getAccuracy() > Configuration.confidenceThreshold)
+            if (triple1.getAccuracy() > Configuration.confidenceThreshold &&
+                    !triple1.getPredicate().equals("negative"))
                 result.add(triple1);
         }
         return result;
