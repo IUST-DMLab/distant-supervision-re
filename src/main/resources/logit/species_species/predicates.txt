@@ -1,6 +1,6 @@
 negative	6.0
 classis	2.0
-genus	3.0
-regnum	1.0
-ordo	4.0
-familia	5.0
+genus	4.0
+ordo	1.0
+regnum	5.0
+familia	3.0

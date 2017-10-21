@@ -1,4 +1,4 @@
-محل زندگی	3.0
+محل زندگی	1.0
 negative	4.0
 birth_place	2.0
-death_place	1.0
+death_place	3.0
