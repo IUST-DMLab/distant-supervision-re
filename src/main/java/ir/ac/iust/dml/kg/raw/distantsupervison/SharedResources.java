@@ -3,6 +3,7 @@ package ir.ac.iust.dml.kg.raw.distantsupervison;
 import ir.ac.iust.dml.kg.raw.utils.ConfigReader;
 import ir.ac.iust.dml.kg.raw.utils.dump.triple.TripleData;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class SharedResources {
 
     public static CorpusDB negativeSamlpesDB = new CorpusDB();
 
-    public static final String logitDirectory = logitPath+"\\";
+    public static final String logitDirectory = logitPath + File.separator;
     public static final String predicatesToLoadFile_shared = logitDirectory+"predicatesToLoad.txt";
     public static final String predicatesInExportsJsonFile = logitDirectory+"predicatesInExportsJson.txt";
     public static final String mappingsFile = logitDirectory+"mappings.txt";

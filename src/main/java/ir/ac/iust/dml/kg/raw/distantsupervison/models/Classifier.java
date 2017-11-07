@@ -74,8 +74,7 @@ public class Classifier {
 
     public String fullPath(String fileName){
         return SharedResources.logitDirectory
-                + this.modelDirectoryName + "\\"
-                + fileName;
+                + this.modelDirectoryName + File.separator + fileName;
     }
 
     public void createTrainData(int maximumNumberOfTrainingExamples,
