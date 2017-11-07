@@ -182,24 +182,25 @@ public class Classifier {
     }
 
     private void buildSegmentedBowModel() {
+        int temp = (int) (this.trainData.getNumberOfClasses() * 100);
         SegmentedBagOfWords segmentedBagOfWords = new SegmentedBagOfWords(trainData.getEntries(), Constants.segmentedBagOfWordsAttribs.SUBJECT_PRECEDING,
                 fullPath(Constants.segmentedBagOfWordsAttribs.SUBJECT_PRECEDING),
-                false, defaultMaximumNoOfVocabularyForBOW / 4);
+                false, temp / 4);
         segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.SUBJECT_PRECEDING, segmentedBagOfWords);
 
         segmentedBagOfWords = new SegmentedBagOfWords(trainData.getEntries(), Constants.segmentedBagOfWordsAttribs.SUBJECT_FOLLOWING,
                 fullPath(Constants.segmentedBagOfWordsAttribs.SUBJECT_FOLLOWING),
-                false, defaultMaximumNoOfVocabularyForBOW / 4);
+                false, temp / 4);
         segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.SUBJECT_FOLLOWING, segmentedBagOfWords);
 
         segmentedBagOfWords = new SegmentedBagOfWords(trainData.getEntries(), Constants.segmentedBagOfWordsAttribs.OBJECT_PRECEDING,
                 fullPath(Constants.segmentedBagOfWordsAttribs.OBJECT_PRECEDING),
-                false, defaultMaximumNoOfVocabularyForBOW / 4);
+                false, temp / 4);
         segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.OBJECT_PRECEDING, segmentedBagOfWords);
 
         segmentedBagOfWords = new SegmentedBagOfWords(trainData.getEntries(), Constants.segmentedBagOfWordsAttribs.OBJECT_FOLLOWING,
                 fullPath(Constants.segmentedBagOfWordsAttribs.OBJECT_FOLLOWING),
-                false, defaultMaximumNoOfVocabularyForBOW / 4);
+                false, temp / 4);
         segmentedBagOfWordsHashMap.put(Constants.segmentedBagOfWordsAttribs.OBJECT_FOLLOWING, segmentedBagOfWords);
     }
 

@@ -4,11 +4,9 @@ import de.bwaldvogel.liblinear.FeatureNode;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Constants;
 import ir.ac.iust.dml.kg.raw.distantsupervison.CorpusEntryObject;
+import ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources;
 
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.util.*;
 
 import static java.lang.Math.log10;
@@ -17,6 +15,8 @@ import static java.lang.Math.log10;
  * Created by hemmatan on 5/9/2017.
  */
 public class SegmentedBagOfWords {
+    private String stopFile = SharedResources.logitDirectory+"stop.txt";
+    private List<String> stopList = new ArrayList<>();
     private String segment;
     private String bowFile;
     private List<CorpusEntryObject> corpusOfBOW = new ArrayList<>();
@@ -67,6 +67,14 @@ public class SegmentedBagOfWords {
     }
 
     private void extractVocabulary(List<CorpusEntryObject> corpusOfBOW) {
+        try {
+            Scanner scanner = new Scanner(new FileInputStream(stopFile));
+            while (scanner.hasNextLine()){
+                stopList.add(scanner.nextLine());
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         this.corpusOfBOW = corpusOfBOW;
         for (CorpusEntryObject corpusEntryObject :
                 corpusOfBOW) {
@@ -77,6 +85,8 @@ public class SegmentedBagOfWords {
 
             for (String queryWord :
                     words) {
+                if (stopList.contains(queryWord))
+                    continue;
                 vocabularySet.add(queryWord);
                 currentSentenceUniqueWords.add(queryWord);
                 if (!tfInCorpus.containsKey(queryWord)) {

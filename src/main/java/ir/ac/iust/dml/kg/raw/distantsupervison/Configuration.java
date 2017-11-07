@@ -10,7 +10,7 @@ public class Configuration {
     //public static final String trainCorpusName
 
 
-    public static final int maximumNoOfVocabularyForBagOfWords = 500;
+    public static final int maximumNoOfVocabularyForBagOfWords = 1600;
     public static long maximumNoOfInstancesForEachPredicate = 1000;
     public static final long initialMaximumNoOfInstancesForEachPredicate = 1000;
     public static int noOfTrainExamples;// = 33000;//21000;
