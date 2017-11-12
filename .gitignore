@@ -4,3 +4,6 @@ target
 src/main/resources/tuples/*
 src/main/resources/fawiki_extracted.txt
 src/main/resources/fawiki_temp.txt
+/src/main/resources/resources.rar
+/src/main/resources/test.json
+/src/main/resources/logit/*/consoleOutput*

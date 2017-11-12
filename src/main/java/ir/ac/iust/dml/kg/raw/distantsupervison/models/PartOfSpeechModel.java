@@ -1,20 +1,23 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison.models;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.*;
 
 /**
  * Created by hemmatan on 5/8/2017.
  */
 public class PartOfSpeechModel {
-    private String posFile = "posModel.txt";
+    private String posFile;
     private int noOfPOS = 0;
     private Set<String> partsOfSpeech = new HashSet<>();
     private HashMap<String, Integer> posIndex = new HashMap<>();
     private HashMap<Integer, String> posInvertedIndex = new HashMap<>();
 
-    public PartOfSpeechModel() {
-
+    public PartOfSpeechModel(String posFile) {
+        this.posFile = posFile;
     }
 
     public void addToModel(List<String> posTagged) {
@@ -36,7 +39,7 @@ public class PartOfSpeechModel {
             Set<String> pos = this.posIndex.keySet();
             for (String s :
                     pos) {
-                fileWriter.write(s + "\n");
+                fileWriter.write(s + "\t" + posIndex.get(s) + "\n");
             }
             fileWriter.close();
         } catch (IOException e) {
@@ -46,17 +49,17 @@ public class PartOfSpeechModel {
 
     public void loadModel() {
         try (Scanner scanner = new Scanner(new FileInputStream(this.posFile))) {
-            int lastIdx = 0;
             while (scanner.hasNextLine()) {
-                String pos = scanner.nextLine();
+                String line = scanner.nextLine().replace("\uFEFF", "");
+                String pos = line.split("\t")[0];
+                int lastIdx = Integer.parseInt(line.split("\t")[1]);
                 posIndex.put(pos, lastIdx);
                 posInvertedIndex.put(lastIdx, pos);
-                lastIdx++;
             }
             noOfPOS = posIndex.keySet().size();
             partsOfSpeech = posIndex.keySet();
             scanner.close();
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

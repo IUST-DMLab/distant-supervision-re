@@ -1,8 +1,8 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison.database;
 
 import com.mongodb.*;
+import ir.ac.iust.dml.kg.raw.distantsupervison.Configuration;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Constants;
-import ir.ac.iust.dml.kg.raw.distantsupervison.RawTextHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.Sentence;
 
 import java.util.List;
@@ -14,33 +14,8 @@ import static ir.ac.iust.dml.kg.raw.distantsupervison.SharedResources.corpus;
  */
 public class SentenceDbHandler extends DbHandler {
 
-    public void createCorpusTableFromWikiDump() {
-        MongoClient mongo = null;
 
-            mongo = new MongoClient(host, port);
-            DB distantSupervisionDB = mongo.getDB(distantSupervisionDBName);
-
-            DBCollection corpusTable = distantSupervisionDB.getCollection(sentencesTableName);
-
-            RawTextHandler.loadRawText();
-            RawTextHandler.buildCorpus();
-
-            List<Sentence> sentenceList = corpus.getSentences();
-
-            for (Sentence sentence:
-                    sentenceList) {
-                BasicDBObject dbSentence = new BasicDBObject();
-                dbSentence.put(Constants.sentenceAttribs.RAW, sentence.getRaw());
-                dbSentence.put(Constants.sentenceAttribs.WORDS, sentence.getWords());
-                dbSentence.put(Constants.sentenceAttribs.POSTAG, sentence.getPosTagged());
-
-                corpusTable.insert(dbSentence);
-            }
-
-
-    }
-
-    public void loadCorpusTable(){
+    public void loadSentenceTable() {
         //if (corpus.getSentences().isEmpty())
         //  createCorpusTableFromWikiDump();
 
@@ -49,9 +24,9 @@ public class SentenceDbHandler extends DbHandler {
         MongoClient mongo = null;
 
             mongo = new MongoClient(host, port);
-            DB distantSupervisionDB = mongo.getDB(distantSupervisionDBName);
+        DB distantSupervisionDB = mongo.getDB(Configuration.distantSupervisionDBName);
 
-            DBCollection corpusTable = distantSupervisionDB.getCollection(sentencesTableName);
+        DBCollection corpusTable = distantSupervisionDB.getCollection(Configuration.sentencesTableName);
             DBCursor cursor = corpusTable.find();
 
             int cnt = 0;

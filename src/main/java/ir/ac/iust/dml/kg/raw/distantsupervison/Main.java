@@ -1,7 +1,10 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
-import ir.ac.iust.dml.kg.raw.distantsupervison.database.SentenceDbHandler;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.Date;
 
 /**
  * Created by hemmatan on 4/26/2017.
@@ -9,52 +12,46 @@ import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
 public class Main {
 
     public static void main(String[] args) {
-        if (args.length > 0 && args[0].equals("train")) process(true);
+        if (args.length > 0 && args[0].equals(Constants.runOptions.TRAIN)) process(true);
+        else if (args.length > 0 && args[0].equals(Constants.runOptions.MAKE_DB)) JSONHandler.makeDBsFromJson();
         else process(false);
 
     }
 
     private static void process(boolean train) {
-        //TODO: these two lines should be remove because the corpus table loads in Classifier()!
-        SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
-        sentenceDbHandler.loadCorpusTable();
+        //TODO: these two lines should be removed because the corpus table loads in Classifier()!
+        //SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
+        //sentenceDbHandler.loadSentenceTable();
+        Date date = new Date();
+        String dateString = date.toString().replaceAll("[: ]", "-");
 
         Classifier classifier = new Classifier();
 
-        if (train) classifier.train(Configuration.noOfTrainExamples, Configuration.noOfTestExamples);
+        if (train) classifier.train((int) Configuration.maximumNumberOfTrainExamples, true);
+        else classifier.loadModels();
 
 
-        classifier.testForSingleSentenceString("پروین اعتصامی متولد قم است");
-        classifier.testForSingleSentenceString("مولوی متولد قم است");
-        classifier.testForSingleSentenceString("حافظ متولد قم است");
-        classifier.testForSingleSentenceString("حسن روحانی متولد قم است");
-        classifier.testForSingleSentenceString("محمد اصفهانی متولد قم است");
-        classifier.testForSingleSentenceString("علی لاریجانی متولد قم است");
-        classifier.testForSingleSentenceString("رفسنجانی متولد قم است");
-        classifier.testForSingleSentenceString("سعدی متولد قم است");
+        //classifier.initializeModels(false);
 
+        PrintStream out = null;
+        try {
+            out = new PrintStream(new FileOutputStream("testResults-" + dateString + ".txt"));
 
-        classifier.testForSingleSentenceString("پروین اعتصامی در آبادان چشم به جهان گشود");
-        classifier.testForSingleSentenceString("محل تولد شاعر بزرگ، مولوی ساوه میباشد.");
-        classifier.testForSingleSentenceString("حافظ در شیراز به دنیا آمد");
-        classifier.testForSingleSentenceString("حسن روحانی در خانواده تهیدست در  مشهد متولد گشت");
-        classifier.testForSingleSentenceString("محمد اصفهانی در سال ۱۳۳۰ در تهران به دنیا آمد");
-        classifier.testForSingleSentenceString("علی لاریجانی در بهمن ۱۳۵۷ در  گرگان متولد شد");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        System.setOut(out);
+
+        classifier.testOnGoldJson();
+
+        try {
+            Files.deleteIfExists(new File(SharedResources.LastTestResultsFile).toPath());
+            Files.copy(new File("testResults-" + dateString + ".txt").toPath(), new File(SharedResources.LastTestResultsFile).toPath());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-//    public void test() {
-//        SentenceDbHandler sentenceDbHandler = new SentenceDbHandler();
-//        sentenceDbHandler.loadCorpusTable();
-//
-//        CorpusDbHandler corpusDbHandler = new CorpusDbHandler();
-//        corpusDbHandler.loadByMostFrequentPredicates(corpusDB, 1000);
-//        corpusDB.shuffle();
-//
-//
-//        for (int i = 0 ; i<1000; i++){
-//            CorpusEntryObject corpusEntryObject = corpusDB.getShuffledEntries().get(i);
-//        }
-//        System.out.println("**"+corpusDB.getIndices().keySet());
-//
-//    }
 }
