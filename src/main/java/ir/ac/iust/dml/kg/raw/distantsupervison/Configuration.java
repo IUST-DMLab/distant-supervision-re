@@ -1,5 +1,7 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
+import ir.ac.iust.dml.kg.raw.utils.ConfigReader;
+
 /**
  * Created by hemmatan on 4/26/2017.
  */
@@ -21,12 +23,12 @@ public class Configuration {
 
     //(Integer) noOfTotalExamples/maximumNoOfInstancesForEachPredicate +1;
 
-    public static final String extractorClient = "http://194.225.227.161:8094";
-    public static final String ontologyClient = "http://194.225.227.161:8090";
-    public static final String exportURL = "http://dmls.iust.ac.ir:8100/rest/v1/raw/export";
+    public static final String extractorClient = ConfigReader.INSTANCE.getString("resource.extractor.url", "http://localhost:8094");
+    public static final String ontologyClient = ConfigReader.INSTANCE.getString("mapper.url", "http://localhost:8090");
+    public static final String exportURL = "http://localhost:8100/rest/v1/raw/export";
 
     public static final int maxWindowSize = 4;
-    public static final double confidenceThreshold = 0.95;
+    public static final double confidenceThreshold = 0.4;
     public static final int maxLengthForRawString = 2000;
     public static final float contextDisambiguationThreshold = 0.001f;
 
