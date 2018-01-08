@@ -81,7 +81,7 @@ public class DistantSupervisionTripleExtractor implements RawTripleExtractor {
         StringBuilder entity = new StringBuilder();
         raw.append(sentence.get(s).getWord()).append(" ");
         if (sentence.get(s).getIobType().name().equalsIgnoreCase("Beginning") &&
-            sentence.get(s).getResource() != null & sentence.get(s).getResource().getClasses().size() != 1) {
+            sentence.get(s).getResource() != null && sentence.get(s).getResource().getClasses().size() != 1) {
           List<String> entityType = new ArrayList<>(sentence.get(s).getResource().getClasses());
           entity.append(sentence.get(s).getWord()).append(" ");
           s++;
