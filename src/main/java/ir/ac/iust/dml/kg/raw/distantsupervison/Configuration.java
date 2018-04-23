@@ -30,7 +30,7 @@ public class Configuration {
     public static final int maxWindowSize = 4;
     public static final double confidenceThreshold = 0.4;
     public static final int maxLengthForRawString = 2000;
-    public static final float contextDisambiguationThreshold = 0.001f;
+  public static final float contextDisambiguationThreshold = 0.0001f;
 
 
     public static class libLinearParams {

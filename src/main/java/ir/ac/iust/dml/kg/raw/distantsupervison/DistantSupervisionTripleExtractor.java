@@ -20,17 +20,17 @@ public class DistantSupervisionTripleExtractor implements RawTripleExtractor {
 
   //private final Classifier classifier;
   private HashMap<String, Classifier> classifiers = new HashMap<>();
+  private EnhancedEntityExtractor enhancedEntityExtractor = new EnhancedEntityExtractor();
 
   public DistantSupervisionTripleExtractor() {
-
     initializeClassifiers();
   }
 
 
+  @SuppressWarnings("Duplicates")
   @Override
   public List<RawTriple> extract(String source, String version, String text) {
     List<RawTriple> result;
-    EnhancedEntityExtractor enhancedEntityExtractor = new EnhancedEntityExtractor();
     List<List<ResolvedEntityToken>> sentences = enhancedEntityExtractor.extract(text);
     enhancedEntityExtractor.disambiguateByContext(sentences, Configuration.contextDisambiguationThreshold);
     result = extract(source, version, sentences);
