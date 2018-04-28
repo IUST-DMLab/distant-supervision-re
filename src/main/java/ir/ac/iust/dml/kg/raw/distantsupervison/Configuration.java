@@ -28,7 +28,7 @@ public class Configuration {
     public static final String exportURL = "http://localhost:8100/rest/v1/raw/export";
 
     public static final int maxWindowSize = 4;
-    public static final double confidenceThreshold = 0.4;
+  public static final double confidenceThreshold = 0.9;
     public static final int maxLengthForRawString = 2000;
   public static final float contextDisambiguationThreshold = 0.0001f;
 
