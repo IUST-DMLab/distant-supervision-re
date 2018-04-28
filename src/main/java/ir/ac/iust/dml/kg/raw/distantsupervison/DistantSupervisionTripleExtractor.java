@@ -1,6 +1,7 @@
 package ir.ac.iust.dml.kg.raw.distantsupervison;
 
 import ir.ac.iust.dml.kg.raw.Normalizer;
+import ir.ac.iust.dml.kg.raw.SentenceBranch;
 import ir.ac.iust.dml.kg.raw.distantsupervison.models.Classifier;
 import ir.ac.iust.dml.kg.raw.extractor.EnhancedEntityExtractor;
 import ir.ac.iust.dml.kg.raw.extractor.ResolvedEntityToken;
@@ -32,8 +33,8 @@ public class DistantSupervisionTripleExtractor implements RawTripleExtractor {
   @Override
   public List<RawTriple> extract(String source, String version, String text) {
     List<RawTriple> result;
-    List<List<ResolvedEntityToken>> sentences = enhancedEntityExtractor.extract(Normalizer.removeBrackets(
-        Normalizer.normalize(text)));
+    List<List<ResolvedEntityToken>> sentences = enhancedEntityExtractor.extract(
+        SentenceBranch.summarize(Normalizer.removeBrackets(Normalizer.normalize(text))));
     enhancedEntityExtractor.disambiguateByContext(sentences, Configuration.contextDisambiguationThreshold);
     result = extract(source, version, sentences);
     return result;
