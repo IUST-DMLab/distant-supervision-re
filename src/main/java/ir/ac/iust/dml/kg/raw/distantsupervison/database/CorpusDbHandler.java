@@ -327,6 +327,7 @@ public class CorpusDbHandler extends DbHandler {
             result = extractor.extract(rawString);
             List<String> newObjectType = new ArrayList<>();
             List<String> newSubjectType = new ArrayList<>();
+//            extractor.integrateNER(result, false);
             extractor.disambiguateByContext(result, Configuration.contextDisambiguationThreshold);
             int i = 0;
             int j;

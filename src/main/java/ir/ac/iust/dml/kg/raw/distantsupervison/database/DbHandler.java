@@ -75,6 +75,7 @@ public class DbHandler {
 
                         EnhancedEntityExtractor e = new EnhancedEntityExtractor();
                         List<List<ResolvedEntityToken>> result = e.extract(originalSentence);
+//                        e.integrateNER(result, false);
                         e.disambiguateByContext(result, Configuration.contextDisambiguationThreshold);
 
 

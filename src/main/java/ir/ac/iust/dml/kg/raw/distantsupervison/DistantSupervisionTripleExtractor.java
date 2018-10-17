@@ -35,6 +35,7 @@ public class DistantSupervisionTripleExtractor implements RawTripleExtractor {
     List<RawTriple> result;
     List<List<ResolvedEntityToken>> sentences = enhancedEntityExtractor.extract(
         SentenceBranch.summarize(Normalizer.removeBrackets(Normalizer.normalize(text))));
+//    enhancedEntityExtractor.integrateNER(sentences, false);
     enhancedEntityExtractor.disambiguateByContext(sentences, Configuration.contextDisambiguationThreshold);
     result = extract(source, version, sentences);
     return result;
